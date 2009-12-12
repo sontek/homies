@@ -1,13 +1,15 @@
-set nocompatible
-set background=dark
-set nowrap
-set guioptions-=m  "remove menu bar
-set guioptions-=T  "remove toolbar
-set guioptions-=r  "remove right-hand scroll bar
-set completeopt=longest,menuone " don't select first item, follow typing
+set nocompatible   	" don't be compatible with vi
+set background=dark 
+set nowrap		" don't wrap text
+set guioptions-=m  	" remove menu bar
+set guioptions-=T  	" remove toolbar
+set guioptions-=r  	" remove right-hand scroll bar
+
+" don't select first item, follow typing in autocomplete
+set completeopt=longest,menuone 
 set noic
-set number
-set ai
+set number		" show line numbers
+set ai			" auto indent
 set softtabstop=4
 set tabstop=8
 set shiftwidth=4
@@ -16,11 +18,11 @@ set textwidth=79
 let Tlist_GainFocus_On_ToggleOpen=1
 let g:skip_loading_mswin=1
 
-syntax on
-
+syntax on		" syntax highlighting
 filetype on
 filetype plugin on
 
+" easily move around tabs
 map <silent><A-Right> :tabnext<CR> 
 map <silent><A-Left> :tabprevious<CR> 
 map <silent><C-Left> <C-T>      
