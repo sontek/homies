@@ -1,3 +1,11 @@
 .vim - directory of file type configurations and plugins
 .vimrc - my vim configuration
 .screenrc - my screen configuration
+
+INSTALLATION
+=====================================
+git clone git://github.com/sontek/dotfiles.git
+cd dotfiles
+ln -s .vim ~/.vim
+ln -s .vimrc ~/.vimrc
+ln -s .screenrc ~/.screenrc
