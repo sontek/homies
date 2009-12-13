@@ -18,11 +18,13 @@ set ignorecase              " Default to using case insensitive searches,
 set smartcase               " unless uppercase letters are used in the regex.
 set hlsearch                " Highlight searches by default.
 set incsearch               " Incrementally search while typing a /regex
-set hlsearch		    " Highlight matched search items
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=longest,menuone,preview
+set completeopt=menuone,preview
+" close preview window automatically
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 """" Folding
 set foldmethod=syntax       " By default, use syntax to determine folds
