@@ -12,6 +12,7 @@ set backspace=2             " Allow backspacing over autoindent, EOL, and BOL
 set showmatch               " Briefly jump to a paren once it's balanced
 set matchtime=2             " (for only .2 seconds).
 set nowrap		    " don't wrap text
+set linebreak               " don't wrap textin the middle of a word
 
 """ Searching and Patterns
 set ignorecase              " Default to using case insensitive searches,
@@ -34,9 +35,11 @@ set foldlevelstart=99       " All folds open by default
 set number                  " Display line numbers
 set numberwidth=1           " using only 1 column (and 1 space) while possible
 set background=dark 
-set guioptions-=m  	    " remove menu bar
-set guioptions-=T      	    " remove toolbar
-set guioptions-=r  	    " remove right-hand scroll bar
+set guioptions-=m           " remove menu bar
+set guioptions-=T           " remove toolbar
+set guioptions-=r           " remove right-hand scroll bar
+" displays tabs with :set list & displays when a line runs off-screen
+set listchars=tab:>-,eol:$,trail:-,precedes:<,extends:>
 
 """" Messages, Info, Status
 set vb t_vb=                " Disable all bells.  I hate ringing/flashing.
@@ -53,7 +56,8 @@ set tabstop=8               " Real tab characters are 8 spaces wide,
 set shiftwidth=4            " but an indent level is 2 spaces wide.
 set softtabstop=4           " <BS> over an autoindent deletes both spaces.
 set expandtab               " Use spaces, not tabs, for autoindent/tab key.
-set ai			    " auto indent
+set ai                      " auto indent
+set shiftround              " rounds indent to a multiple of shiftwidth
 
 """" Tags
 set tags=./tags;/home       " Tags can be in ./tags, ../tags, ..., /home/tags.
@@ -105,11 +109,11 @@ filetype plugin on          " also allow for filetype-specific plugins,
 syntax on                   " and turn on per-filetype syntax highlighting.
 
 """ Key Mappings
-map <silent><C-Left> <C-T>      
+map <silent><C-Left> <C-T>
 map <silent><C-Right> <C-]>
 " easily move around tabs
-map <silent><A-Right> :tabnext<CR> 
-map <silent><A-Left> :tabprevious<CR> 
+map <silent><A-Right> :tabnext<CR>
+map <silent><A-Left> :tabprevious<CR>
 " execute selected script
 map <C-h> :py EvaluateCurrentRange()<CR>
 " launch TaskList Plugin
@@ -126,22 +130,22 @@ autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^
 
 inoremap <Nul> <C-x><C-o>
 inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
-	\ "\<lt>C-n>" :
-	\ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
-	\ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
-	\ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
+        \ "\<lt>C-n>" :
+        \ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
+        \ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
+        \ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
 imap <C-@> <C-Space>
 
 python << EOF
 import os
 import sys
 import vim
-# lets us use 'gf' to go to files imported    
+# lets us use 'gf' to go to files imported
 for p in sys.path:
     if os.path.isdir(p):
         vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
 
 # lets us execute the highlighted portion of the script
-def EvaluateCurrentRange():       
-  eval(compile('\n'.join(vim.current.range),'','exec'),globals())       
+def EvaluateCurrentRange():
+  eval(compile('\n'.join(vim.current.range),'','exec'),globals())
 EOF
