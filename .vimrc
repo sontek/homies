@@ -60,7 +60,10 @@ set ai                      " auto indent
 set shiftround              " rounds indent to a multiple of shiftwidth
 
 """" Tags
-set tags=./tags;/home       " Tags can be in ./tags, ../tags, ..., /home/tags.
+" Tags can be in ./tags, ../tags, ..., /home/tags.
+set tags+=$HOME/.vim/tags/python.ctags
+set tags+=$HOME/.vim/tags/django.ctags
+
 set showfulltag             " Show more information while completing tags.
 set cscopetag               " When using :tag, <C-]>, or "vim -t", try cscope:
 set cscopetagorder=0        " try ":cscope find g foo" and then ":tselect foo"
