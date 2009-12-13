@@ -8,6 +8,6 @@ INSTALLATION
 =====================================
 git clone git://github.com/sontek/dotfiles.git
 cd dotfiles
-ln -s .vim ~/.vim
-ln -s .vimrc ~/.vimrc
-ln -s .screenrc ~/.screenrc
+ln -s $(pwd)/.vimrc ~/.vimrc
+ln -s $(pwd)/.vim ~/.vim
+ln -s $(pwd)/.screenrc ~/.screenrc
