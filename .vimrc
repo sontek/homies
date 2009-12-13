@@ -22,7 +22,7 @@ set hlsearch		    " Highlight matched search items
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=longest,menuone 
+set completeopt=longest,menuone,preview
 
 """" Folding
 set foldmethod=syntax       " By default, use syntax to determine folds
@@ -58,8 +58,6 @@ set tags=./tags;/home       " Tags can be in ./tags, ../tags, ..., /home/tags.
 set showfulltag             " Show more information while completing tags.
 set cscopetag               " When using :tag, <C-]>, or "vim -t", try cscope:
 set cscopetagorder=0        " try ":cscope find g foo" and then ":tselect foo"
-map <silent><C-Left> <C-T>      
-map <silent><C-Right> <C-]>
 
 """" Reading/Writing
 set noautowrite             " Never write a file unless I request it.
@@ -104,21 +102,21 @@ filetype indent on          " use filetype-specific indenting where available,
 filetype plugin on          " also allow for filetype-specific plugins,
 syntax on                   " and turn on per-filetype syntax highlighting.
 
-
-
-set noic
-set textwidth=79
-"set showtabline=2
-let Tlist_GainFocus_On_ToggleOpen=1
-let g:skip_loading_mswin=1
-
+""" Key Mappings
+map <silent><C-Left> <C-T>      
+map <silent><C-Right> <C-]>
 " easily move around tabs
 map <silent><A-Right> :tabnext<CR> 
 map <silent><A-Left> :tabprevious<CR> 
+" execute selected script
 map <C-h> :py EvaluateCurrentRange()<CR>
-map T :TaskList<CR><C-w><Left>
-map <F4> :TlistToggle<CR>
-hi clear
+" launch TaskList Plugin
+"map T :TaskList<CR><C-w><Left>
+"map <F4> :TlistToggle<CR>
+
+set textwidth=79
+let Tlist_GainFocus_On_ToggleOpen=1
+let g:skip_loading_mswin=1
 
 autocmd FileType python set omnifunc=pythoncomplete#Complete
 autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"      
