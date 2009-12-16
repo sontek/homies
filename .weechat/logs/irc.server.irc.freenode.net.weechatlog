@@ -1,0 +1,460 @@
+2009-12-15 23:27:49		irc: connecting to server irc.freenode.net/6667...
+2009-12-15 23:27:52		irc: connected to irc.freenode.net (207.158.1.150)
+2009-12-15 23:27:52	--	*** Looking up your hostname...
+2009-12-15 23:27:52	--	*** Checking ident
+2009-12-15 23:27:52	--	*** Couldn't look up your hostname
+2009-12-15 23:28:00	--	*** No identd (auth) response
+2009-12-15 23:28:00	--	Welcome to the freenode IRC Network OES\janderson
+2009-12-15 23:28:00	--	Your host is simmons.freenode.net[simmons.freenode.net/6667], running version hyperion-1.0.2b
+2009-12-15 23:28:00	--	*** Your host is simmons.freenode.net[simmons.freenode.net/6667], running version hyperion-1.0.2b
+2009-12-15 23:28:00	--	This server was created Wed Jun 13 13:37:44 UTC 2007
+2009-12-15 23:28:00	--	simmons.freenode.net hyperion-1.0.2b aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStTuUvVwWxXyYzZ01234569*@ bcdefFhiIklmnoPqstv
+2009-12-15 23:28:00	--	IRCD=dancer CAPAB CHANTYPES=# EXCEPTS INVEX CHANMODES=bdeIq,k,lfJD,cgijLmnPQrRstz CHANLIMIT=#:20 PREFIX=(ov)@+ MAXLIST=bdeI:50 MODES=4 STATUSMSG=@ KNOCK NICKLEN=16 :are supported by this server
+2009-12-15 23:28:00	--	SAFELIST CASEMAPPING=ascii CHANNELLEN=30 TOPICLEN=450 KICKLEN=450 KEYLEN=23 USERLEN=10 HOSTLEN=63 SILENCE=50 :are supported by this server
+2009-12-15 23:28:00	--	There are 23769 listed and 21961 unlisted users on 28 servers
+2009-12-15 23:28:00	--	49 :flagged staff members
+2009-12-15 23:28:00	--	22186 :channels formed
+2009-12-15 23:28:00	--	I have 1594 clients and 0 servers
+2009-12-15 23:28:00	--	Current local  users: 1594  Max: 4247
+2009-12-15 23:28:00	--	Current global users: 45730  Max: 59863
+2009-12-15 23:28:00	--	Highest connection count: 4248 (4247 clients) (126647 since server was (re)started)
+2009-12-15 23:28:00	--	- simmons.freenode.net Message of the Day -
+2009-12-15 23:28:00	--	- Welcome to simmons.freenode.net in san diego CA, USA!
+2009-12-15 23:28:00	--	- Thanks to San Diego colocation 'http://www.americanis.net' for sponsoring this server!
+2009-12-15 23:28:00	--	- You're using freenode, a service of Peer-Directed Projects
+2009-12-15 23:28:00	--	- Center Ltd (http://freenode.net/pdpc.shtml).
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- Thanks to everyone who helped us make the 2008/2009 fundraiser
+2009-12-15 23:28:00	--	- a success, indivdual donors, hardware and bandwith sponsors and
+2009-12-15 23:28:00	--	- our corporate sponsor Canonical Ltd (http://www.canonical.com).
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- By connecting to freenode you indicate that you have read
+2009-12-15 23:28:00	--	- and agree to adhere to our policies and procedures as per
+2009-12-15 23:28:00	--	- the website (http://freenode.net). We would like to remind
+2009-12-15 23:28:00	--	- you that unauthorized public logging of channels on the
+2009-12-15 23:28:00	--	- network is prohibited. Public channel logging should only
+2009-12-15 23:28:00	--	- take place where the channel owner(s) has requested this
+2009-12-15 23:28:00	--	- and users of the channel are all made aware (if you are
+2009-12-15 23:28:00	--	- publically logging your channel, you may wish to keep a
+2009-12-15 23:28:00	--	- notice in topic and perhaps as a on-join message).
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- By registering your nickname with Nickserv you agree that you
+2009-12-15 23:28:00	--	- are 13 years of age, or older. For more information about the
+2009-12-15 23:28:00	--	- Children's Online Privacy Protection Act please see their
+2009-12-15 23:28:00	--	- website at (http://www.coppa.org).
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- freenode runs an open proxy scanner. Your use of the network
+2009-12-15 23:28:00	--	- indicates your acceptance of this policy. For details on
+2009-12-15 23:28:00	--	- freenode network policy, please take a look at our policy
+2009-12-15 23:28:00	--	- page (http://freenode.net/policy.shtml). Thank you for using
+2009-12-15 23:28:00	--	- the network!
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- The PDPC and freenode now do a fortnightly podcast, which you
+2009-12-15 23:28:00	--	- can find over at http://podcast.freenode.net and throughout the
+2009-12-15 23:28:00	--	- summer months we will be arranging geeknics - Picnics for Geeks
+2009-12-15 23:28:00	--	- across the globe! More information can be found over at
+2009-12-15 23:28:00	--	- http://www.geeknic.org
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- freenode is a service of Peer-Directed Projects Center Ltd,
+2009-12-15 23:28:00	--	- a not for profit organisation registered in England and Wales.
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- Our 2009/2010 fundraiser will be starting soon, more information
+2009-12-15 23:28:00	--	- will be available here and on the website! If you wish to donate
+2009-12-15 23:28:00	--	- you can help out over at http://freenode.net/pdpc_donations.shtml
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	- Thank you for using freenode!
+2009-12-15 23:28:00	--	-
+2009-12-15 23:28:00	--	End of /MOTD command.
+2009-12-15 22:31:18	--	NickServ (NickServ@services.): This nickname is registered. Please choose a different nickname, or identify via /msg NickServ identify <password>.
+2009-12-15 22:31:28	--	-nickserv- identify ************
+2009-12-15 22:31:28	--	NickServ (NickServ@services.): Invalid password for Sontek.
+2009-12-15 22:31:30	--	-nickserv- identify ***********
+2009-12-15 22:31:30	--	NickServ (NickServ@services.): Invalid password for Sontek.
+2009-12-15 22:31:42	--	-nickserv- identify ******
+2009-12-15 22:31:42	--	NickServ (NickServ@services.): You are now identified for Sontek.
+2009-12-15 22:31:42	--	NickServ (NickServ@services.): 2 failed logins since last login.
+2009-12-15 22:31:42	--	NickServ (NickServ@services.): Last failed attempt from: sontek!n=OES\jand@66.133.98.8 on Dec 16 05:31:30 2009.
+2009-12-15 22:31:42	--	You are now logged in. (id Sontek, username n=OES\jand, hostname opensuse/member/Sontek)
+2009-12-15 22:31:42	--	User mode [+e] by services.
+2009-12-15 22:32:18	--	ChanServ (ChanServ@services.): [#python] Welcome to #python, puny fleshlings. Please see our website, http://pound-python.org/ , for information about the channel and Python.
+2009-12-15 22:37:30	--	ChanServ (ChanServ@services.): [#ubuntu] Welcome to #ubuntu! Please read the channel topic and consider spending some time on the FAQ mentioned there - This channel is officially logged at http://irclogs.ubuntu.com/
+2009-12-15 23:13:18		irc: connecting to server irc.freenode.net/6667...
+2009-12-15 23:13:18		irc: connected to irc.freenode.net (213.161.196.11)
+2009-12-15 23:13:18	--	*** Looking up your hostname...
+2009-12-15 23:13:19	--	*** Checking ident
+2009-12-15 23:13:19	--	*** Couldn't look up your hostname
+2009-12-15 23:13:26	--	*** No identd (auth) response
+2009-12-15 23:13:26	--	Welcome to the freenode IRC Network OES\janderson
+2009-12-15 23:13:26	--	Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-15 23:13:26	--	*** Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-15 23:13:26	--	This server was created Wed Oct 14 21:50:39 UTC 2009
+2009-12-15 23:13:26	--	jordan.freenode.net hyperion-1.0.2b aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStTuUvVwWxXyYzZ01234569*@ bcdefFhiIklmnoPqstv
+2009-12-15 23:13:26	--	IRCD=dancer CAPAB CHANTYPES=# EXCEPTS INVEX CHANMODES=bdeIq,k,lfJD,cgijLmnPQrRstz CHANLIMIT=#:20 PREFIX=(ov)@+ MAXLIST=bdeI:50 MODES=4 STATUSMSG=@ KNOCK NICKLEN=16 :are supported by this server
+2009-12-15 23:13:26	--	SAFELIST CASEMAPPING=ascii CHANNELLEN=30 TOPICLEN=450 KICKLEN=450 KEYLEN=23 USERLEN=10 HOSTLEN=63 SILENCE=50 :are supported by this server
+2009-12-15 23:13:26	--	There are 24704 listed and 23174 unlisted users on 27 servers
+2009-12-15 23:13:26	--	48 :flagged staff members
+2009-12-15 23:13:26	--	22189 :channels formed
+2009-12-15 23:13:26	--	I have 6668 clients and 0 servers
+2009-12-15 23:13:26	--	Current local  users: 6668  Max: 7464
+2009-12-15 23:13:26	--	Current global users: 47878  Max: 59854
+2009-12-15 23:13:26	--	Highest connection count: 7465 (7464 clients) (122953 since server was (re)started)
+2009-12-15 23:13:26	--	- jordan.freenode.net Message of the Day -
+2009-12-15 23:13:26	--	- Welcome to jordan.freenode.net in Evry, FR, EU.
+2009-12-15 23:13:26	--	- Thanks to: Frontier Online (http://www.frontier.fr) for sponsoring this server!
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- JORDAN, ROBERT (1948-2007).  Esteemed author of The Wheel of
+2009-12-15 23:13:26	--	- Time, Lord of Chaos and A Crown of Swords.
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- You're using freenode, a service of Peer-Directed Projects
+2009-12-15 23:13:26	--	- Center Ltd (http://freenode.net/pdpc.shtml).
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- Thanks to everyone who helped us make the 2008/2009 fundraiser
+2009-12-15 23:13:26	--	- a success, indivdual donors, hardware and bandwith sponsors and
+2009-12-15 23:13:26	--	- our corporate sponsor Canonical Ltd (http://www.canonical.com).
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- By connecting to freenode you indicate that you have read
+2009-12-15 23:13:26	--	- and agree to adhere to our policies and procedures as per
+2009-12-15 23:13:26	--	- the website (http://freenode.net). We would like to remind
+2009-12-15 23:13:26	--	- you that unauthorized public logging of channels on the
+2009-12-15 23:13:26	--	- network is prohibited. Public channel logging should only
+2009-12-15 23:13:26	--	- take place where the channel owner(s) has requested this
+2009-12-15 23:13:26	--	- and users of the channel are all made aware (if you are
+2009-12-15 23:13:26	--	- publically logging your channel, you may wish to keep a
+2009-12-15 23:13:26	--	- notice in topic and perhaps as a on-join message).
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- By registering your nickname with Nickserv you agree that you
+2009-12-15 23:13:26	--	- are 13 years of age, or older. For more information about the
+2009-12-15 23:13:26	--	- Children's Online Privacy Protection Act please see their
+2009-12-15 23:13:26	--	- website at (http://www.coppa.org).
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- freenode runs an open proxy scanner. Your use of the network
+2009-12-15 23:13:26	--	- indicates your acceptance of this policy. For details on
+2009-12-15 23:13:26	--	- freenode network policy, please take a look at our policy
+2009-12-15 23:13:26	--	- page (http://freenode.net/policy.shtml). Thank you for using
+2009-12-15 23:13:26	--	- the network!
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- The PDPC and freenode now do a fortnightly podcast, which you
+2009-12-15 23:13:26	--	- can find over at http://podcast.freenode.net and throughout the
+2009-12-15 23:13:26	--	- summer months we will be arranging geeknics - Picnics for Geeks
+2009-12-15 23:13:26	--	- across the globe! More information can be found over at
+2009-12-15 23:13:26	--	- http://www.geeknic.org
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- freenode is a service of Peer-Directed Projects Center Ltd,
+2009-12-15 23:13:26	--	- a not for profit organisation registered in England and Wales.
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- Our 2009/2010 fundraiser will be starting soon, more information
+2009-12-15 23:13:26	--	- will be available here and on the website! If you wish to donate
+2009-12-15 23:13:26	--	- you can help out over at http://freenode.net/pdpc_donations.shtml
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	- Thank you for using freenode!
+2009-12-15 23:13:26	--	-
+2009-12-15 23:13:26	--	End of /MOTD command.
+2009-12-15 23:13:28	--	-nickserv- identify ******
+2009-12-15 23:13:28	--	NickServ (NickServ@services.): OES\janderson is not a registered nickname.
+2009-12-15 23:13:34	--	NickServ (NickServ@services.): This nickname is registered. Please choose a different nickname, or identify via /msg NickServ identify <password>.
+2009-12-15 23:13:34	--	-nickserv- identify ******
+2009-12-15 23:13:35	--	NickServ (NickServ@services.): You are now identified for Sontek.
+2009-12-15 23:13:35	--	You are now logged in. (id Sontek, username n=OES\jand, hostname opensuse/member/Sontek)
+2009-12-15 23:13:35	--	User mode [+e] by services.
+2009-12-15 23:15:51		irc: connecting to server irc.freenode.net/6667...
+2009-12-15 23:15:51		irc: connected to irc.freenode.net (213.161.196.11)
+2009-12-15 23:15:51	--	*** Looking up your hostname...
+2009-12-15 23:15:52	--	*** Checking ident
+2009-12-15 23:15:52	--	*** Couldn't look up your hostname
+2009-12-15 23:15:59	--	*** No identd (auth) response
+2009-12-15 23:15:59	--	Welcome to the freenode IRC Network OES\janderson
+2009-12-15 23:15:59	--	Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-15 23:15:59	--	*** Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-15 23:15:59	--	This server was created Wed Oct 14 21:50:39 UTC 2009
+2009-12-15 23:15:59	--	jordan.freenode.net hyperion-1.0.2b aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStTuUvVwWxXyYzZ01234569*@ bcdefFhiIklmnoPqstv
+2009-12-15 23:15:59	--	IRCD=dancer CAPAB CHANTYPES=# EXCEPTS INVEX CHANMODES=bdeIq,k,lfJD,cgijLmnPQrRstz CHANLIMIT=#:20 PREFIX=(ov)@+ MAXLIST=bdeI:50 MODES=4 STATUSMSG=@ KNOCK NICKLEN=16 :are supported by this server
+2009-12-15 23:15:59	--	SAFELIST CASEMAPPING=ascii CHANNELLEN=30 TOPICLEN=450 KICKLEN=450 KEYLEN=23 USERLEN=10 HOSTLEN=63 SILENCE=50 :are supported by this server
+2009-12-15 23:15:59	--	There are 24705 listed and 23170 unlisted users on 27 servers
+2009-12-15 23:15:59	--	48 :flagged staff members
+2009-12-15 23:15:59	--	22190 :channels formed
+2009-12-15 23:15:59	--	I have 6663 clients and 0 servers
+2009-12-15 23:15:59	--	Current local  users: 6663  Max: 7464
+2009-12-15 23:15:59	--	Current global users: 47875  Max: 59854
+2009-12-15 23:15:59	--	Highest connection count: 7465 (7464 clients) (122999 since server was (re)started)
+2009-12-15 23:15:59	--	- jordan.freenode.net Message of the Day -
+2009-12-15 23:15:59	--	- Welcome to jordan.freenode.net in Evry, FR, EU.
+2009-12-15 23:15:59	--	- Thanks to: Frontier Online (http://www.frontier.fr) for sponsoring this server!
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- JORDAN, ROBERT (1948-2007).  Esteemed author of The Wheel of
+2009-12-15 23:15:59	--	- Time, Lord of Chaos and A Crown of Swords.
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- You're using freenode, a service of Peer-Directed Projects
+2009-12-15 23:15:59	--	- Center Ltd (http://freenode.net/pdpc.shtml).
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- Thanks to everyone who helped us make the 2008/2009 fundraiser
+2009-12-15 23:15:59	--	- a success, indivdual donors, hardware and bandwith sponsors and
+2009-12-15 23:15:59	--	- our corporate sponsor Canonical Ltd (http://www.canonical.com).
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- By connecting to freenode you indicate that you have read
+2009-12-15 23:15:59	--	- and agree to adhere to our policies and procedures as per
+2009-12-15 23:15:59	--	- the website (http://freenode.net). We would like to remind
+2009-12-15 23:15:59	--	- you that unauthorized public logging of channels on the
+2009-12-15 23:15:59	--	- network is prohibited. Public channel logging should only
+2009-12-15 23:15:59	--	- take place where the channel owner(s) has requested this
+2009-12-15 23:15:59	--	- and users of the channel are all made aware (if you are
+2009-12-15 23:15:59	--	- publically logging your channel, you may wish to keep a
+2009-12-15 23:15:59	--	- notice in topic and perhaps as a on-join message).
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- By registering your nickname with Nickserv you agree that you
+2009-12-15 23:15:59	--	- are 13 years of age, or older. For more information about the
+2009-12-15 23:15:59	--	- Children's Online Privacy Protection Act please see their
+2009-12-15 23:15:59	--	- website at (http://www.coppa.org).
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- freenode runs an open proxy scanner. Your use of the network
+2009-12-15 23:15:59	--	- indicates your acceptance of this policy. For details on
+2009-12-15 23:15:59	--	- freenode network policy, please take a look at our policy
+2009-12-15 23:15:59	--	- page (http://freenode.net/policy.shtml). Thank you for using
+2009-12-15 23:15:59	--	- the network!
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- The PDPC and freenode now do a fortnightly podcast, which you
+2009-12-15 23:15:59	--	- can find over at http://podcast.freenode.net and throughout the
+2009-12-15 23:15:59	--	- summer months we will be arranging geeknics - Picnics for Geeks
+2009-12-15 23:15:59	--	- across the globe! More information can be found over at
+2009-12-15 23:15:59	--	- http://www.geeknic.org
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- freenode is a service of Peer-Directed Projects Center Ltd,
+2009-12-15 23:15:59	--	- a not for profit organisation registered in England and Wales.
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- Our 2009/2010 fundraiser will be starting soon, more information
+2009-12-15 23:15:59	--	- will be available here and on the website! If you wish to donate
+2009-12-15 23:15:59	--	- you can help out over at http://freenode.net/pdpc_donations.shtml
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	- Thank you for using freenode!
+2009-12-15 23:15:59	--	-
+2009-12-15 23:15:59	--	End of /MOTD command.
+2009-12-15 23:17:34		irc: connecting to server irc.freenode.net/6667...
+2009-12-15 23:17:34		irc: connected to irc.freenode.net (213.161.196.11)
+2009-12-15 23:17:35	--	*** Looking up your hostname...
+2009-12-15 23:17:35	--	*** Checking ident
+2009-12-15 23:17:35	--	*** Couldn't look up your hostname
+2009-12-15 23:17:43	--	*** No identd (auth) response
+2009-12-15 23:17:43	--	Welcome to the freenode IRC Network OES\janderson
+2009-12-15 23:17:43	--	Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-15 23:17:43	--	*** Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-15 23:17:43	--	This server was created Wed Oct 14 21:50:39 UTC 2009
+2009-12-15 23:17:43	--	jordan.freenode.net hyperion-1.0.2b aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStTuUvVwWxXyYzZ01234569*@ bcdefFhiIklmnoPqstv
+2009-12-15 23:17:43	--	IRCD=dancer CAPAB CHANTYPES=# EXCEPTS INVEX CHANMODES=bdeIq,k,lfJD,cgijLmnPQrRstz CHANLIMIT=#:20 PREFIX=(ov)@+ MAXLIST=bdeI:50 MODES=4 STATUSMSG=@ KNOCK NICKLEN=16 :are supported by this server
+2009-12-15 23:17:43	--	SAFELIST CASEMAPPING=ascii CHANNELLEN=30 TOPICLEN=450 KICKLEN=450 KEYLEN=23 USERLEN=10 HOSTLEN=63 SILENCE=50 :are supported by this server
+2009-12-15 23:17:43	--	There are 24696 listed and 23173 unlisted users on 27 servers
+2009-12-15 23:17:43	--	48 :flagged staff members
+2009-12-15 23:17:43	--	22194 :channels formed
+2009-12-15 23:17:43	--	I have 6661 clients and 0 servers
+2009-12-15 23:17:43	--	Current local  users: 6661  Max: 7464
+2009-12-15 23:17:43	--	Current global users: 47869  Max: 59854
+2009-12-15 23:17:43	--	Highest connection count: 7465 (7464 clients) (123024 since server was (re)started)
+2009-12-15 23:17:43	--	- jordan.freenode.net Message of the Day -
+2009-12-15 23:17:43	--	- Welcome to jordan.freenode.net in Evry, FR, EU.
+2009-12-15 23:17:43	--	- Thanks to: Frontier Online (http://www.frontier.fr) for sponsoring this server!
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- JORDAN, ROBERT (1948-2007).  Esteemed author of The Wheel of
+2009-12-15 23:17:43	--	- Time, Lord of Chaos and A Crown of Swords.
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- You're using freenode, a service of Peer-Directed Projects
+2009-12-15 23:17:43	--	- Center Ltd (http://freenode.net/pdpc.shtml).
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- Thanks to everyone who helped us make the 2008/2009 fundraiser
+2009-12-15 23:17:43	--	- a success, indivdual donors, hardware and bandwith sponsors and
+2009-12-15 23:17:43	--	- our corporate sponsor Canonical Ltd (http://www.canonical.com).
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- By connecting to freenode you indicate that you have read
+2009-12-15 23:17:43	--	- and agree to adhere to our policies and procedures as per
+2009-12-15 23:17:43	--	- the website (http://freenode.net). We would like to remind
+2009-12-15 23:17:43	--	- you that unauthorized public logging of channels on the
+2009-12-15 23:17:43	--	- network is prohibited. Public channel logging should only
+2009-12-15 23:17:43	--	- take place where the channel owner(s) has requested this
+2009-12-15 23:17:43	--	- and users of the channel are all made aware (if you are
+2009-12-15 23:17:43	--	- publically logging your channel, you may wish to keep a
+2009-12-15 23:17:43	--	- notice in topic and perhaps as a on-join message).
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- By registering your nickname with Nickserv you agree that you
+2009-12-15 23:17:43	--	- are 13 years of age, or older. For more information about the
+2009-12-15 23:17:43	--	- Children's Online Privacy Protection Act please see their
+2009-12-15 23:17:43	--	- website at (http://www.coppa.org).
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- freenode runs an open proxy scanner. Your use of the network
+2009-12-15 23:17:43	--	- indicates your acceptance of this policy. For details on
+2009-12-15 23:17:43	--	- freenode network policy, please take a look at our policy
+2009-12-15 23:17:43	--	- page (http://freenode.net/policy.shtml). Thank you for using
+2009-12-15 23:17:43	--	- the network!
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- The PDPC and freenode now do a fortnightly podcast, which you
+2009-12-15 23:17:43	--	- can find over at http://podcast.freenode.net and throughout the
+2009-12-15 23:17:43	--	- summer months we will be arranging geeknics - Picnics for Geeks
+2009-12-15 23:17:43	--	- across the globe! More information can be found over at
+2009-12-15 23:17:43	--	- http://www.geeknic.org
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- freenode is a service of Peer-Directed Projects Center Ltd,
+2009-12-15 23:17:43	--	- a not for profit organisation registered in England and Wales.
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- Our 2009/2010 fundraiser will be starting soon, more information
+2009-12-15 23:17:43	--	- will be available here and on the website! If you wish to donate
+2009-12-15 23:17:43	--	- you can help out over at http://freenode.net/pdpc_donations.shtml
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	- Thank you for using freenode!
+2009-12-15 23:17:43	--	-
+2009-12-15 23:17:43	--	End of /MOTD command.
+2009-12-15 23:17:46	--	NickServ (NickServ@services.): This nickname is registered. Please choose a different nickname, or identify via /msg NickServ identify <password>.
+2009-12-15 23:17:51	--	-nickserv- identify ******
+2009-12-15 23:17:52	--	NickServ (NickServ@services.): You are now identified for Sontek.
+2009-12-15 23:17:52	--	You are now logged in. (id Sontek, username n=OES\jand, hostname opensuse/member/Sontek)
+2009-12-15 23:17:52	--	User mode [+e] by services.
+2009-12-15 23:18:12	--	ChanServ (ChanServ@services.): [#python] Welcome to #python, puny fleshlings. Please see our website, http://pound-python.org/ , for information about the channel and Python.
+2009-12-16 07:27:18		irc: connecting to server irc.freenode.net/6667...
+2009-12-16 07:27:19		irc: connected to irc.freenode.net (213.161.196.11)
+2009-12-16 07:27:19	--	*** Looking up your hostname...
+2009-12-16 07:27:19	--	*** Checking ident
+2009-12-16 07:27:19	--	*** Couldn't look up your hostname
+2009-12-16 07:27:27	--	*** No identd (auth) response
+2009-12-16 07:27:27	--	Welcome to the freenode IRC Network OES\janderson
+2009-12-16 07:27:27	--	Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-16 07:27:27	--	*** Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-16 07:27:27	--	This server was created Wed Oct 14 21:50:39 UTC 2009
+2009-12-16 07:27:27	--	jordan.freenode.net hyperion-1.0.2b aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStTuUvVwWxXyYzZ01234569*@ bcdefFhiIklmnoPqstv
+2009-12-16 07:27:27	--	IRCD=dancer CAPAB CHANTYPES=# EXCEPTS INVEX CHANMODES=bdeIq,k,lfJD,cgijLmnPQrRstz CHANLIMIT=#:20 PREFIX=(ov)@+ MAXLIST=bdeI:50 MODES=4 STATUSMSG=@ KNOCK NICKLEN=16 :are supported by this server
+2009-12-16 07:27:27	--	SAFELIST CASEMAPPING=ascii CHANNELLEN=30 TOPICLEN=450 KICKLEN=450 KEYLEN=23 USERLEN=10 HOSTLEN=63 SILENCE=50 :are supported by this server
+2009-12-16 07:27:27	--	There are 30487 listed and 24250 unlisted users on 28 servers
+2009-12-16 07:27:27	--	50 :flagged staff members
+2009-12-16 07:27:27	--	21612 :channels formed
+2009-12-16 07:27:27	--	I have 7248 clients and 0 servers
+2009-12-16 07:27:27	--	Current local  users: 7248  Max: 7880
+2009-12-16 07:27:27	--	Current global users: 54737  Max: 59854
+2009-12-16 07:27:27	--	Highest connection count: 7881 (7880 clients) (132708 since server was (re)started)
+2009-12-16 07:27:27	--	- jordan.freenode.net Message of the Day -
+2009-12-16 07:27:27	--	- Welcome to jordan.freenode.net in Evry, FR, EU.
+2009-12-16 07:27:27	--	- Thanks to: Frontier Online (http://www.frontier.fr) for sponsoring this server!
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- JORDAN, ROBERT (1948-2007).  Esteemed author of The Wheel of
+2009-12-16 07:27:27	--	- Time, Lord of Chaos and A Crown of Swords.
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- You're using freenode, a service of Peer-Directed Projects
+2009-12-16 07:27:27	--	- Center Ltd (http://freenode.net/pdpc.shtml).
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- Thanks to everyone who helped us make the 2008/2009 fundraiser
+2009-12-16 07:27:27	--	- a success, indivdual donors, hardware and bandwith sponsors and
+2009-12-16 07:27:27	--	- our corporate sponsor Canonical Ltd (http://www.canonical.com).
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- By connecting to freenode you indicate that you have read
+2009-12-16 07:27:27	--	- and agree to adhere to our policies and procedures as per
+2009-12-16 07:27:27	--	- the website (http://freenode.net). We would like to remind
+2009-12-16 07:27:27	--	- you that unauthorized public logging of channels on the
+2009-12-16 07:27:27	--	- network is prohibited. Public channel logging should only
+2009-12-16 07:27:27	--	- take place where the channel owner(s) has requested this
+2009-12-16 07:27:27	--	- and users of the channel are all made aware (if you are
+2009-12-16 07:27:27	--	- publically logging your channel, you may wish to keep a
+2009-12-16 07:27:27	--	- notice in topic and perhaps as a on-join message).
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- By registering your nickname with Nickserv you agree that you
+2009-12-16 07:27:27	--	- are 13 years of age, or older. For more information about the
+2009-12-16 07:27:27	--	- Children's Online Privacy Protection Act please see their
+2009-12-16 07:27:27	--	- website at (http://www.coppa.org).
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- freenode runs an open proxy scanner. Your use of the network
+2009-12-16 07:27:27	--	- indicates your acceptance of this policy. For details on
+2009-12-16 07:27:27	--	- freenode network policy, please take a look at our policy
+2009-12-16 07:27:27	--	- page (http://freenode.net/policy.shtml). Thank you for using
+2009-12-16 07:27:27	--	- the network!
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- The PDPC and freenode now do a fortnightly podcast, which you
+2009-12-16 07:27:27	--	- can find over at http://podcast.freenode.net and throughout the
+2009-12-16 07:27:27	--	- summer months we will be arranging geeknics - Picnics for Geeks
+2009-12-16 07:27:27	--	- across the globe! More information can be found over at
+2009-12-16 07:27:27	--	- http://www.geeknic.org
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- freenode is a service of Peer-Directed Projects Center Ltd,
+2009-12-16 07:27:27	--	- a not for profit organisation registered in England and Wales.
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- Our 2009/2010 fundraiser will be starting soon, more information
+2009-12-16 07:27:27	--	- will be available here and on the website! If you wish to donate
+2009-12-16 07:27:27	--	- you can help out over at http://freenode.net/pdpc_donations.shtml
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	- Thank you for using freenode!
+2009-12-16 07:27:27	--	-
+2009-12-16 07:27:27	--	End of /MOTD command.
+2009-12-16 07:27:30	--	NickServ (NickServ@services.): This nickname is registered. Please choose a different nickname, or identify via /msg NickServ identify <password>.
+2009-12-16 07:27:34	--	-nickserv- identify ******
+2009-12-16 07:27:35	--	NickServ (NickServ@services.): You are now identified for Sontek.
+2009-12-16 07:27:35	--	You are now logged in. (id Sontek, username n=OES\jand, hostname opensuse/member/Sontek)
+2009-12-16 07:27:35	--	User mode [+e] by services.
+2009-12-16 07:27:42	--	ChanServ (ChanServ@services.): [#python] Welcome to #python, puny fleshlings. Please see our website, http://pound-python.org/ , for information about the channel and Python.
+2009-12-16 07:42:00		irc: connecting to server irc.freenode.net/6667...
+2009-12-16 07:42:00		irc: connected to irc.freenode.net (213.161.196.11)
+2009-12-16 07:42:00	--	*** Looking up your hostname...
+2009-12-16 07:42:00	--	*** Checking ident
+2009-12-16 07:42:00	--	*** Couldn't look up your hostname
+2009-12-16 07:42:08	--	*** No identd (auth) response
+2009-12-16 07:42:08	--	Welcome to the freenode IRC Network OES\janderson
+2009-12-16 07:42:08	--	Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-16 07:42:08	--	*** Your host is jordan.freenode.net[dancer.frontier.fr/6667], running version hyperion-1.0.2b
+2009-12-16 07:42:08	--	This server was created Wed Oct 14 21:50:39 UTC 2009
+2009-12-16 07:42:08	--	jordan.freenode.net hyperion-1.0.2b aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStTuUvVwWxXyYzZ01234569*@ bcdefFhiIklmnoPqstv
+2009-12-16 07:42:08	--	IRCD=dancer CAPAB CHANTYPES=# EXCEPTS INVEX CHANMODES=bdeIq,k,lfJD,cgijLmnPQrRstz CHANLIMIT=#:20 PREFIX=(ov)@+ MAXLIST=bdeI:50 MODES=4 STATUSMSG=@ KNOCK NICKLEN=16 :are supported by this server
+2009-12-16 07:42:08	--	SAFELIST CASEMAPPING=ascii CHANNELLEN=30 TOPICLEN=450 KICKLEN=450 KEYLEN=23 USERLEN=10 HOSTLEN=63 SILENCE=50 :are supported by this server
+2009-12-16 07:42:08	--	There are 30772 listed and 24359 unlisted users on 28 servers
+2009-12-16 07:42:08	--	50 :flagged staff members
+2009-12-16 07:42:08	--	21715 :channels formed
+2009-12-16 07:42:08	--	I have 7386 clients and 0 servers
+2009-12-16 07:42:08	--	Current local  users: 7386  Max: 7880
+2009-12-16 07:42:08	--	Current global users: 55131  Max: 59854
+2009-12-16 07:42:08	--	Highest connection count: 7881 (7880 clients) (133161 since server was (re)started)
+2009-12-16 07:42:08	--	- jordan.freenode.net Message of the Day -
+2009-12-16 07:42:08	--	- Welcome to jordan.freenode.net in Evry, FR, EU.
+2009-12-16 07:42:08	--	- Thanks to: Frontier Online (http://www.frontier.fr) for sponsoring this server!
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- JORDAN, ROBERT (1948-2007).  Esteemed author of The Wheel of
+2009-12-16 07:42:08	--	- Time, Lord of Chaos and A Crown of Swords.
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- You're using freenode, a service of Peer-Directed Projects
+2009-12-16 07:42:08	--	- Center Ltd (http://freenode.net/pdpc.shtml).
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- Thanks to everyone who helped us make the 2008/2009 fundraiser
+2009-12-16 07:42:08	--	- a success, indivdual donors, hardware and bandwith sponsors and
+2009-12-16 07:42:08	--	- our corporate sponsor Canonical Ltd (http://www.canonical.com).
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- By connecting to freenode you indicate that you have read
+2009-12-16 07:42:08	--	- and agree to adhere to our policies and procedures as per
+2009-12-16 07:42:08	--	- the website (http://freenode.net). We would like to remind
+2009-12-16 07:42:08	--	- you that unauthorized public logging of channels on the
+2009-12-16 07:42:08	--	- network is prohibited. Public channel logging should only
+2009-12-16 07:42:08	--	- take place where the channel owner(s) has requested this
+2009-12-16 07:42:08	--	- and users of the channel are all made aware (if you are
+2009-12-16 07:42:08	--	- publically logging your channel, you may wish to keep a
+2009-12-16 07:42:08	--	- notice in topic and perhaps as a on-join message).
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- By registering your nickname with Nickserv you agree that you
+2009-12-16 07:42:08	--	- are 13 years of age, or older. For more information about the
+2009-12-16 07:42:08	--	- Children's Online Privacy Protection Act please see their
+2009-12-16 07:42:08	--	- website at (http://www.coppa.org).
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- freenode runs an open proxy scanner. Your use of the network
+2009-12-16 07:42:08	--	- indicates your acceptance of this policy. For details on
+2009-12-16 07:42:08	--	- freenode network policy, please take a look at our policy
+2009-12-16 07:42:08	--	- page (http://freenode.net/policy.shtml). Thank you for using
+2009-12-16 07:42:08	--	- the network!
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- The PDPC and freenode now do a fortnightly podcast, which you
+2009-12-16 07:42:08	--	- can find over at http://podcast.freenode.net and throughout the
+2009-12-16 07:42:08	--	- summer months we will be arranging geeknics - Picnics for Geeks
+2009-12-16 07:42:08	--	- across the globe! More information can be found over at
+2009-12-16 07:42:08	--	- http://www.geeknic.org
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- freenode is a service of Peer-Directed Projects Center Ltd,
+2009-12-16 07:42:08	--	- a not for profit organisation registered in England and Wales.
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- Our 2009/2010 fundraiser will be starting soon, more information
+2009-12-16 07:42:08	--	- will be available here and on the website! If you wish to donate
+2009-12-16 07:42:08	--	- you can help out over at http://freenode.net/pdpc_donations.shtml
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	- Thank you for using freenode!
+2009-12-16 07:42:08	--	-
+2009-12-16 07:42:08	--	End of /MOTD command.
+2009-12-16 07:42:17	--	NickServ (NickServ@services.): This nickname is registered. Please choose a different nickname, or identify via /msg NickServ identify <password>.
+2009-12-16 07:42:21	--	-nickserv- identify ******
+2009-12-16 07:42:21	--	NickServ (NickServ@services.): You are now identified for Sontek.
+2009-12-16 07:42:21	--	You are now logged in. (id Sontek, username n=OES\jand, hostname opensuse/member/Sontek)
+2009-12-16 07:42:21	--	User mode [+e] by services.
+2009-12-16 07:42:28	--	ChanServ (ChanServ@services.): [#python] Welcome to #python, puny fleshlings. Please see our website, http://pound-python.org/ , for information about the channel and Python.

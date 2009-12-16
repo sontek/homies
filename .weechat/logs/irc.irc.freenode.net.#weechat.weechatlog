@@ -1,0 +1,38 @@
+2009-12-16 06:58:19	-->	sontek (n=OES\jand@opensuse/member/Sontek) has joined #weechat
+2009-12-16 06:58:19	--	Topic for #weechat is "WeeChat, stable: 0.3.0, web: http://www.weechat.org/ | English support channel | Please read doc/faq/quickstart before asking here | Old versions like 0.2.6 are not supported any more"
+2009-12-16 06:58:19	--	Topic set by FlashCode on Wed Nov  4 02:19:27 2009
+2009-12-16 06:58:19	--	Nicks #weechat: [@ChanServ @FlashCode @kolter @ptitlouis +_FlashB0t _flow_ A-Angel abarrett aep Aexoden2 aitch AkiraYB ak|ra AlexMax alturiak andrew ArcAngel Asy atari Bazerka Bonzodog bthomson Caleb Candle Chaz6 cjns3274 CodeBlock codemac dinosys divVerent dominikh drubin Echtor2oo3 EgS em1 Emralegna erikh esteel Evanlec_ felipe GolemJ goraxe Gotisch Gu1ll4um3r0m41n Guest55529 gui hardkore Helios higuita hilts hullap jdhore1 jfx jnbek jones-- JyZyXEL kalpik kelnoky KenjiE20 kinabalu koolfy liffi_backupname m4v mama Muz Nicolae orione oxez pauletin phed_ Pnevma polemon r0bby Rasi RegEchse rico Rockj royale2 ruskie sabinef72 sasquatch scrooloose selckin SirFoxey sjohnson Skiff sleo Soliton soltys sontek Spreadsheet steve___ Stravy sukeri SuperTux88 sybariten szal t taruti Tass` tchan tdy Texou ThePink thorstenk tigrmesh Tit0 Whoopi whuffor1 wolverian xt YPSY zeltak]
+2009-12-16 06:58:19	--	Channel #weechat: 113 nicks (4 ops, 0 halfop, 1 voice, 108 normal)
+2009-12-16 06:58:20	--	Channel created on Sat Nov 25 23:42:51 2006
+2009-12-16 06:58:20	--	URL for #weechat: http://www.weechat.org
+2009-12-16 06:58:29	sontek	Is there a /lastlog type command in weechat?
+2009-12-16 06:59:05	sontek	and how can I have it not re-order what channels have activity? Like right now it says "Act:5,1,4" I'd like it to say "1, 4, 5"
+2009-12-16 06:59:09	xt	sontek: there's a  script for it
+2009-12-16 06:59:14	Emralegna	test
+2009-12-16 06:59:16	xt	there's an option for that
+2009-12-16 06:59:19	xt	for buffer order
+2009-12-16 06:59:34	xt	lastlog script is called egerp
+2009-12-16 06:59:39	xt	*egerp
+2009-12-16 06:59:41	xt	*egrep
+2009-12-16 07:00:55	sontek	xt: I tried telling it not to re-order hotlist, I thought that was the option to do it but its not
+2009-12-16 07:01:10	sontek	weechat.look.hotlist_sort
+2009-12-16 07:01:20	xt	sontek: /help weechat.look.hotlist_sort
+2009-12-16 07:01:20	sontek	I used group_number_asc
+2009-12-16 07:03:34	sontek	xt: it doesn't really have good /help, no real description other than 'hotlist sort type'
+2009-12-16 07:04:02	sontek	but its definitely not the right now since I'm using group_number_asc and its still sorting all weird
+2009-12-16 07:04:29	sontek	xt: thanks for the egrep script :)
+2009-12-16 07:04:35	xt	number_asc is what you want
+2009-12-16 07:04:40	xt	group by number, ascending
+2009-12-16 07:05:08	xt	group_ is for grouping different types of hotlist types, like privmsg, chanmsg
+2009-12-16 07:05:08	drubin	true that.
+2009-12-16 07:12:21	sontek	nice :)
+2009-12-16 07:12:31	sontek	now where do I put these scripts so they autoload?
+2009-12-16 07:12:41	sontek	is there an ~/.weechat/scripts folder or anything?
+2009-12-16 07:14:51	@FlashCode	in ~/.weechat/<language>/autoload/
+2009-12-16 07:15:00	@FlashCode	see quickstart/doc
+2009-12-16 07:15:16	xt	sontek: you isntall them with weeget, which does it for you automatically
+2009-12-16 07:19:41	<--	Texou (n=Tex@unaffiliated/texou) has quit ("++")
+2009-12-16 07:21:00	+_FlashB0t	-git- flashcode: Fix typo: licence -> license
+2009-12-16 07:21:02	+_FlashB0t	-git- flashcode: Add option "autorejoin_delay" for servers (task #8771), fix autorejoin on channels with key
+2009-12-16 07:21:33	-->	MrElendig (n=oh@pdpc/supporter/active/mrelendig) has joined #weechat
+2009-12-16 07:26:47	xt	wee

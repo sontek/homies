@@ -1,0 +1,363 @@
+2009-12-15 22:31:56	-->	sontek (n=OES\jand@opensuse/member/Sontek) has joined #utah
+2009-12-15 22:31:56	--	Topic for #utah is "http://utos.org/irc | logs @ http://ibot.rikers.org/#utah | This, Jen, is the Internet."
+2009-12-15 22:31:56	--	Topic set by sjansen on Mon Dec 14 10:52:05 2009
+2009-12-15 22:31:56	--	Nicks #utah: [@ChanServ @ibot +friocorte +herlo acc_ A| beelzebob bgerber bmidgley bonez2046 brasto CamargoBP ccjoe decriptor diesel eco eggyknap eightyeight fadein fugue88 harleypig Heartsbane jnbek jnbek|wc JoshH jshipley_ jsmith-away Lars-UT levi macnewbold1 markl_ mecworks_ mrpull mulicheng Nafai pashdown peno pmcnabb programmerq redbeard2 romanovic-away rsimpkins RyanE Sargun_Screen ScytheBlade1 sinuhe sontek Supaplex synic TehLaser Tene tensai thesuper1igfrog tiwula tristanbob_ tristanbob__ tvc123 undertakingyou unum whiteinge whiteley Zelut zzzirk_a`]
+2009-12-15 22:31:56	--	Channel #utah: 63 nicks (2 ops, 0 halfop, 2 voices, 59 normal)
+2009-12-15 22:31:56	--	URL for #Utah: http://dmoz.org/Computers/Software/Operating_Systems/Linux/User_Groups/North_America/United_States/Utah/
+2009-12-15 22:31:56	--	Channel created on Sat Nov 25 23:42:53 2006
+2009-12-15 22:34:00	<--	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	herlo (n=clints@fedora/herlo) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	Nafai (n=Nafai@travishartwell.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	pmcnabb (n=peter@komodo.mcnabbs.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:00	<--	Tene (n=tene@poipu/supporter/slacker/tene) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:01	<--	ccjoe (n=ccjoe@69.20.152.109) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:34:01	<--	eggyknap (n=jtolley@unaffiliated/eggyknap) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:35:20	<--	TehLaser (n=andrew@emelia.prismation.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:35:20	<--	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:35:20	<--	ibot (i=ibot@rikers.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:35:20	<--	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:35:20	<--	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:37:12	-->	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has joined #utah
+2009-12-15 22:37:12	-->	eggyknap (n=jtolley@unaffiliated/eggyknap) has joined #utah
+2009-12-15 22:37:12	-->	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has joined #utah
+2009-12-15 22:37:12	-->	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has joined #utah
+2009-12-15 22:37:12	-->	ccjoe (n=ccjoe@69.20.152.109) has joined #utah
+2009-12-15 22:37:12	-->	pmcnabb (n=peter@komodo.mcnabbs.org) has joined #utah
+2009-12-15 22:37:12	-->	Tene (n=tene@poipu/supporter/slacker/tene) has joined #utah
+2009-12-15 22:37:12	-->	Nafai (n=Nafai@travishartwell.net) has joined #utah
+2009-12-15 22:37:12	-->	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has joined #utah
+2009-12-15 22:37:12	-->	herlo (n=clints@fedora/herlo) has joined #utah
+2009-12-15 22:37:12	--	Mode #utah [+v herlo] by irc.freenode.net
+2009-12-15 22:42:01	-->	ibot (i=ibot@rikers.org) has joined #utah
+2009-12-15 22:42:01	-->	TehLaser (n=andrew@emelia.prismation.com) has joined #utah
+2009-12-15 22:42:01	-->	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has joined #utah
+2009-12-15 22:42:01	-->	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has joined #utah
+2009-12-15 22:42:01	-->	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has joined #utah
+2009-12-15 22:42:01	--	Mode #utah [+o ibot] by irc.freenode.net
+2009-12-15 22:42:57	<--	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:57	<--	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:57	<--	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:57	<--	herlo (n=clints@fedora/herlo) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:57	<--	Nafai (n=Nafai@travishartwell.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:57	<--	pmcnabb (n=peter@komodo.mcnabbs.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:57	<--	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:58	<--	Tene (n=tene@poipu/supporter/slacker/tene) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:58	<--	ccjoe (n=ccjoe@69.20.152.109) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:42:58	<--	eggyknap (n=jtolley@unaffiliated/eggyknap) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:43:06	-->	badon (n=q@pdpc/supporter/active/badon) has joined #utah
+2009-12-15 22:43:25	-->	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has joined #utah
+2009-12-15 22:43:25	-->	eggyknap (n=jtolley@unaffiliated/eggyknap) has joined #utah
+2009-12-15 22:43:25	-->	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has joined #utah
+2009-12-15 22:43:25	-->	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has joined #utah
+2009-12-15 22:43:25	-->	ccjoe (n=ccjoe@69.20.152.109) has joined #utah
+2009-12-15 22:43:25	-->	pmcnabb (n=peter@komodo.mcnabbs.org) has joined #utah
+2009-12-15 22:43:25	-->	Tene (n=tene@poipu/supporter/slacker/tene) has joined #utah
+2009-12-15 22:43:25	-->	Nafai (n=Nafai@travishartwell.net) has joined #utah
+2009-12-15 22:43:25	-->	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has joined #utah
+2009-12-15 22:43:25	-->	herlo (n=clints@fedora/herlo) has joined #utah
+2009-12-15 22:43:25	--	Mode #utah [+v herlo] by irc.freenode.net
+2009-12-15 22:43:44	-->	TimRiker (n=timr@bzflag/projectlead/TimRiker) has joined #utah
+2009-12-15 22:43:44	--	Mode #utah [+o TimRiker] by ChanServ
+2009-12-15 22:44:28	<--	tristanbob__ (n=tristanb@static-vpn-137-190-250-252.weber.edu) has quit (Read error: 110 (Connection timed out))
+2009-12-15 22:46:12	@ibot	W00T!
+2009-12-15 22:46:46	-->	tristanbob__ (n=tristanb@c-67-164-207-61.hsd1.ut.comcast.net) has joined #utah
+2009-12-15 22:50:32	-->	wps (n=wps@208.53.47.251) has joined #utah
+2009-12-15 22:52:15	<--	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	herlo (n=clints@fedora/herlo) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	Nafai (n=Nafai@travishartwell.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	pmcnabb (n=peter@komodo.mcnabbs.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	Tene (n=tene@poipu/supporter/slacker/tene) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:15	<--	ccjoe (n=ccjoe@69.20.152.109) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:52:16	<--	eggyknap (n=jtolley@unaffiliated/eggyknap) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:54:56	-->	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has joined #utah
+2009-12-15 22:54:56	-->	eggyknap (n=jtolley@unaffiliated/eggyknap) has joined #utah
+2009-12-15 22:54:56	-->	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has joined #utah
+2009-12-15 22:54:56	-->	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has joined #utah
+2009-12-15 22:54:56	-->	ccjoe (n=ccjoe@69.20.152.109) has joined #utah
+2009-12-15 22:54:56	-->	pmcnabb (n=peter@komodo.mcnabbs.org) has joined #utah
+2009-12-15 22:54:56	-->	Tene (n=tene@poipu/supporter/slacker/tene) has joined #utah
+2009-12-15 22:54:56	-->	Nafai (n=Nafai@travishartwell.net) has joined #utah
+2009-12-15 22:54:56	-->	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has joined #utah
+2009-12-15 22:54:56	-->	herlo (n=clints@fedora/herlo) has joined #utah
+2009-12-15 22:54:56	--	Mode #utah [+v herlo] by irc.freenode.net
+2009-12-15 22:55:12	<--	TehLaser (n=andrew@emelia.prismation.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:55:12	<--	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:55:13	<--	ibot (i=ibot@rikers.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:55:13	<--	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:55:13	<--	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:56:46	-->	ibot (i=ibot@rikers.org) has joined #utah
+2009-12-15 22:56:46	-->	TehLaser (n=andrew@emelia.prismation.com) has joined #utah
+2009-12-15 22:56:46	-->	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has joined #utah
+2009-12-15 22:56:46	-->	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has joined #utah
+2009-12-15 22:56:46	-->	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has joined #utah
+2009-12-15 22:56:46	--	Mode #utah [+o ibot] by irc.freenode.net
+2009-12-15 22:57:06	<--	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:06	<--	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:06	<--	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:06	<--	herlo (n=clints@fedora/herlo) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:07	<--	Nafai (n=Nafai@travishartwell.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:07	<--	pmcnabb (n=peter@komodo.mcnabbs.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:07	<--	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:07	<--	Tene (n=tene@poipu/supporter/slacker/tene) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:07	<--	ccjoe (n=ccjoe@69.20.152.109) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:57:07	<--	eggyknap (n=jtolley@unaffiliated/eggyknap) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 22:58:52	-->	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has joined #utah
+2009-12-15 22:58:52	-->	eggyknap (n=jtolley@unaffiliated/eggyknap) has joined #utah
+2009-12-15 22:58:52	-->	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has joined #utah
+2009-12-15 22:58:52	-->	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has joined #utah
+2009-12-15 22:58:52	-->	ccjoe (n=ccjoe@69.20.152.109) has joined #utah
+2009-12-15 22:58:52	-->	pmcnabb (n=peter@komodo.mcnabbs.org) has joined #utah
+2009-12-15 22:58:52	-->	Tene (n=tene@poipu/supporter/slacker/tene) has joined #utah
+2009-12-15 22:58:52	-->	Nafai (n=Nafai@travishartwell.net) has joined #utah
+2009-12-15 22:58:52	-->	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has joined #utah
+2009-12-15 22:58:52	-->	herlo (n=clints@fedora/herlo) has joined #utah
+2009-12-15 22:58:52	--	Mode #utah [+v herlo] by irc.freenode.net
+2009-12-15 23:02:09	<--	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	herlo (n=clints@fedora/herlo) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	Nafai (n=Nafai@travishartwell.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	pmcnabb (n=peter@komodo.mcnabbs.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	Tene (n=tene@poipu/supporter/slacker/tene) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:09	<--	ccjoe (n=ccjoe@69.20.152.109) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:10	<--	eggyknap (n=jtolley@unaffiliated/eggyknap) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:43	-->	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has joined #utah
+2009-12-15 23:02:43	-->	eggyknap (n=jtolley@unaffiliated/eggyknap) has joined #utah
+2009-12-15 23:02:43	-->	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has joined #utah
+2009-12-15 23:02:43	-->	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has joined #utah
+2009-12-15 23:02:43	-->	ccjoe (n=ccjoe@69.20.152.109) has joined #utah
+2009-12-15 23:02:43	-->	pmcnabb (n=peter@komodo.mcnabbs.org) has joined #utah
+2009-12-15 23:02:43	-->	Tene (n=tene@poipu/supporter/slacker/tene) has joined #utah
+2009-12-15 23:02:43	-->	Nafai (n=Nafai@travishartwell.net) has joined #utah
+2009-12-15 23:02:43	-->	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has joined #utah
+2009-12-15 23:02:43	-->	herlo (n=clints@fedora/herlo) has joined #utah
+2009-12-15 23:02:43	--	Mode #utah [+v herlo] by irc.freenode.net
+2009-12-15 23:02:54	<--	TehLaser (n=andrew@emelia.prismation.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:54	<--	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:55	<--	ibot (i=ibot@rikers.org) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:55	<--	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:02:55	<--	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has quit (simmons.freenode.net irc.freenode.net)
+2009-12-15 23:03:50	-->	ibot (i=ibot@rikers.org) has joined #utah
+2009-12-15 23:03:50	-->	TehLaser (n=andrew@emelia.prismation.com) has joined #utah
+2009-12-15 23:03:50	-->	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has joined #utah
+2009-12-15 23:03:50	-->	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has joined #utah
+2009-12-15 23:03:50	-->	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has joined #utah
+2009-12-15 23:03:50	--	Mode #utah [+o ibot] by irc.freenode.net
+2009-12-15 23:06:18	@ibot	W00T!
+2009-12-15 23:13:42	-->	sontek (n=OES\jand@opensuse/member/Sontek) has joined #utah
+2009-12-15 23:13:42	--	Topic for #utah is "http://utos.org/irc | logs @ http://ibot.rikers.org/#utah | This, Jen, is the Internet."
+2009-12-15 23:13:42	--	Topic set by sjansen on Mon Dec 14 10:52:05 2009
+2009-12-15 23:13:42	--	Nicks #utah: [@ChanServ @ibot @TimRiker +friocorte +herlo acc_ A| badon beelzebob bgerber bmidgley bonez2046 brasto CamargoBP ccjoe decriptor diesel eco eggyknap eightyeight fadein fugue88 harleypig Heartsbane jnbek jnbek|wc JoshH jshipley_ jsmith-away Lars-UT levi macnewbold1 markl_ mecworks_ mrpull mulicheng Nafai pashdown peno pmcnabb programmerq redbeard2 romanovic-away rsimpkins RyanE Sargun_Screen ScytheBlade1 sinuhe sontek Supaplex synic TehLaser Tene tensai thesuper1igfrog tiwula tristanbob_ tristanbob__ tvc123 undertakingyou unum whiteinge whiteley wps Zelut zzzirk_a`]
+2009-12-15 23:13:42	--	Channel #utah: 66 nicks (3 ops, 0 halfop, 2 voices, 61 normal)
+2009-12-15 23:13:42	--	Channel created on Sat Nov 25 23:42:53 2006
+2009-12-15 23:13:43	--	URL for #Utah: http://dmoz.org/Computers/Software/Operating_Systems/Linux/User_Groups/North_America/United_States/Utah/
+2009-12-15 23:17:57	-->	sontek (n=OES\jand@opensuse/member/Sontek) has joined #utah
+2009-12-15 23:17:57	--	Topic for #utah is "http://utos.org/irc | logs @ http://ibot.rikers.org/#utah | This, Jen, is the Internet."
+2009-12-15 23:17:57	--	Topic set by sjansen on Mon Dec 14 10:52:05 2009
+2009-12-15 23:17:57	--	Nicks #utah: [@ChanServ @ibot @TimRiker +friocorte +herlo acc_ A| badon beelzebob bgerber bmidgley bonez2046 brasto CamargoBP ccjoe decriptor diesel eco eggyknap eightyeight fadein fugue88 harleypig Heartsbane jnbek jnbek|wc JoshH jshipley_ jsmith-away Lars-UT levi macnewbold1 markl_ mecworks_ mrpull mulicheng Nafai pashdown peno pmcnabb programmerq redbeard2 romanovic-away rsimpkins RyanE Sargun_Screen ScytheBlade1 sinuhe sontek Supaplex synic TehLaser Tene tensai thesuper1igfrog tiwula tristanbob_ tristanbob__ tvc123 undertakingyou unum whiteinge whiteley wps Zelut zzzirk_a`]
+2009-12-15 23:17:57	--	Channel #utah: 66 nicks (3 ops, 0 halfop, 2 voices, 61 normal)
+2009-12-15 23:17:57	--	Channel created on Sat Nov 25 23:42:53 2006
+2009-12-15 23:17:57	--	URL for #Utah: http://dmoz.org/Computers/Software/Operating_Systems/Linux/User_Groups/North_America/United_States/Utah/
+2009-12-15 23:35:00	<--	decriptor (n=decripto@53.250.sfcn.org) has quit ("Ex-Chat")
+2009-12-15 23:35:42	-->	Sargun (n=Sargun@atarack/Staff/Sargun) has joined #utah
+2009-12-15 23:37:13	-->	decriptor (n=decripto@53.250.sfcn.org) has joined #utah
+2009-12-15 23:39:54	<--	sinuhe (n=user@kaptah.deevans.net) has quit ("ERC Version 5.3 (IRC client for Emacs)")
+2009-12-16 00:09:56	<--	brasto (n=brasto@c-98-202-14-89.hsd1.ut.comcast.net) has quit (Read error: 60 (Operation timed out))
+2009-12-16 00:30:54	<--	tiwula (n=lane@63.225.228.210) has quit ("Leaving")
+2009-12-16 01:34:44	<--	decriptor (n=decripto@53.250.sfcn.org) has quit (Read error: 113 (No route to host))
+2009-12-16 01:44:57	-->	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 01:52:57	<--	A| (n=A@174.52.193.171) has quit (Read error: 113 (No route to host))
+2009-12-16 01:56:59	-->	brasto (n=brasto@c-67-182-203-21.hsd1.ut.comcast.net) has joined #Utah
+2009-12-16 02:20:31	<--	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 148 (No route to host))
+2009-12-16 02:20:57	-->	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 02:31:09	<--	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 60 (Operation timed out))
+2009-12-16 02:35:53	-->	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 02:48:26	<--	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 60 (Operation timed out))
+2009-12-16 02:48:32	-->	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 03:01:13	<--	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 148 (No route to host))
+2009-12-16 03:11:48	-->	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 03:21:57	-->	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 03:28:15	<--	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 60 (Operation timed out))
+2009-12-16 03:29:05	<--	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 113 (No route to host))
+2009-12-16 03:42:43	-->	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 03:49:24	<--	TimRiker (n=timr@bzflag/projectlead/TimRiker) has quit ("Well, at least my terminal is not so controlling now")
+2009-12-16 03:55:21	-->	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 03:56:39	<--	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 145 (Connection timed out))
+2009-12-16 04:08:43	-->	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 04:13:45	<--	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 113 (No route to host))
+2009-12-16 04:19:31	-->	A_ (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 04:19:56	--	A_ is now known as Guest49679
+2009-12-16 04:26:57	<--	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 113 (No route to host))
+2009-12-16 04:39:53	<--	Guest49679 (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (Read error: 145 (Connection timed out))
+2009-12-16 04:43:44	-->	LukeJenkins (n=A@174.52.193.171) has joined #utah
+2009-12-16 04:48:55	-->	tiwula (n=lane@63.225.228.210) has joined #utah
+2009-12-16 04:55:41	<--	ChanServ (ChanServ@services.) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 04:55:50	-->	ChanServ (ChanServ@services.) has joined #utah
+2009-12-16 04:55:50	--	Mode #utah [+o ChanServ] by irc.freenode.net
+2009-12-16 04:56:28	<--	tiwula (n=lane@63.225.228.210) has quit ("Leaving")
+2009-12-16 04:58:44	-->	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 05:02:44	<--	LukeJenkins (n=A@174.52.193.171) has quit (Read error: 60 (Operation timed out))
+2009-12-16 05:09:23	-->	LukeJenkins (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 05:15:11	<--	A (n=A@c-174-52-193-171.hsd1.ut.comcast.net) has quit (No route to host)
+2009-12-16 06:09:29	--	friocorte is now known as goozbach
+2009-12-16 06:48:11	<--	TehLaser (n=andrew@emelia.prismation.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:12	<--	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:12	<--	ibot (i=ibot@rikers.org) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:12	<--	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:12	<--	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:13	<--	romanovic-away (n=romanovi@c-67-182-248-31.hsd1.ut.comcast.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:13	<--	bonez2046 (i=scott@75-145-58-209-Utah.hfc.comcastbusiness.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:13	<--	jnbek|wc (n=jnbek@unaffiliated/jnbek) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:13	<--	unum (n=unum@li32-23.members.linode.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:13	<--	harleypig (n=harleypi@harleypig.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:15	<--	diesel (n=dlong@63.75.14.62) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:15	<--	ChanServ (ChanServ@services.) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:17	<--	Sargun (n=Sargun@atarack/Staff/Sargun) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:17	<--	badon (n=q@pdpc/supporter/active/badon) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:17	<--	acc_ (n=acc@hexadecagram.org) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:18	<--	redbeard2 (n=jphall@techhat.dsl.xmission.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:19	<--	goozbach (n=goozbach@74.207.226.4) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:19	<--	beelzebob (n=bob@204.202.11.121) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:19	<--	tensai (n=tensai@joanna.zmonkey.org) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:19	<--	jsmith-away (n=nnjsmith@asterisk/training-and-documentation-guru/jsmith) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:19	<--	CamargoBP (n=CamargoB@orem.jiveip.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:19	<--	bmidgley (n=bmidgley@c-76-27-89-77.hsd1.ut.comcast.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:20	<--	JoshH (n=josh@2607:fa18:100:8000:191:0:0:0) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:20	<--	brasto (n=brasto@c-67-182-203-21.hsd1.ut.comcast.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:21	<--	tristanbob__ (n=tristanb@c-67-164-207-61.hsd1.ut.comcast.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:22	<--	rsimpkins (n=rsimpkin@callisto.ryansimpkins.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:22	<--	mecworks_ (n=marc@137.65.135.29) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:22	<--	RyanE (i=Piadas@rberick.dsl.xmission.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:22	<--	Zelut (n=christer@unaffiliated/zelut) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:23	<--	Lars-UT (n=lars@67.208.112.36) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:25	<--	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:25	<--	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:25	<--	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:25	<--	herlo (n=clints@fedora/herlo) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:25	<--	Nafai (n=Nafai@travishartwell.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:25	<--	pmcnabb (n=peter@komodo.mcnabbs.org) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:26	<--	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:26	<--	Tene (n=tene@poipu/supporter/slacker/tene) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:26	<--	ccjoe (n=ccjoe@69.20.152.109) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:26	<--	eggyknap (n=jtolley@unaffiliated/eggyknap) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:28	<--	jshipley_ (n=jshipley@ip67-88-113-150.z113-88-67.customer.algx.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:29	<--	thesuper1igfrog (n=thesuper@c-98-247-72-114.hsd1.wa.comcast.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:29	<--	whiteley (n=bart@nat/novell/x-ktffdvbbeldiirzz) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:29	<--	zzzirk_a` (n=zzzirk@173-10-29-145-BusName-utah.ut.hfc.comcastbusiness.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:29	<--	synic (n=squish@pdpc/supporter/student/synic) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:30	<--	programmerq (n=jefferya@saffron.programmerq.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:31	<--	wps (n=wps@208.53.47.251) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:31	<--	eightyeight (n=88@oalug/member/pdpc.supporter.monthlybronze.eightyeight) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:31	<--	levi (n=user@levi.dsl.xmission.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:31	<--	peno (i=peno@peno.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:31	<--	whiteinge (n=whiteing@oalug/member/whiteinge) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:33	<--	eco (n=eco@gnuk.net) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:33	<--	macnewbold1 (n=mac@hao.codegreene.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:33	<--	pashdown (i=pashdown@sine.xmission.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:33	<--	Supaplex (n=supaplex@166.70.62.193) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:33	<--	Sargun_Screen (n=sargun@208.106.98.2) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:48:34	<--	bgerber (n=gerberb@suse103.zenez.com) has quit (jordan.freenode.net irc.freenode.net)
+2009-12-16 06:51:45	-->	ChanServ (ChanServ@services.) has joined #utah
+2009-12-16 06:51:45	-->	brasto (n=brasto@c-67-182-203-21.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 06:51:45	-->	Sargun (n=Sargun@atarack/Staff/Sargun) has joined #utah
+2009-12-16 06:51:45	-->	tristanbob_ (n=tristanr@ubuntu/member/tristanbob) has joined #utah
+2009-12-16 06:51:45	-->	Heartsbane (i=tsharpe@unaffiliated/heartsbane) has joined #utah
+2009-12-16 06:51:45	-->	fugue88 (n=dsowen@fugue88.dsl.xmission.com) has joined #utah
+2009-12-16 06:51:45	-->	TehLaser (n=andrew@emelia.prismation.com) has joined #utah
+2009-12-16 06:51:45	-->	ibot (i=ibot@rikers.org) has joined #utah
+2009-12-16 06:51:45	-->	herlo (n=clints@fedora/herlo) has joined #utah
+2009-12-16 06:51:45	-->	ScytheBlade1 (n=Death@smtp.mail.averageurl.com) has joined #utah
+2009-12-16 06:51:45	-->	Nafai (n=Nafai@travishartwell.net) has joined #utah
+2009-12-16 06:51:45	-->	Tene (n=tene@poipu/supporter/slacker/tene) has joined #utah
+2009-12-16 06:51:45	-->	pmcnabb (n=peter@komodo.mcnabbs.org) has joined #utah
+2009-12-16 06:51:45	-->	ccjoe (n=ccjoe@69.20.152.109) has joined #utah
+2009-12-16 06:51:45	-->	mrpull (n=Jake@205.158.184.126.ptr.us.xo.net) has joined #utah
+2009-12-16 06:51:45	-->	tvc123 (n=tcameron@host-148.pl1071220.fiber.net) has joined #utah
+2009-12-16 06:51:45	-->	eggyknap (n=jtolley@unaffiliated/eggyknap) has joined #utah
+2009-12-16 06:51:45	-->	fadein (i=fadein@static-ip-62-75-255-124.inaddr.server4you.de) has joined #utah
+2009-12-16 06:51:45	-->	wps (n=wps@208.53.47.251) has joined #utah
+2009-12-16 06:51:45	-->	tristanbob__ (n=tristanb@c-67-164-207-61.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 06:51:45	-->	badon (n=q@pdpc/supporter/active/badon) has joined #utah
+2009-12-16 06:51:45	-->	redbeard2 (n=jphall@techhat.dsl.xmission.com) has joined #utah
+2009-12-16 06:51:45	-->	romanovic-away (n=romanovi@c-67-182-248-31.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 06:51:45	-->	acc_ (n=acc@hexadecagram.org) has joined #utah
+2009-12-16 06:51:45	-->	bonez2046 (i=scott@75-145-58-209-Utah.hfc.comcastbusiness.net) has joined #utah
+2009-12-16 06:51:45	-->	goozbach (n=goozbach@74.207.226.4) has joined #utah
+2009-12-16 06:51:45	--	Mode #utah [+oovv ChanServ ibot herlo goozbach] by irc.freenode.net
+2009-12-16 06:51:45	-->	beelzebob (n=bob@204.202.11.121) has joined #utah
+2009-12-16 06:51:45	-->	tensai (n=tensai@joanna.zmonkey.org) has joined #utah
+2009-12-16 06:51:45	-->	jsmith-away (n=nnjsmith@asterisk/training-and-documentation-guru/jsmith) has joined #utah
+2009-12-16 06:51:45	-->	bmidgley (n=bmidgley@c-76-27-89-77.hsd1.ut.comcast.net) has joined #utah
+2009-12-16 06:51:45	-->	CamargoBP (n=CamargoB@orem.jiveip.net) has joined #utah
+2009-12-16 06:51:45	-->	eightyeight (n=88@oalug/member/pdpc.supporter.monthlybronze.eightyeight) has joined #utah
+2009-12-16 06:51:45	-->	jshipley_ (n=jshipley@ip67-88-113-150.z113-88-67.customer.algx.net) has joined #utah
+2009-12-16 06:51:45	-->	rsimpkins (n=rsimpkin@callisto.ryansimpkins.com) has joined #utah
+2009-12-16 06:51:45	-->	levi (n=user@levi.dsl.xmission.com) has joined #utah
+2009-12-16 06:51:45	-->	mecworks_ (n=marc@137.65.135.29) has joined #utah
+2009-12-16 06:51:45	-->	peno (i=peno@peno.com) has joined #utah
+2009-12-16 06:51:45	-->	thesuper1igfrog (n=thesuper@c-98-247-72-114.hsd1.wa.comcast.net) has joined #utah
+2009-12-16 06:51:45	-->	whiteinge (n=whiteing@oalug/member/whiteinge) has joined #utah
+2009-12-16 06:51:45	-->	whiteley (n=bart@nat/novell/x-ktffdvbbeldiirzz) has joined #utah
+2009-12-16 06:51:45	-->	RyanE (i=Piadas@rberick.dsl.xmission.com) has joined #utah
+2009-12-16 06:51:45	-->	harleypig (n=harleypi@harleypig.com) has joined #utah
+2009-12-16 06:51:45	-->	jnbek|wc (n=jnbek@unaffiliated/jnbek) has joined #utah
+2009-12-16 06:51:45	-->	unum (n=unum@li32-23.members.linode.com) has joined #utah
+2009-12-16 06:51:45	-->	diesel (n=dlong@63.75.14.62) has joined #utah
+2009-12-16 06:51:45	-->	zzzirk_a` (n=zzzirk@173-10-29-145-BusName-utah.ut.hfc.comcastbusiness.net) has joined #utah
+2009-12-16 06:51:45	-->	synic (n=squish@pdpc/supporter/student/synic) has joined #utah
+2009-12-16 06:51:45	-->	Zelut (n=christer@unaffiliated/zelut) has joined #utah
+2009-12-16 06:51:45	-->	eco (n=eco@gnuk.net) has joined #utah
+2009-12-16 06:51:45	-->	JoshH (n=josh@2607:fa18:100:8000:191:0:0:0) has joined #utah
+2009-12-16 06:51:45	-->	Lars-UT (n=lars@67.208.112.36) has joined #utah
+2009-12-16 06:51:45	-->	macnewbold1 (n=mac@hao.codegreene.com) has joined #utah
+2009-12-16 06:51:45	-->	pashdown (i=pashdown@sine.xmission.com) has joined #utah
+2009-12-16 06:51:45	-->	Supaplex (n=supaplex@166.70.62.193) has joined #utah
+2009-12-16 06:51:45	-->	bgerber (n=gerberb@suse103.zenez.com) has joined #utah
+2009-12-16 06:51:45	-->	Sargun_Screen (n=sargun@208.106.98.2) has joined #utah
+2009-12-16 06:51:45	-->	programmerq (n=jefferya@saffron.programmerq.net) has joined #utah
+2009-12-16 06:52:18	<--	redbeard2 (n=jphall@techhat.dsl.xmission.com) has quit (Read error: 104 (Connection reset by peer))
+2009-12-16 07:15:58	-->	emcnabb (n=emcnabb@66.187.233.202) has joined #utah
+2009-12-16 07:15:58	--	Mode #utah [+v emcnabb] by ChanServ
+2009-12-16 07:16:53	--	jsmith-away is now known as jsmith-teaching
+2009-12-16 07:27:41	-->	sontek (n=OES\jand@opensuse/member/Sontek) has joined #utah
+2009-12-16 07:27:41	--	Topic for #utah is "http://utos.org/irc | logs @ http://ibot.rikers.org/#utah | This, Jen, is the Internet."
+2009-12-16 07:27:41	--	Topic set by sjansen on Mon Dec 14 10:52:05 2009
+2009-12-16 07:27:41	--	Nicks #utah: [@ChanServ @ibot +emcnabb +goozbach +herlo acc_ badon beelzebob bgerber bmidgley bonez2046 brasto CamargoBP ccjoe diesel eco eggyknap eightyeight fadein fugue88 harleypig Heartsbane jnbek jnbek|wc JoshH jshipley_ jsmith-teaching Lars-UT levi LukeJenkins macnewbold1 markl_ mecworks_ mrpull mulicheng Nafai pashdown peno pmcnabb programmerq romanovic-away rsimpkins RyanE Sargun Sargun_Screen ScytheBlade1 sontek Supaplex synic TehLaser Tene tensai thesuper1igfrog tristanbob_ tristanbob__ tvc123 undertakingyou unum whiteinge whiteley wps Zelut zzzirk_a`]
+2009-12-16 07:27:41	--	Channel #utah: 63 nicks (2 ops, 0 halfop, 3 voices, 58 normal)
+2009-12-16 07:27:42	--	Channel created on Sat Nov 25 23:42:53 2006
+2009-12-16 07:27:42	--	URL for #Utah: http://dmoz.org/Computers/Software/Operating_Systems/Linux/User_Groups/North_America/United_States/Utah/
+2009-12-16 07:28:02	sontek	ok, after a ew tweaks weechat is pretty nice :)
+2009-12-16 07:28:26	sontek	fixed a couple bad default settings and added the egrep script :)
+2009-12-16 07:29:54	eightyeight	is the ordering of window activity still sorted based on most recent activity rather than numerically?
+2009-12-16 07:31:37	sontek	eightyeight: thats one of the bad defaults I had to fix :P
+2009-12-16 07:31:46	eightyeight	how did you change it?
+2009-12-16 07:32:21	sontek	hotlist_sort = number_asc
+2009-12-16 07:32:23	sontek	in the conf
+2009-12-16 07:32:37	sontek	i.e /set hotlist_sort number_asc
+2009-12-16 07:33:17	eightyeight	i might retry it then. that was a show stopper for me when i tried it a couple years back
+2009-12-16 07:33:53	sontek	That was the first annoying thing, then the bouncing between buffers when you hit alt-# was annoying
+2009-12-16 07:34:09	sontek	it'd jump between the previous and current buffer
+2009-12-16 07:34:18	sontek	and then I needed /lastlog support, thats what egrep does
+2009-12-16 07:34:28	sontek	so now I feel like I'm in irssi++ :)
+2009-12-16 07:34:33	eightyeight	yeah. that was stopper #2
+2009-12-16 07:34:39	eightyeight	/lastlog is critical
+2009-12-16 07:37:56	eightyeight	speaking of irc: http://www.youtube.com/watch?v=O2rGTXHvPCQ
+2009-12-16 07:40:46	sontek	haha yeah I saw that episode
+2009-12-16 07:40:53	sontek	I love tv hacking :P
+2009-12-16 07:41:48	sontek	brb
+2009-12-16 07:42:27	-->	sontek (n=OES\jand@opensuse/member/Sontek) has joined #utah
+2009-12-16 07:42:27	--	Topic for #utah is "http://utos.org/irc | logs @ http://ibot.rikers.org/#utah | This, Jen, is the Internet."
+2009-12-16 07:42:27	--	Topic set by sjansen on Mon Dec 14 10:52:05 2009
+2009-12-16 07:42:27	--	Nicks #utah: [@ChanServ @ibot +emcnabb +goozbach +herlo acc_ badon beelzebob bgerber bmidgley bonez2046 brasto CamargoBP ccjoe diesel eco eggyknap eightyeight fadein fugue88 harleypig Heartsbane jnbek jnbek|wc JoshH jshipley_ jsmith-teaching Lars-UT levi LukeJenkins macnewbold1 markl_ mecworks_ mrpull mulicheng Nafai pashdown peno pmcnabb programmerq romanovic-away rsimpkins RyanE Sargun Sargun_Screen ScytheBlade1 sontek Supaplex synic TehLaser Tene tensai thesuper1igfrog tristanbob_ tristanbob__ tvc123 undertakingyou unum whiteinge whiteley wps Zelut zzzirk_a`]
+2009-12-16 07:42:27	--	Channel #utah: 63 nicks (2 ops, 0 halfop, 3 voices, 58 normal)
+2009-12-16 07:42:28	--	Channel created on Sat Nov 25 23:42:53 2006
+2009-12-16 07:42:28	--	URL for #Utah: http://dmoz.org/Computers/Software/Operating_Systems/Linux/User_Groups/North_America/United_States/Utah/
+2009-12-16 07:43:03	sontek	can you highlight me?
+2009-12-16 07:44:11	eightyeight	sontek: ping
