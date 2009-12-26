@@ -1,9 +1,0 @@
-[2009-12-16 07:41:51] weechat 0.3.0 (compiled on Dec 11 2009 20:19:42)
-[2009-12-16 07:41:51] Reading configuration file weechat.conf
-[2009-12-16 07:41:51] Reading configuration file plugins.conf
-[2009-12-16 07:41:51] Reading configuration file irc.conf
-[2009-12-16 07:41:51] Reading configuration file charset.conf
-[2009-12-16 07:41:51] Reading configuration file logger.conf
-[2009-12-16 07:41:51] Reading configuration file alias.conf
-[2009-12-16 07:41:51] Reading configuration file xfer.conf
-[2009-12-16 07:42:00] irc: connecting to server irc.freenode.net/6667...
