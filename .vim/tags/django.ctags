@@ -1,3 +1,0 @@
-finalize_options	/home/sontek/code/django-trunk/setup.py	/^    def finalize_options(self):$/
-fullsplit	/home/sontek/code/django-trunk/setup.py	/^def fullsplit(path, result=None):$/
-osx_install_data	/home/sontek/code/django-trunk/setup.py	/^class osx_install_data(install_data):$/
