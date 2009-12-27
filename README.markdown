@@ -25,10 +25,9 @@ becomes
 ### Installing source files
 It's as simple as running:
 
-    make
+    ./install.sh
 
 From this top-level directory.
 
 ## Requirements
 * bash
-* gnu make
