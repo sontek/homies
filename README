@@ -13,3 +13,4 @@ ln -s $(pwd)/.vimrc ~/.vimrc
 ln -s $(pwd)/.vim ~/.vim
 ln -s $(pwd)/.screenrc ~/.screenrc
 ln -s $(pwd)/.weechat ~/.weechat
+ln -s $(pwd)/.fonts ~/.fonts
