@@ -52,7 +52,7 @@ set laststatus=2            " Always show statusline, even if only 1 window.
 
 """" Tabs/Indent Levels
 set autoindent              " Do dumb autoindentation when no filetype is set
-set tabstop=8               " Real tab characters are 8 spaces wide,
+set tabstop=4               " <tab> inserts 4 spaces 
 set shiftwidth=4            " but an indent level is 2 spaces wide.
 set softtabstop=4           " <BS> over an autoindent deletes both spaces.
 set expandtab               " Use spaces, not tabs, for autoindent/tab key.
