@@ -65,7 +65,7 @@ SCRIPT_LICENSE = 'BSD'
 DEFAULTS = {
   'maxlen'      => '50',
   'color'       => 'red',
-  'shortener'   => 'isgd',
+  'shortener'   => 'tinyurl',
   'bitly_login' => '',
   'bitly_key'   => '',
 }
