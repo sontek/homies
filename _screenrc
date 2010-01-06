@@ -1,0 +1,39 @@
+# Created by John Anderson < sontek@gmail.com >
+##    Explanation of hardstatus line    ##
+
+# Note the embeded space after the colon, I feel
+#  it just looks nicer with a blank between the
+#  text and console edge:
+#   '%{=b}%{G} Screens: '
+
+# This prints the window listing in blue:
+#   '%{b}%w'
+
+# This right-aligns what follows:
+#   '%='
+
+# This displays the time (hours and minutes) in 12hr format
+# and adds an AM/PM flag, in bold green:
+#   '%{G}%C%A'
+
+# This displays the day of the week:
+#   '%D'
+
+#This displays the date in Mon/day/year format:
+# and again I embeded a space to give me one space
+# between the text and console edge:
+#  '%M/%d/%Y '
+
+# The resultsing command give you a status line that
+#  looks like this:
+#   | Screens: 0* bash  <blanks zapped>         5:30PM  Fri, Jun/25/2004 |
+#  (The pipes indicate the edges of the xterm/console).
+
+# Green text, time, and date; windows in blue:
+hardstatus alwayslastline "%{=b}%{G} Screen(s): %{b}%w %=%{kG}%C%A  %D, %M/%d/%Y "
+
+# Turn off start message:
+startup_message off
+
+# Set messages timeout to one second:
+msgwait 1

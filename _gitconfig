@@ -1,0 +1,11 @@
+[user]
+	name = John Anderson
+	email = sontek@gmail.com
+
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+
+[push]
+	default = matching
