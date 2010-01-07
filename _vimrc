@@ -58,8 +58,8 @@ set shiftround              " rounds indent to a multiple of shiftwidth
 
 """" Tags
 " Tags can be in ./tags, ../tags, ..., /home/tags.
-set tags+=$HOME/.vim/tags/python.ctags
-set tags+=$HOME/.vim/tags/django.ctags
+"set tags+=$HOME/.vim/tags/python.ctags
+"set tags+=$HOME/.vim/tags/django.ctags
 
 set showfulltag             " Show more information while completing tags.
 set cscopetag               " When using :tag, <C-]>, or "vim -t", try cscope:
