@@ -16,7 +16,7 @@ ISGD = 'http://is.gd/api.php?%s'
 # script options
 settings = {
     "color": "red",
-    "urllength": 30,
+    "urllength": "30",
 }
 
 
@@ -65,7 +65,7 @@ def match_url(message, buffer, from_self):
 
     new_message = message
     for url in urlRe.findall(message):
-        if len(url) > weechat.config_get_plugin('urllength'):
+        if len(url) > int(weechat.config_get_plugin('urllength')):
             if from_self:
                 short_url = tiny_url(url)
                 new_message = new_message.replace(url, short_url)
