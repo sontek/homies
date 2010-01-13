@@ -44,7 +44,8 @@ def tiny_url(url, buffer):
     finally:
         if url:
             if in_weechat:
-                weechat.prnt(buffer, '[%s]' % (url))
+                color = weechat.color("red")
+                weechat.prnt(buffer, '%s[%s]' % (color, url))
             else:
                 print url
 
