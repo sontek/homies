@@ -1,4 +1,19 @@
 #!/usr/bin/env python
+# Copyright (c) 2009 by John Anderson <sontek@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 import re
 import weechat
@@ -12,12 +27,25 @@ SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC    = "Shorten long incoming and outgoing URLs"
 
 ISGD = 'http://is.gd/api.php?%s'
+TINYURL = 'http://tinyurl.com/api-create.php?%s'
 
 # script options
+# shortener options:
+#  - isgd
+#  - tinyurl
+
 settings = {
     "color": "red",
     "urllength": "30",
+    "shortener": "isgd",
 }
+
+octet = r'(?:2(?:[0-4]\d|5[0-5])|1\d\d|\d{1,2})'
+ipAddr = r'%s(?:\.%s){3}' % (octet, octet)
+# Base domain regex off RFC 1034 and 1738
+label = r'[0-9a-z][-0-9a-z]*[0-9a-z]?'
+domain = r'%s(?:\.%s)*\.[a-z][-0-9a-z]*[a-z]?' % (label, label)
+urlRe = re.compile(r'(\w+://(?:%s|%s)(?::\d+)?(?:/[^\])>\s]*)?)' % (domain, ipAddr), re.I)
 
 
 if weechat.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE,
@@ -56,43 +84,35 @@ def hook_print_callback(data, buffer, date, tags, displayed, highlight, prefix, 
     return weechat.WEECHAT_RC_OK
 
 def match_url(message, buffer, from_self):
-    octet = r'(?:2(?:[0-4]\d|5[0-5])|1\d\d|\d{1,2})'
-    ipAddr = r'%s(?:\.%s){3}' % (octet, octet)
-    # Base domain regex off RFC 1034 and 1738
-    label = r'[0-9a-z][-0-9a-z]*[0-9a-z]?'
-    domain = r'%s(?:\.%s)*\.[a-z][-0-9a-z]*[a-z]?' % (label, label)
-    urlRe = re.compile(r'(\w+://(?:%s|%s)(?::\d+)?(?:/[^\])>\s]*)?)' % (domain, ipAddr), re.I)
-
     new_message = message
     for url in urlRe.findall(message):
         if len(url) > int(weechat.config_get_plugin('urllength')):
             if from_self:
-                short_url = tiny_url(url)
+                short_url = tiny_url(url, None)
                 new_message = new_message.replace(url, short_url)
             else:
-                tiny_url_process(url, buffer, from_self)
+                tiny_url(url, buffer)
 
     if from_self:
         return new_message
     else:
         return weechat.WEECHAT_RC_OK 
 
-def tiny_url(url):
-    url = ISGD % urlencode({'longurl':url})
+def tiny_url(url, buffer):
+    shortener = weechat.config_get_plugin('shortener')
+    if shortener == 'isgd':
+        url = ISGD % urlencode({'longurl':url})
+    if shortener == 'tinyurl':
+        url = TINYURL % urlencode({'url':url})
     try:
-        return urlopen(url).read()
+        if buffer:
+            shortenurl_hook_process = weechat.hook_process(
+                        "python -c \"import urllib2; print urllib2.urlopen('" + url + "').read()\"",
+                        10 * 1000, "process_complete", buffer)
+        else:
+            return urlopen(url).read()
     except:
         return  url
-
-def tiny_url_process(url, buffer, from_self):
-    """ Query a Tinyurl service, if not available query an alternative one
-        If the alternative service is not available, don't do anything
-    """ 
-    url = ISGD % urlencode({'longurl':url})
-
-    shortenurl_hook_process = weechat.hook_process(
-                 "python -c \"import urllib2; print urllib2.urlopen('" + url + "').read()\"",
-                 10 * 1000, "process_complete", buffer)
 
 def process_complete(data, command, rc, stdout, stderr):
     url = stdout.strip()
