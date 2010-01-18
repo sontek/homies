@@ -55,3 +55,8 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
+
+venwrap=`type -P virtualenvwrapper_bashrc`
+if [ "$venwrap" != "" ]; then
+    source $venwrap
+fi
