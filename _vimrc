@@ -113,14 +113,20 @@ syntax on                   " and turn on per-filetype syntax highlighting.
 """ Key Mappings
 map <silent><C-Left> <C-T>
 map <silent><C-Right> <C-]>
+
 " easily move around tabs
 map <silent><A-Right> :tabnext<CR>
 map <silent><A-Left> :tabprevious<CR>
+
 " execute selected script
 map <C-h> :py EvaluateCurrentRange()<CR>
-" launch TaskList Plugin
-"map T :TaskList<CR><C-w><Left>
-"map <F4> :TlistToggle<CR>
+
+" Show tasks in current buffer
+map T :TaskList<CR><C-w><Left>
+
+" Show Project Menu
+map <F3> :NERDTreeToggle<CR>
+
 
 let Tlist_GainFocus_On_ToggleOpen=1
 let g:skip_loading_mswin=1
