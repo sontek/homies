@@ -21,7 +21,9 @@ set incsearch               " Incrementally search while typing a /regex
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=menuone,preview
+set completeopt=longest,menuone,preview
+set pumheight=6             " Keep a small completion window
+
 " close preview window automatically
 autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
