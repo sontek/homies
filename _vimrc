@@ -162,16 +162,16 @@ imap <C-@> <C-Space>
 
 if has("python")
 python << EOF
-    import os
-    import sys
-    import vim
-    # lets us use 'gf' to go to files imported
-    for p in sys.path:
-        if os.path.isdir(p):
-            vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
+import os
+import sys
+import vim
+# lets us use 'gf' to go to files imported
+for p in sys.path:
+    if os.path.isdir(p):
+        vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
 
-    # lets us execute the highlighted portion of the script
-    def EvaluateCurrentRange():
+# lets us execute the highlighted portion of the script
+def EvaluateCurrentRange():
     eval(compile('\n'.join(vim.current.range),'','exec'),globals())
 EOF
 endif
