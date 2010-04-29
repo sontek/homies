@@ -90,7 +90,7 @@ if has("win32")
 endif
 if has("unix")
     if ! len(glob("~/.backup/"))
-        echomsg "Backup directory ~/backup doesn't exist!"
+        echomsg "Backup directory ~/.backup doesn't exist!"
     endif
     set backupdir^=~/.backup    " Backups are written to ~/.backup/ if possible.
     set directory^=~/.backup//  " Swap files are also written to ~/.backup, too.
