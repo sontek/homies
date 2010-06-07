@@ -29,7 +29,7 @@ autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 """" Folding
-set foldmethod=syntax       " By default, use syntax to determine folds
+set foldmethod=indent       " By default, use syntax to determine folds
 set foldlevelstart=99       " All folds open by default
 
 """" Display
