@@ -21,22 +21,28 @@ set incsearch               " Incrementally search while typing a /regex
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=menuone,preview
+set completeopt=longest,menuone,preview
+set pumheight=6             " Keep a small completion window
+
 " close preview window automatically
 autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 """" Folding
-set foldmethod=syntax       " By default, use syntax to determine folds
+set foldmethod=indent       " By default, use syntax to determine folds
 set foldlevelstart=99       " All folds open by default
 
 """" Display
+colors peaksea
 set number                  " Display line numbers
 set numberwidth=1           " using only 1 column (and 1 space) while possible
 set background=dark 
-set guioptions-=m           " remove menu bar
-set guioptions-=T           " remove toolbar
-set guioptions-=r           " remove right-hand scroll bar
+if has("gui_running")
+    set guioptions-=m           " remove menu bar
+    set guioptions-=T           " remove toolbar
+    set guioptions-=r           " remove right-hand scroll bar
+    set t_Co=256
+endif
 " displays tabs with :set list & displays when a line runs off-screen
 set listchars=tab:>-,eol:$,trail:-,precedes:<,extends:>
 
@@ -75,16 +81,26 @@ set ffs=unix,dos,mac        " Try recognizing dos, unix, and mac line endings.
 
 """" Backups/Swap Files
 " Make sure that the directory where we want to put swap/backup files exists.
-if ! len(glob("~/.backup/"))
-  echomsg "Backup directory ~/.backup doesn't exist!"
+if has("win32") 
+    if ! len(glob("~/backup/"))
+        echomsg "Backup directory ~/backup doesn't exist!"
+    endif
+    set backupdir^=~/backup    " Backups are written to ~/.backup/ if possible.
+    set directory^=~/backup//  " Swap files are also written to ~/.backup, too.
 endif
+if has("unix")
+    if ! len(glob("~/.backup/"))
+        echomsg "Backup directory ~/.backup doesn't exist!"
+    endif
+    set backupdir^=~/.backup    " Backups are written to ~/.backup/ if possible.
+    set directory^=~/.backup//  " Swap files are also written to ~/.backup, too.
+endif
+
 set writebackup             " Make a backup of the original file when writing
 set backup                  " and don't delete it after a succesful write.
 set backupskip=             " There are no files that shouldn't be backed up.
 set updatetime=2000         " Write swap files after 2 seconds of inactivity.
 set backupext=~             " Backup for "file" is "file~"
-set backupdir^=~/.backup    " Backups are written to ~/.backup/ if possible.
-set directory^=~/.backup//  " Swap files are also written to ~/.backup, too.
 " ^ Here be magic! Quoth the help:
 " For Unix and Win32, if a directory ends in two path separators "//" or "\\",
 " the swap file name will be built from the complete path to the file with all
@@ -111,14 +127,20 @@ syntax on                   " and turn on per-filetype syntax highlighting.
 """ Key Mappings
 map <silent><C-Left> <C-T>
 map <silent><C-Right> <C-]>
+
 " easily move around tabs
 map <silent><A-Right> :tabnext<CR>
 map <silent><A-Left> :tabprevious<CR>
+
 " execute selected script
 map <C-h> :py EvaluateCurrentRange()<CR>
-" launch TaskList Plugin
-"map T :TaskList<CR><C-w><Left>
-"map <F4> :TlistToggle<CR>
+
+" Show tasks in current buffer
+map T :TaskList<CR><C-w><Left>
+
+" Show Project Menu
+map <F3> :NERDTreeToggle<CR>
+
 
 let Tlist_GainFocus_On_ToggleOpen=1
 let g:skip_loading_mswin=1
@@ -138,6 +160,7 @@ inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
         \ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
 imap <C-@> <C-Space>
 
+if has("python")
 python << EOF
 import os
 import sys
@@ -149,5 +172,6 @@ for p in sys.path:
 
 # lets us execute the highlighted portion of the script
 def EvaluateCurrentRange():
-  eval(compile('\n'.join(vim.current.range),'','exec'),globals())
+    eval(compile('\n'.join(vim.current.range),'','exec'),globals())
 EOF
+endif

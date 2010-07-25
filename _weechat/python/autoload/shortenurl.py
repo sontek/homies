@@ -38,6 +38,7 @@ settings = {
     "color": "red",
     "urllength": "30",
     "shortener": "isgd",
+    "public": "off",
 }
 
 octet = r'(?:2(?:[0-4]\d|5[0-5])|1\d\d|\d{1,2})'
@@ -88,8 +89,10 @@ def match_url(message, buffer, from_self):
     for url in urlRe.findall(message):
         if len(url) > int(weechat.config_get_plugin('urllength')):
             if from_self:
-                short_url = tiny_url(url, None)
-                new_message = new_message.replace(url, short_url)
+                public = weechat.config_get_plugin('public')
+                if public == 'on':
+                    short_url = tiny_url(url, None)
+                    new_message = new_message.replace(url, short_url)
             else:
                 tiny_url(url, buffer)
 
