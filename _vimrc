@@ -97,7 +97,7 @@ if has("unix")
 endif
 
 set writebackup             " Make a backup of the original file when writing
-set backup                  " and don't delete it after a succesful write.
+"set backup                  " and don't delete it after a succesful write.
 set backupskip=             " There are no files that shouldn't be backed up.
 set updatetime=2000         " Write swap files after 2 seconds of inactivity.
 set backupext=~             " Backup for "file" is "file~"

@@ -4,9 +4,9 @@
 "License: Copyright (c) 2001-2009, Fvw
 "         GNU General Public License version 2 for more details.
 
-noremap  <c-p>      :call BufPrevPart()<cr>
-noremap  <c-n>      :call BufNextPart()<cr>
-noremap  <leader>bo :call BufOnly()<cr>
+noremap  \n       :call BufPrevPart()<cr>
+noremap  \p       :call BufNextPart()<cr>
+noremap  ,bo :call BufOnly()<cr>
 
 hi NowBuf term=bold ctermfg=Cyan guifg=green guibg=blue gui=bold
 set statusline=%m\{%{&ff}:%{&fenc}:%Y:%#NowBuf#%t%#StatusLine#}\ %{g:bufPartStr}%<%=%l,%c,%P,%L%<
@@ -26,20 +26,20 @@ function! BufMap()
     if now_maxidx > s:last_maxidx
         for i in range(s:last_maxidx+1, now_maxidx, 1)
             if i < 10
-                exec "silent! noremap <M-".i."> :call BufChange(".i.")<CR>"
+                exec "silent! noremap \\".i." :call BufChange(".i.")<CR>"
             else
-                exec "silent! noremap <M-".i/10."><M-".i%10."> :call BufChange(".i.")<CR>"
+                exec "silent! noremap \\".i/10.i%10." :call BufChange(".i.")<CR>"
             endif
-            exec "silent! noremap <leader>".i." :call BufSplit(".i.")<CR>"
+            exec "silent! noremap ,".i." :call BufSplit(".i.")<CR>"
         endfor
     elseif now_maxidx < s:last_maxidx
         for i in range(now_maxidx+1, s:last_maxidx, 1)
             if i < 10
-                exec "silent! unmap <M-".i.">"
+                exec "silent! unmap \\".i
             else
-                exec "silent! unmap <M-".i/10."><M-".i%10.">"
+                exec "silent! unmap \\".i/10.i%10
             endif
-            exec "silent! unmap <leader>".i
+            exec "silent! unmap ,".i
         endfor
     endif
     let s:last_maxidx = now_maxidx
