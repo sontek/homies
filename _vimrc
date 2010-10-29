@@ -33,7 +33,9 @@ set foldmethod=indent       " By default, use syntax to determine folds
 set foldlevelstart=99       " All folds open by default
 
 """" Display
-colors peaksea
+if !has('mac_unix')
+    colors inkpot
+endif
 set number                  " Display line numbers
 set numberwidth=1           " using only 1 column (and 1 space) while possible
 set background=dark 
