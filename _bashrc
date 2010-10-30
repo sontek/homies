@@ -60,12 +60,12 @@ fi
 {
   [ "_$TERM" = "_xterm" ] && type ldd && type grep && type tput && [ -L "/proc/$PPID/exe" ] && {
     if ldd /proc/$PPID/exe | grep libvte; then
-      if [ "`tput -Tgnome-256color colors`" = "256" ]; then
-        TERM=gnome-256color
+      if [ "`tput -Txterm-256color colors`" = "256" ]; then
+        TERM=xterm-256color
       elif [ "`tput -Txterm-256color colors`" = "256" ]; then
         TERM=xterm-256color
-      elif tput -T gnome; then
-        TERM=gnome
+      elif tput -T xterm; then
+        TERM=xterm
       fi
     fi
   }
