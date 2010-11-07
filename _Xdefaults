@@ -1,0 +1,10 @@
+xterm*background: black
+xterm*foreground: white
+
+URxvt.buffered:         true
+URxvt.background:       black
+URxvt.foreground:       white
+URxvt.cursorColor:      green
+URxvt.perl-ext-common:  default,matcher
+URxvt.urlLauncher:      /usr/bin/chromium
+URxvt.matcher.button:   1
