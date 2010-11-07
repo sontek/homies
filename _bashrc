@@ -33,16 +33,76 @@ xterm*|rxvt*)
     ;;
 esac
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+# Set up TERM variables.
+# vt100 and xterm have no color in vim (at least on unixs), but if we call them xterm-color, they will.
+# (vt100 for F-Secure SSH.)
+# This may well be the case for some other terms, so I'm putting them here.
+# Also set up a variable to indicate whether to set up the title functions.
+# TODO gnome-terminal, or however it reports itself
+case $TERM in
+
+  screen)
+    TERM_IS_COLOR=true
+    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=false
+    TERM_CAN_TITLE=true
+  ;;
+
+  xterm-color|color_xterm|rxvt|Eterm|screen*) # screen.linux|screen-w
+    TERM_IS_COLOR=true
+    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
+    TERM_CAN_TITLE=true
+  ;;
+
+  linux)
+    TERM_IS_COLOR=true
+    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
+    TERM_CAN_TITLE=false
+  ;;
+
+  xterm|vt100)
+    TERM_IS_COLOR=true
+    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=true
+    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=false
+    TERM_CAN_TITLE=true
+  ;;
+
+  *xterm*|eterm|rxvt*)
+    TERM_IS_COLOR=true
+    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=true
+    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
+    TERM_CAN_TITLE=true
+  ;;
+
+  *)
+    TERM_IS_COLOR=false
+    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=false
+    TERM_CAN_TITLE=false
+  ;;
+
+esac
+
+# dircolors... make sure that we have a color terminal, dircolors exists, and ls supports it.
+if $TERM_IS_COLOR && ( dircolors --help && ls --color ) &> /dev/null; then
+  # For some reason, the unixs machines need me to use $HOME instead of ~
+  # List files from highest priority to lowest.  As soon as the loop finds one that works, it will exit.
+  for POSSIBLE_DIR_COLORS in "$HOME/.dir_colors" "/etc/DIR_COLORS"; do
+    [[ -f "$POSSIBLE_DIR_COLORS" ]] && [[ -r "$POSSIBLE_DIR_COLORS" ]] && eval `dircolors -b "$POSSIBLE_DIR_COLORS"` && break
+  done
+
+  alias ls="ls --color=auto"
+  alias ll="ls --color=auto -l"
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
+else
+  # No color, so put a slash at the end of directory names, etc. to differentiate.
+  alias ls="ls -F"
+  alias ll="ls -lF"
 fi
 
 # Alias definitions.

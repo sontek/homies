@@ -1,5 +1,0 @@
-URxvt.buffered:     true
-URxvt.background:   black
-URxvt.cursorColor:  green
-URxvt.font:         xft:Terminus:pixelsize=14:antialias=false
-URxvt.boldFont:     xft:Terminus:bold:pixelsize=14:antialias=false
