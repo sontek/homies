@@ -33,7 +33,7 @@ set foldmethod=indent       " By default, use syntax to determine folds
 set foldlevelstart=99       " All folds open by default
 
 """" Display
-color inkpot
+colorscheme jellybeans 
 
 set number                  " Display line numbers
 set numberwidth=1           " using only 1 column (and 1 space) while possible
