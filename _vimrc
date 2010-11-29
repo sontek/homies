@@ -32,8 +32,6 @@ autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 set foldmethod=indent       " By default, use syntax to determine folds
 set foldlevelstart=99       " All folds open by default
 
-"""" Display
-colorscheme jellybeans 
 
 set number                  " Display line numbers
 set numberwidth=1           " using only 1 column (and 1 space) while possible
@@ -153,14 +151,6 @@ autocmd FileType python set omnifunc=pythoncomplete#Complete
 autocmd BufRead *.py set makeprg=python\ -c\ \"import\ py_compile,sys;\ sys.stderr=sys.stdout;\ py_compile.compile(r'%')\"      
 autocmd BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m       
 
-inoremap <Nul> <C-x><C-o>
-inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
-        \ "\<lt>C-n>" :
-        \ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
-        \ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
-        \ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
-imap <C-@> <C-Space>
-
 if has("python")
 python << EOF
 import os
@@ -176,3 +166,6 @@ def EvaluateCurrentRange():
     eval(compile('\n'.join(vim.current.range),'','exec'),globals())
 EOF
 endif
+
+"""" Display
+colorscheme jellybeans
