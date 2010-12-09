@@ -36,14 +36,20 @@ set foldlevelstart=99       " All folds open by default
 set number                  " Display line numbers
 set numberwidth=1           " using only 1 column (and 1 space) while possible
 set background=dark 
+
 if has("gui_running")
     set guioptions-=m           " remove menu bar
     set guioptions-=T           " remove toolbar
     set guioptions-=r           " remove right-hand scroll bar
     set t_Co=256
 endif
+
+" show a line at column 79
+set colorcolumn=79
+
 " displays tabs with :set list & displays when a line runs off-screen
 set listchars=tab:>-,eol:$,trail:-,precedes:<,extends:>
+set list
 
 """" Messages, Info, Status
 set vb t_vb=                " Disable all bells.  I hate ringing/flashing.
@@ -96,7 +102,8 @@ if has("unix")
 endif
 
 set writebackup             " Make a backup of the original file when writing
-"set backup                  " and don't delete it after a succesful write.
+
+"set backup                 " and don't delete it after a succesful write.
 set backupskip=             " There are no files that shouldn't be backed up.
 set updatetime=2000         " Write swap files after 2 seconds of inactivity.
 set backupext=~             " Backup for "file" is "file~"
