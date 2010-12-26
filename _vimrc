@@ -45,7 +45,9 @@ if has("gui_running")
 endif
 
 " show a line at column 79
-set colorcolumn=79
+if exists("&colorcolumn")
+    set colorcolumn=79
+endif
 
 " displays tabs with :set list & displays when a line runs off-screen
 set listchars=tab:>-,eol:$,trail:-,precedes:<,extends:>
