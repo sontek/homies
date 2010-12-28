@@ -141,5 +141,5 @@ fi
 PATH=$PATH:/var/lib/gems/1.9.1/gems/haml-3.0.4/bin
 export PATH
 
-PYTHONSTARTUP=~/.pythonrc
+PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
