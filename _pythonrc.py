@@ -7,16 +7,20 @@ complement this file.
 """
 import sys
 import os
-import readline, rlcompleter
 import atexit
 import pprint
 from tempfile import mkstemp
 from code import InteractiveConsole
 
-# Imports we want
-import datetime
-import pdb
+try:
+    import readline
+except ImportError:
+    print("Module readline not available.")
+else:
+    import rlcompleter
+    readline.parse_and_bind("tab: complete")
 
+WELCOME=''
 # Color Support
 class TermColors(dict):
     """Gives easy access to ANSI color codes. Attempts to fall back to no color
@@ -110,7 +114,7 @@ if 'DJANGO_SETTINGS_MODULE' in os.environ:
     C = Client()
 
     WELCOME += """%(Green)s
-Django environment detected.
+    Django environment detected.
 * Your INSTALLED_APPS models are available as `A`.
 * Your project settings are available as `S`.
 * The Django test client is available as `C`.
@@ -127,7 +131,6 @@ Warning: DEBUG_PROPAGATE_EXCEPTIONS has been set to True.
 %(Normal)s""" % _c
 
 # Start an external editor with \e
-##################################     
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/438813/
 
 EDITOR = os.environ.get('EDITOR', 'vi')
@@ -158,7 +161,7 @@ class EditableBufferInteractiveConsole(InteractiveConsole):
         return line
 
 c = EditableBufferInteractiveConsole(locals=locals())
-c.interact(banner='')
+c.interact(banner=WELCOME)
 
 # Exit the Python shell on exiting the InteractiveConsole
 sys.exit()
