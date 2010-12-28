@@ -5,12 +5,7 @@ regular Python commands, so do what you will. Your ~/.inputrc file can greatly
 complement this file.
 
 """
-import sys
 import os
-import atexit
-import pprint
-from tempfile import mkstemp
-from code import InteractiveConsole
 
 try:
     import readline
@@ -19,6 +14,25 @@ except ImportError:
 else:
     import rlcompleter
     readline.parse_and_bind("tab: complete")
+
+    # Enable a History
+    HISTFILE="%s/.pyhistory" % os.environ["HOME"]
+
+    # Read the existing history if there is one
+    if os.path.exists(HISTFILE):
+        readline.read_history_file(HISTFILE)
+
+    # Set maximum number of items that will be written to the history file
+    readline.set_history_length(300)
+
+    def savehist():
+        readline.write_history_file(HISTFILE)
+
+    import atexit
+    atexit.register(savehist)
+finally:
+    del rlcompleter
+    del atexit
 
 WELCOME=''
 # Color Support
@@ -56,21 +70,9 @@ class TermColors(dict):
             self.update(dict([(k, self.NoColor) for k,v in self.COLOR_TEMPLATES]))
 _c = TermColors()
 
-# Enable a History
-HISTFILE="%s/.pyhistory" % os.environ["HOME"]
 
-# Read the existing history if there is one
-if os.path.exists(HISTFILE):
-    readline.read_history_file(HISTFILE)
 
-# Set maximum number of items that will be written to the history file
-readline.set_history_length(300)
-
-def savehist():
-    readline.write_history_file(HISTFILE)
-
-atexit.register(savehist)
-
+import sys
 # Enable Color Prompts
 sys.ps1 = '%s>>> %s' % (_c['Green'], _c['Normal'])
 sys.ps2 = '%s... %s' % (_c['Red'], _c['Normal'])
@@ -84,7 +86,9 @@ def my_displayhook(value):
         except ImportError:
             __builtins__._ = value
 
+        import pprint
         pprint.pprint(value)
+        del pprint
 
 sys.displayhook = my_displayhook
 
@@ -136,6 +140,9 @@ Warning: DEBUG_PROPAGATE_EXCEPTIONS has been set to True.
 EDITOR = os.environ.get('EDITOR', 'vim')
 EDIT_CMD = '\e'
 
+from tempfile import mkstemp
+from code import InteractiveConsole
+
 class EditableBufferInteractiveConsole(InteractiveConsole):
     def __init__(self, *args, **kwargs):
         self.last_buffer = [] # This holds the last executed statement
@@ -160,8 +167,13 @@ class EditableBufferInteractiveConsole(InteractiveConsole):
             line = lines[-1]
         return line
 
+# clean up namespace
+del sys
+del os
+
 c = EditableBufferInteractiveConsole(locals=locals())
 c.interact(banner=WELCOME)
 
 # Exit the Python shell on exiting the InteractiveConsole
+import sys
 sys.exit()
