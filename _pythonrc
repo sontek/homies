@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This file is executed when the Python interactive shell is started if
 $PYTHONSTARTUP is in your environment and points to this file. It's just
@@ -79,8 +78,10 @@ def my_displayhook(value):
             import __builtin__
             __builtin__._ = value
         except ImportError:
-            pass
+            __builtins__._ = value
+
         pprint.pprint(value)
+
 sys.displayhook = my_displayhook
 
 # Django Helpers
