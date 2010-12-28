@@ -133,7 +133,7 @@ Warning: DEBUG_PROPAGATE_EXCEPTIONS has been set to True.
 # Start an external editor with \e
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/438813/
 
-EDITOR = os.environ.get('EDITOR', 'vi')
+EDITOR = os.environ.get('EDITOR', 'vim')
 EDIT_CMD = '\e'
 
 class EditableBufferInteractiveConsole(InteractiveConsole):
