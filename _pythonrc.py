@@ -169,7 +169,6 @@ class EditableBufferInteractiveConsole(InteractiveConsole):
 
 # clean up namespace
 del sys
-del os
 
 c = EditableBufferInteractiveConsole(locals=locals())
 c.interact(banner=WELCOME)
