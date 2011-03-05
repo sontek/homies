@@ -122,7 +122,7 @@ set wildmode=full           " <Tab> cycles between all matching choices.
 set wcm=<C-Z>               " Ctrl-Z in a mapping acts like <Tab> on cmdline
 source $VIMRUNTIME/menu.vim " Load menus (this would be done anyway in gvim)
 " <F4> triggers the menus, even in terminal vim.
-map <F4> :emenu <C-Z>
+map <F4> :TaskList<CR>
 
 """" Per-Filetype Scripts
 " NOTE: These define autocmds, so they should come before any other autocmds.
