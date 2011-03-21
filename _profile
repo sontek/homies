@@ -22,3 +22,6 @@ fi
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
+
+# macports path
+export PATH=/opt/local/bin:/opt/local/sbin:$PATH
