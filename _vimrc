@@ -177,4 +177,4 @@ EOF
 endif
 
 """" Display
-colorscheme peaksea
+colorscheme vividchalk
