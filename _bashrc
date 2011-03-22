@@ -137,8 +137,9 @@ venwrap=`type -P virtualenvwrapper_bashrc`
 if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
-PATH=$PATH:/var/lib/gems/1.9.1/gems/haml-3.0.4/bin
+PATH=$PATH:/usr/local/Cellar/python/2.7.1/Frameworks/Python.framework/Versions/2.7/bin
 PATH=$PATH:/Applications/MacVim.app/Contents/MacOS
+PATH=$PATH:~/.local/bin
 export PATH
 
 PYTHONSTARTUP=~/.pythonrc.py

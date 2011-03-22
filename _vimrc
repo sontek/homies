@@ -177,4 +177,4 @@ EOF
 endif
 
 """" Display
-colorscheme jellybeans
+colorscheme peaksea
