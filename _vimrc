@@ -17,7 +17,7 @@ set incsearch               " Incrementally search while typing a /regex
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=longest,menuone,preview
+"set completeopt=longest,menuone,preview
 set pumheight=6             " Keep a small completion window
 
 " close preview window automatically
@@ -57,6 +57,10 @@ set report=0                " : commands always print changed line count.
 set shortmess+=a            " Use [+]/[RO]/[w] for modified/readonly/written.
 set ruler                   " Show some info, even without statuslines.
 set laststatus=2            " Always show statusline, even if only 1 window.
+"
+" Useful information
+set statusline=%<%f\ (%{&ft})%=%-19(%3l,%02c%03V%)
+
 
 """" Tabs/Indent Levels
 set tabstop=4               " <tab> inserts 4 spaces 
@@ -183,3 +187,15 @@ endif
 "
 """" Display
 colorscheme vividchalk
+
+function! InsertTabWrapper()
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k'
+        return "\<tab>"
+    else
+        return "\<c-p>"
+    endif
+endfunction
+
+inoremap <tab> <c-r>=InsertTabWrapper()<cr>
+inoremap <s-tab> <c-n>
