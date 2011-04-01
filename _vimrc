@@ -140,6 +140,17 @@ map <C-h> :py EvaluateCurrentRange()<CR>
 " Show Project Menu
 map <leader>n :NERDTreeToggle<CR>
 
+" clear the search buffer when hitting return
+function! PressedEnter()
+    :nohlsearch
+    if &filetype == 'python'
+        :PyflakesUpdate
+    end
+endfunction
+nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
+
+" Seriously, guys. It's not like :W is bound to anything anyway.
+command! W :w
 
 let Tlist_GainFocus_On_ToggleOpen=1
 let g:skip_loading_mswin=1
@@ -165,6 +176,8 @@ for p in sys.path:
 def EvaluateCurrentRange():
     eval(compile('\n'.join(vim.current.range),'','exec'),globals())
 EOF
+
+source ~/.vim/ropevim/rope.vim
 endif
 
 "

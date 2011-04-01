@@ -9,3 +9,6 @@ do
         ln -sf ${source} ${target}
 #    fi
 done
+
+cd _vim/ropevim/
+./install.sh
