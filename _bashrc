@@ -140,8 +140,17 @@ fi
 
 # homebrew
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
+
 PATH=$PATH:~/.local/bin
+
+# osx vim
+if [ -x "/Applications/MacVim.app/Contents/MacOS/Vim" ]; then
+    PATH=/Applications/MacVim.app/Contents/MacOS/:$PATH
+fi
+
 export PATH
+
+
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP

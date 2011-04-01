@@ -1,6 +1,6 @@
 [user]
-	name = John Anderson
-	email = sontek@gmail.com
+    name = John Anderson
+    email = sontek@gmail.com
 
 [color]
     diff = auto
@@ -8,6 +8,6 @@
     branch = auto
 
 [push]
-	default = matching
+    default = matching
 [core]
-	editor = vim
+    editor = vim
