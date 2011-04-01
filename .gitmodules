@@ -1,3 +1,0 @@
-[submodule "_vim/ftplugin/python/pyflakes"]
-	path = _vim/ftplugin/python/pyflakes
-	url = https://github.com/kevinw/pyflakes.git
