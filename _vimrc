@@ -1,8 +1,4 @@
-" Author: John Anderson (sontek@gmail.com)
-
-" Stop behaving like vi; vim enhancements are better
-set nocompatible 
-
+let mapleader = ","
 """ Moving Around/Editing
 set nostartofline           " Avoid moving cursor to BOL when jumping around
 set virtualedit=block       " Let cursor move past the last char in <C-v> mode
@@ -121,8 +117,6 @@ set wildmenu                " Menu completion in command mode on <Tab>
 set wildmode=full           " <Tab> cycles between all matching choices.
 set wcm=<C-Z>               " Ctrl-Z in a mapping acts like <Tab> on cmdline
 source $VIMRUNTIME/menu.vim " Load menus (this would be done anyway in gvim)
-" <F4> triggers the menus, even in terminal vim.
-map <F4> :TaskList<CR>
 
 """" Per-Filetype Scripts
 " NOTE: These define autocmds, so they should come before any other autocmds.
@@ -143,11 +137,8 @@ map <silent><A-Left> :tabprevious<CR>
 " execute selected script
 map <C-h> :py EvaluateCurrentRange()<CR>
 
-" Show tasks in current buffer
-map T :TaskList<CR><C-w><Left>
-
 " Show Project Menu
-map <F3> :NERDTreeToggle<CR>
+map <leader>n :NERDTreeToggle<CR>
 
 
 let Tlist_GainFocus_On_ToggleOpen=1
@@ -176,5 +167,6 @@ def EvaluateCurrentRange():
 EOF
 endif
 
+"
 """" Display
 colorscheme vividchalk
