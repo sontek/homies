@@ -8,14 +8,14 @@ def SetBreakpoint():
     strWhite = re.search( '^(\s*)', strLine).group(1)
 
     vim.current.buffer.append(
-       "%(space)sipdb.set_trace() %(mark)s Breakpoint %(mark)s" %
+       "%(space)spdb.set_trace() %(mark)s Breakpoint %(mark)s" %
          {'space':strWhite, 'mark': '#' * 30}, nLine - 1)
 
     for strLine in vim.current.buffer:
-        if strLine == "import ipdb":
+        if strLine == "import pdb":
             break
     else:
-        vim.current.buffer.append( "import ipdb", 0)
+        vim.current.buffer.append( "import pdb", 0)
         vim.command( "normal j1")
 
 vim.command( "map <f7> :py SetBreakpoint()<cr>")
@@ -28,7 +28,7 @@ def RemoveBreakpoints():
     nLines = []
     nLine = 1
     for strLine in vim.current.buffer:
-        if strLine == "import ipdb" or strLine.lstrip()[:15] == "ipdb.set_trace()":
+        if strLine == "import pdb" or strLine.lstrip()[:15] == "pdb.set_trace()":
             nLines.append( nLine)
         nLine += 1
 
@@ -42,5 +42,5 @@ def RemoveBreakpoints():
 
     vim.command( "normal %dG" % nCurrentLine)
 
-vim.command( "map <s-f7> :py RemoveBreakpoints()<cr>")
+vim.command( "map <f8> :py RemoveBreakpoints()<cr>")
 EOF

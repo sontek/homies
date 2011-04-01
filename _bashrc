@@ -137,8 +137,9 @@ venwrap=`type -P virtualenvwrapper_bashrc`
 if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
-PATH=$PATH:/usr/local/Cellar/python/2.7.1/Frameworks/Python.framework/Versions/2.7/bin
-PATH=$PATH:/Applications/MacVim.app/Contents/MacOS
+
+# homebrew
+PATH=/usr/local/bin:/usr/local/sbin:$PATH
 PATH=$PATH:~/.local/bin
 export PATH
 
