@@ -147,9 +147,19 @@ map <leader>g :call RopeGotoDefinition()<CR>
 
 let g:stop_autocomplete=0
 
+function! InsertTabWrapper()
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k'
+        return "\<tab>"
+    else
+        return "\<c-p>"
+    endif
+endfunction
+
 function! CleverTab(type)
     if a:type=='omni'
-        if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+        let col = col('.') - 1
+        if !col || getline('.')[col - 1] !~ '\k'
             let g:stop_autocomplete=1
             return "\<TAB>"
         elseif !pumvisible() && !&omnifunc
