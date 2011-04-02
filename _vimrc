@@ -17,7 +17,7 @@ set incsearch               " Incrementally search while typing a /regex
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-"set completeopt=longest,menuone,preview
+set completeopt=longest,menuone,preview
 set pumheight=6             " Keep a small completion window
 
 " close preview window automatically
@@ -163,7 +163,7 @@ function! CleverTab(type)
             let g:stop_autocomplete=1
             return "\<TAB>"
         elseif !pumvisible() && !&omnifunc
-            return "\<C-X>\<C-O>\<C-P>"
+            return "\<C-X>\<C-O>"
         endif
     elseif a:type=='keyword' && !pumvisible() && !g:stop_autocomplete
         return "\<C-X>\<C-N>\<C-P>"
