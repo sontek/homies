@@ -143,6 +143,8 @@ map <C-h> :py EvaluateCurrentRange()<CR>
 
 " Show Project Menu
 map <leader>n :NERDTreeToggle<CR>
+map <leader>g :call RopeGotoDefinition()<CR>
+
 
 " clear the search buffer when hitting return
 function! PressedEnter()

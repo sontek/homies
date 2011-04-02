@@ -140,7 +140,7 @@ fi
 
 # homebrew
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
-
+PATH=$PATH:/usr/local/Cellar/python/2.7.1/Frameworks/Python.framework/Versions/2.7/bin/
 PATH=$PATH:~/.local/bin
 
 # osx vim
