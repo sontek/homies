@@ -145,6 +145,30 @@ map <C-h> :py EvaluateCurrentRange()<CR>
 map <leader>n :NERDTreeToggle<CR>
 map <leader>g :call RopeGotoDefinition()<CR>
 
+let g:stop_autocomplete=0
+
+function! CleverTab(type)
+    if a:type=='omni'
+        if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+            let g:stop_autocomplete=1
+            return "\<TAB>"
+        elseif !pumvisible() && !&omnifunc
+            return "\<C-X>\<C-O>\<C-P>"
+        endif
+    elseif a:type=='keyword' && !pumvisible() && !g:stop_autocomplete
+        return "\<C-X>\<C-N>\<C-P>"
+    elseif a:type=='next'
+        if g:stop_autocomplete
+            let g:stop_autocomplete=0
+        else
+            return "\<C-N>"
+        endif
+    endif
+    return ''
+endfunction
+
+inoremap <silent><TAB> <C-R>=CleverTab('omni')<CR><C-R>=CleverTab('keyword')<CR><C-R>=CleverTab('next')<CR>
+
 
 " clear the search buffer when hitting return
 function! PressedEnter()
@@ -189,15 +213,3 @@ endif
 "
 """" Display
 colorscheme vividchalk
-
-function! InsertTabWrapper()
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k'
-        return "\<tab>"
-    else
-        return "\<c-p>"
-    endif
-endfunction
-
-inoremap <tab> <c-r>=InsertTabWrapper()<cr>
-inoremap <s-tab> <c-n>
