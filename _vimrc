@@ -222,4 +222,4 @@ endif
 
 "
 """" Display
-colorscheme vividchalk
+colorscheme solarized
