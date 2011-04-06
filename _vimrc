@@ -222,4 +222,8 @@ endif
 
 "
 """" Display
-colorscheme solarized
+colorscheme vividchalk
+
+if filereadable($VIRTUAL_ENV . '/.vimrc')
+    source $VIRTUAL_ENV/.vimrc
+endif
