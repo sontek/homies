@@ -16,11 +16,14 @@ else:
     readline.parse_and_bind("tab: complete")
 
     # Enable a History
-    HISTFILE="%s/.pyhistory" % os.environ["HOME"]
+    HISTFILE=os.path.expanduser("%s/.pyhistory" % os.environ["HOME"])
 
     # Read the existing history if there is one
     if os.path.exists(HISTFILE):
-        readline.read_history_file(HISTFILE)
+        try:
+            readline.read_history_file(HISTFILE)
+        except IOError:
+            pass
 
     # Set maximum number of items that will be written to the history file
     readline.set_history_length(300)
@@ -28,11 +31,17 @@ else:
     def savehist():
         readline.write_history_file(HISTFILE)
 
-    import atexit
-    atexit.register(savehist)
+    try:
+        import atexit
+        atexit.register(savehist)
+    except:
+        pass
 finally:
-    del rlcompleter
-    del atexit
+    try:
+        del rlcompleter
+        del atexit
+    except:
+        pass
 
 WELCOME=''
 # Color Support
