@@ -9,39 +9,33 @@ import os
 
 try:
     import readline
-except ImportError:
-    print("Module readline not available.")
-else:
     import rlcompleter
-    readline.parse_and_bind("tab: complete")
+    import atexit
+except ImportError:
+    print("You need readline, rlcompleter, and atexit")
 
-    # Enable a History
-    HISTFILE=os.path.expanduser("%s/.pyhistory" % os.environ["HOME"])
+readline.parse_and_bind("tab: complete")
+readline.parse_and_bind ("bind ^I rl_complete")
 
-    # Read the existing history if there is one
-    if os.path.exists(HISTFILE):
-        try:
-            readline.read_history_file(HISTFILE)
-        except IOError:
-            pass
+class Completer(object):
+    def __init__(self):
+        # Enable a History
+        self.HISTFILE=os.path.expanduser("%s/.pyhistory" % os.environ["HOME"])
 
-    # Set maximum number of items that will be written to the history file
-    readline.set_history_length(300)
+        # Read the existing history if there is one
+        if os.path.exists(self.HISTFILE):
+            readline.read_history_file(self.HISTFILE)
 
-    def savehist():
-        readline.write_history_file(HISTFILE)
+        # Set maximum number of items that will be written to the history file
+        readline.set_history_length(300)
+        atexit.register(self.savehist)
 
-    try:
-        import atexit
-        atexit.register(savehist)
-    except:
-        pass
-finally:
-    try:
-        del rlcompleter
-        del atexit
-    except:
-        pass
+    def savehist(self):
+        import readline
+        readline.write_history_file(self.HISTFILE)
+
+
+c = Completer()
 
 WELCOME=''
 # Color Support
