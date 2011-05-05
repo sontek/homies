@@ -119,6 +119,7 @@ set backupext=~             " Backup for "file" is "file~"
 set history=1000            " Keep a very long command-line history.
 set wildmenu                " Menu completion in command mode on <Tab>
 set wildmode=full           " <Tab> cycles between all matching choices.
+set wildignore+=*.o,*.obj,.git,*.pyc
 set wcm=<C-Z>               " Ctrl-Z in a mapping acts like <Tab> on cmdline
 source $VIMRUNTIME/menu.vim " Load menus (this would be done anyway in gvim)
 
