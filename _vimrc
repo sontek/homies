@@ -17,7 +17,7 @@ set incsearch               " Incrementally search while typing a /regex
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=longest,menuone,preview
+set completeopt=menuone,longest,preview
 set pumheight=6             " Keep a small completion window
 
 " close preview window automatically
@@ -176,8 +176,8 @@ function! CleverTab(type)
     endif
     return ''
 endfunction
-
-inoremap <silent><TAB> <C-R>=CleverTab('omni')<CR><C-R>=CleverTab('keyword')<CR><C-R>=CleverTab('next')<CR>
+let g:SuperTabDefaultCompletionType = "context"
+"inoremap <silent><TAB> <C-R>=CleverTab('omni')<CR><C-R>=CleverTab('keyword')<CR><C-R>=CleverTab('next')<CR>
 
 
 " clear the search buffer when hitting return
