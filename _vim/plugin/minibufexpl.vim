@@ -1,28 +1,33 @@
-" Mini Buffer Explorer <minibufexpl.vim>
+" Mini Buffer Explorer++ <minibufexpl.vim>
 "
 " HINT: Type zR if you don't know how to use folds
 "
 " Script Info and Documentation  {{{
 "=============================================================================
 "    Copyright: Copyright (C) 2002 & 2003 Bindu Wavell 
+"    		    Copyright (C) 2010 Oliver Uvman
+"    		    Copyright (C) 2010 & 2011 Federico Holgado
 "               Permission is hereby granted to use and distribute this code,
 "               with or without modifications, provided that this copyright
 "               notice is copied with it. Like anything else that's free,
-"               minibufexplorer.vim is provided *as is* and comes with no
+"               minibufexpl.vim is provided *as is* and comes with no
 "               warranty of any kind, either expressed or implied. In no
 "               event will the copyright holder be liable for any damamges
 "               resulting from the use of this software.
 "
 " Name Of File: minibufexpl.vim
 "  Description: Mini Buffer Explorer Vim Plugin
-"   Maintainer: Bindu Wavell <bindu@wavell.net>
+"   Maintainer: Federico Holgado <fholgado@gmail.com>
+" Last Updated: Federico Holgado <fholgado@gmail.com>
 "          URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
-"  Last Change: Sunday, June 21, 2004
-"      Version: 6.3.2
+"   GitHub URL: https://github.com/fholgado/minibufexpl.vim
+"  Last Change: Saturday, January 1, 2011
+"      Version: 6.4.0
 "               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
 "               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
 "               original plugin can be found at:
 "               http://lanzarotta.tripod.com/vim/plugin/6/bufexplorer.vim.zip
+"               [NO LONGER AVAILABLE]
 "
 "        Usage: Normally, this file should reside in the plugins
 "               directory and be automatically sourced. If not, you must
@@ -192,13 +197,18 @@
 "               It is possible to customize the the highlighting for the tabs in 
 "               the MBE by configuring the following highlighting groups:
 "
-"                 MBENormal         - for buffers that have NOT CHANGED and
-"                                     are NOT VISIBLE.
-"                 MBEChanged        - for buffers that HAVE CHANGED and are
-"                                     NOT VISIBLE
-"                 MBEVisibleNormal  - buffers that have NOT CHANGED and are
-"                                     VISIBLE
-"                 MBEVisibleChanged - buffers that have CHANGED and are VISIBLE
+"                 MBENormal               - for buffers that have NOT CHANGED and
+"                                           are NOT VISIBLE.
+"                 MBEChanged              - for buffers that HAVE CHANGED and are
+"                                           NOT VISIBLE
+"                 MBEVisibleNormal        - buffers that have NOT CHANGED and are
+"                                           VISIBLE
+"                 MBEVisibleNormalActive  - buffers that have NOT CHANGED and are
+"                                           VISIBLE and is the active buffer
+"                 MBEVisibleChanged       - for buffers that have CHANGED and are 
+"                                           VISIBLE
+"                 MBEVisibleChangedActive - buffers that have CHANGED and are VISIBLE
+"                                           and is the active buffer
 "
 "               You can either link to an existing highlighting group by
 "               adding a command like:
@@ -262,9 +272,13 @@
 "               Several MBE commands can break the window history so <C-W>[pnw]
 "               might not take you to the expected window.
 "
-"         Todo: Add the ability to specify a regexp for eligible buffers
-"               allowing the ability to filter out certain buffers that 
-"               you don't want to control from MBE
+"         Todo:   - Add context to tab titles so that multiple tabs show the
+"                 root folder names. Useful for working with MVC frameworks
+"                 where multiple files have the same name but are in different
+"                 locations.
+"                 - Add the ability to specify a regexp for eligible buffers
+"                 allowing the ability to filter out certain buffers that 
+"                 you don't want to control from MBE.
 "
 "=============================================================================
 " }}}
@@ -296,26 +310,29 @@ endif
 if !hasmapto('<Plug>TMiniBufExplorer')
   map <unique> <Leader>mbt <Plug>TMiniBufExplorer
 endif
-
+if !hasmapto('<Plug>MBEMarkCurrent')
+  map <unique> <Leader>mq <Plug>MBEMarkCurrent
+endif
 " }}}
 " MBE <Script> internal map {{{
 " 
-noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(1, -1)<CR>:<BS>
+noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(1, -1, bufname("%"))<CR>:<BS>
 noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer(1)<CR>:<BS>
-noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1)<CR>:<BS>
+noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1,bufname("%"))<CR>:<BS>
 noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
+noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufname("%"),1)<CR>:<BS>
 
 " }}}
 " MBE commands {{{
 " 
 if !exists(':MiniBufExplorer')
-  command! MiniBufExplorer  call <SID>StartExplorer(1, -1)
+  command! MiniBufExplorer  call <SID>StartExplorer(1, -1, bufname("%"))
 endif
 if !exists(':CMiniBufExplorer')
   command! CMiniBufExplorer  call <SID>StopExplorer(1)
 endif
 if !exists(':UMiniBufExplorer')
-  command! UMiniBufExplorer  call <SID>AutoUpdate(-1)
+  command! UMiniBufExplorer  call <SID>AutoUpdate(-1,bufname("%"))
 endif
 if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer  call <SID>ToggleExplorer()
@@ -336,7 +353,7 @@ endif " }}}
 " 5-9 = info ; 5 is the most important
 " 10 = Entry/Exit
 if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 0 
+  let g:miniBufExplorerDebugLevel = 0
 endif
 
 " }}}
@@ -350,7 +367,7 @@ endif
 " 3 = Write into g:miniBufExplorerDebugOutput
 "     global variable [This is the default]
 if !exists('g:miniBufExplorerDebugMode')
-  let g:miniBufExplorerDebugMode = 3 
+  let g:miniBufExplorerDebugMode = 1
 endif 
 
 " }}}
@@ -597,17 +614,26 @@ let s:debugIndex = 0
 " Setup an autocommand group and some autocommands {{{
 " that keep our explorer updated automatically.
 "
+
+"set update time for the CursorHold function so that it is called 100ms after
+"a key is pressed
+setlocal updatetime=100
+
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufDelete   * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'))
-autocmd MiniBufExplorer BufEnter    * call <SID>DEBUG('-=> BufEnter  AutoCmd', 10) |call <SID>AutoUpdate(-1)
-autocmd MiniBufExplorer VimEnter    * call <SID>DEBUG('-=> VimEnter  AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1)
+autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufname("%"))
+autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorHold    * call <SID>DEBUG('-=> CursroHold  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorHoldI   * call <SID>DEBUG('-=> CursorHoldI  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter  AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1,bufname("%"))
+augroup NONE
 " }}}
 
 " Functions
 "
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
-function! <SID>StartExplorer(sticky, delBufNum)
+function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering StartExplorer()'   ,10)
   call <SID>DEBUG('===========================',10)
@@ -646,32 +672,61 @@ function! <SID>StartExplorer(sticky, delBufNum)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
+  "
+  "Depending on what type of split, make sure the MBE buffer is not
+  "automatically rezised by CTRL + W =, etc...
+  setlocal winfixheight
+  setlocal winfixwidth
+
+  " Set the text of the statusline for the MBE buffer. See help:stl for
+  " many options
+  setlocal stl=-MiniBufExplorer-
  
   if has("syntax")
     syn clear
-    syn match MBENormal             '\[[^\]]*\]'
-    syn match MBEChanged            '\[[^\]]*\]+'
-    syn match MBEVisibleNormal      '\[[^\]]*\]\*+\='
-    syn match MBEVisibleChanged     '\[[^\]]*\]\*+'
+    syn match MBENormal                   '\[[^\]]*\]'
+    syn match MBEChanged                  '\[[^\]]*\]+'
+    syn match MBEVisibleNormal            '\[[^\]]*\]\*+\='
+    syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
+    syn match MBEVisibleActive            '\[[^\]]*\]\*!'
+    syn match MBEVisibleChangedActive     '\[[^\]]*\]\*+!'
+
+    "MiniBufExpl Color Examples
+    " hi MBEVisibleActive guifg=#A6DB29 guibg=fg
+    " hi MBEVisibleChangedActive guifg=#F1266F guibg=fg
+    " hi MBEVisibleChanged guifg=#F1266F guibg=fg
+    " hi MBEVisibleNormal guifg=#5DC2D6 guibg=fg
+    " hi MBEChanged guifg=#CD5907 guibg=fg
+    " hi MBENormal guifg=#808080 guibg=fg
     
     if !exists("g:did_minibufexplorer_syntax_inits")
       let g:did_minibufexplorer_syntax_inits = 1
-      hi def link MBENormal         Comment
-      hi def link MBEChanged        String
-      hi def link MBEVisibleNormal  Special
-      hi def link MBEVisibleChanged Special
+      hi def link MBENormal                Comment
+      hi def link MBEChanged               String
+      hi def link MBEVisibleNormal         Special
+      hi def link MBEVisibleActive         Boolean
+      hi def link MBEVisibleChanged        Special
+      hi def link MBEVisibleChangedActive  Error
     endif
   endif
 
-  " If you press return in the -MiniBufExplorer- then try
+  " If you press return, o or e in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
-  nnoremap <buffer> <CR> :call <SID>MBESelectBuffer()<CR>:<BS>
+  nnoremap <buffer> <CR> :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> o :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> e :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  " If you press s in the -MiniBufExplorer- then try
+  " to open the selected buffer in a split in the previous window.
+  nnoremap <buffer> s :call <SID>MBESelectBuffer(1)<CR>:<BS>
+  " If you press j in the -MiniBufExplorer- then try
+  " to open the selected buffer in a vertical split in the previous window.
+  nnoremap <buffer> v :call <SID>MBESelectBuffer(2)<CR>:<BS>
   " If you DoubleClick in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
   nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
-  nnoremap <buffer> d :call <SID>MBEDeleteBuffer()<CR>:<BS>
+  nnoremap <buffer> d :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
   " If you press w in the -MiniBufExplorer- then switch back
   " to the previous window.
   nnoremap <buffer> p :wincmd p<CR>:<BS>
@@ -686,8 +741,10 @@ function! <SID>StartExplorer(sticky, delBufNum)
   " and restores it.
   nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  nnoremap <buffer> l   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> h :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
  
-  call <SID>DisplayBuffers(a:delBufNum)
+  call <SID>DisplayBuffers(a:delBufNum,a:currBufName)
 
   if (l:curBuf != -1)
     call search('\['.l:curBuf.':'.expand('#'.l:curBuf.':t').'\]')
@@ -745,7 +802,7 @@ function! <SID>ToggleExplorer()
   if l:winNum != -1 
     call <SID>StopExplorer(1)
   else
-    call <SID>StartExplorer(1, -1)
+    call <SID>StartExplorer(1, -1, bufname("%"))
     wincmd p
   endif
 
@@ -895,7 +952,7 @@ endfunction
 " Makes sure we are in our explorer, then erases the current buffer and turns 
 " it into a mini buffer explorer window.
 "
-function! <SID>DisplayBuffers(delBufNum)
+function! <SID>DisplayBuffers(delBufNum,currBufName)
   call <SID>DEBUG('Entering DisplayBuffers()',10)
   
   " Make sure we are in our window
@@ -907,7 +964,7 @@ function! <SID>DisplayBuffers(delBufNum)
   " We need to be able to modify the buffer
   setlocal modifiable
 
-  call <SID>ShowBuffers(a:delBufNum)
+  call <SID>ShowBuffers(a:delBufNum,a:currBufName)
   call <SID>ResizeWindow()
   
   normal! zz
@@ -1006,10 +1063,10 @@ endfunction
 " buffers to the current buffer. Special marks are added for buffers that 
 " are in one or more windows (*) and buffers that have been modified (+)
 "
-function! <SID>ShowBuffers(delBufNum)
+function! <SID>ShowBuffers(delBufNum,currBufName)
   call <SID>DEBUG('Entering ShowBuffers()',10)
 
-  let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1)
+  let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:currBufName)
 
   if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
     let l:save_rep = &report
@@ -1048,24 +1105,52 @@ function! <SID>Max(argOne, argTwo)
 endfunction
 
 " }}}
+" CheckRootDirForDupes - Checks if the buffer parent dirs are the same {{{
+" 
+" Compares 2 buffers with the same filename and returns the directory of
+" buffer 1's path at the point where it is different from buffer 2's path
+"
+function! CheckRootDirForDupes(level,path1,path2)
+    call <SID>DEBUG('Entering Dupe Dir Checking Function for '.join(a:path1),1)
+    if(len(a:path1) >= abs(a:level))
+        if(a:path1[a:level] == a:path2[a:level])
+            let s:bufPathPosition = a:level - 1
+            call CheckRootDirForDupes(s:bufPathPosition,a:path1,a:path2)
+            call <SID>DEBUG('Match in directory name and dupeBufDir is '.a:path1[a:level].' vs '.a:path2[a:level],1)
+        else
+            call <SID>DEBUG('Final path Position is '.s:bufPathPosition,10)
+            let s:bufPathPrefix = a:path1[s:bufPathPosition].'/'
+            call <SID>DEBUG('Found non-matching root dir and it is '.s:bufPathPrefix,1)
+        endif
+    endif
+endfunction
+
+" }}}
 " BuildBufferList - Build the text for the MBE window {{{
 " 
 " Creates the buffer list string and returns 1 if it is different than
 " last time this was called and 0 otherwise.
 "
-function! <SID>BuildBufferList(delBufNum, updateBufList)
+function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
   call <SID>DEBUG('Entering BuildBufferList()',10)
 
+
+  let l:CurrBufName = a:currBufName
   let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
   let l:i = 0                     " Set the buffer index to zero.
 
   let l:fileNames = ''
   let l:maxTabWidth = 0
+  " default separator for *nix file systems
+  let s:PathSeparator = '/'
+  " counter to see what platform we may be in
+  let l:nixPlatform = 0
+  let l:winPlatform = 0
 
   " Loop through every buffer less than the total number of buffers.
   while(l:i <= l:NBuffers)
     let l:i = l:i + 1
-   
+
     " If we have a delBufNum and it is the current
     " buffer then ignore the current buffer. 
     " Otherwise, continue.
@@ -1076,15 +1161,97 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
         let l:BufName = bufname(l:i)
         " Check to see if the buffer is a blank or not. If the buffer does have
         " a name, process it.
+
+        " check to see what platform we are in
+        if (has('unix'))
+            let s:PathSeparator = '/'
+            call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
+        else
+            let s:PathSeparator = '\'
+            call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
+        endif
+
+        call <SID>DEBUG('Separator is '.s:PathSeparator,10)
+
         if(strlen(l:BufName))
           " Only show modifiable buffers (The idea is that we don't 
           " want to show Explorers)
           if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
+              
+            " See if buffer names are duplicate
+            let l:dupeBufName = 0
+            let l:i2 = 0
+            " Establish initial parent directory position
+            let s:bufPathPosition = -2
+            let s:bufPathPrefix = ""
+			let l:pathList = ['']
+
+            " While in current buffer from first loop, loop through all buffers
+            " again!
+            while(l:i2 <= l:NBuffers)
+
+                call <SID>DEBUG('Entering Dupe Buffer Name Checking Loop with '.l:BufName,10)
+                let l:i2 = l:i2 + 1
+                let l:BufName2 = bufname(l:i2)
+
+                " Get the full path of the current buffer in the loop and the
+                " current buffer in the new loop
+                let l:bufPath = expand(l:BufName)
+                let l:bufPath2 = expand(l:BufName2)
+                call <SID>DEBUG('BufName is '.l:BufName.' and bufName2 is '.l:BufName2,10)
+
+                " Split the path string by delimiters
+                let l:bufSplitPath = split(l:bufPath,s:PathSeparator,0)
+                let l:bufSplitPath2 = split(l:bufPath2,s:PathSeparator,0)
+
+                " Get the filename from each buffer to compare them
+                let l:bufFileNameFromPath = 'No Name'
+                if(strlen(l:BufName))
+                    let l:bufFileNameFromPath = l:bufSplitPath[-1]
+                    call <SID>DEBUG('Setting bufFileNameFromPath as '.l:bufSplitPath[-1],10)
+                endif
+
+                " Make sure to take into account empty buffers
+                let l:bufFileNameFromPath2 = 'No Name'
+                if(strlen(l:BufName2))
+                    let l:bufFileNameFromPath2 = l:bufSplitPath2[-1]
+                    call <SID>DEBUG('Setting bufFileNameFromPath2 as '.l:bufSplitPath2[-1],10)
+                endif
+
+                call <SID>DEBUG('Comparing '.l:bufPath.' vs '.l:bufPath2,10)
+
+                " If there is a match for buffer names, increase a variable
+                " that we'll check later
+
+                if (l:bufFileNameFromPath == l:bufFileNameFromPath2)
+                    let l:dupeBufName = l:dupeBufName + 1
+                    call <SID>DEBUG('dupeBufName equals '.l:dupeBufName,10)
+                    " Now check to see if the parent directory matches if there
+                    " are 2 or more buffers with the same name
+						if (l:bufPath2 != 'No Name')
+								let l:bufPathToCompare2 = l:bufPath2
+								let l:pathList = add(l:pathList,l:bufPath2)
+			                    call <SID>DEBUG('Adding '.l:bufPath2.' to pathList',10)
+						endif
+                endif
+
+            endwhile   
             
-            " Get filename & Remove []'s & ()'s
-            let l:shortBufName = fnamemodify(l:BufName, ":t")                  
-            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
-            let l:tab = '['.l:i.':'.l:shortBufName.']'
+            " If there are 2 or more buffers with the same name, let's call a
+            " function that show a differentiating parent directory so that the name is unique.
+            if l:dupeBufName >= 2
+                for item in l:pathList
+                    call <SID>DEBUG('Item in pathList loop is '.item,10)
+                    if ((!empty(item)) && (item != l:bufPath))
+                        call <SID>DEBUG('2 or more duplicate buffer names, calling dir check function with '.l:bufPath.' vs '.item,10)
+                        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(item,s:PathSeparator,0))
+                    endif
+                endfor
+            endif
+
+            " Establish the tab's content, including the differentiating root
+            " dir if neccessary
+            let l:tab = '['.l:i.':'.s:bufPathPrefix.l:bufSplitPath[-1].']'
 
             " If the buffer is open in a window mark it
             if bufwinnr(l:i) != -1
@@ -1094,6 +1261,11 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
             " If the buffer is modified then mark it
             if(getbufvar(l:i, '&modified') == 1)
               let l:tab = l:tab . '+'
+            endif
+
+            " If the buffer matches the)current buffer name, then  mark it
+            if(l:BufName == l:CurrBufName)
+              let l:tab = l:tab . '!'
             endif
 
             let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
@@ -1202,7 +1374,7 @@ endfunction
 " buffer, in which case we will want to close
 " the MBE window.
 "
-function! <SID>AutoUpdate(delBufNum)
+function! <SID>AutoUpdate(delBufNum,currBufName)
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering AutoUpdate('.a:delBufNum.') : '.bufnr('%').' : '.bufname('%'),10)
   call <SID>DEBUG('===========================',10)
@@ -1222,6 +1394,7 @@ function! <SID>AutoUpdate(delBufNum)
     " If this is the only buffer left then toggle the buffer
     if (winbufnr(2) == -1)
         call <SID>CycleBuffer(1)
+        exec 'syntax enable'
         call <SID>DEBUG('AutoUpdate does not run for cycled windows', 9)
     else
       call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
@@ -1250,14 +1423,14 @@ function! <SID>AutoUpdate(delBufNum)
         let l:bufnr = <SID>FindWindow('-MiniBufExplorer-', 0)
         if (l:bufnr == -1)
           call <SID>DEBUG('About to call StartExplorer (Create MBE)', 9)
-          call <SID>StartExplorer(0, a:delBufNum)
+          call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
         else
         " otherwise only update the window if the contents have
         " changed
-          let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0)
+          let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:currBufName)
           if (l:ListChanged)
             call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9) 
-            call <SID>StartExplorer(0, a:delBufNum)
+            call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
           endif
         endif
 
@@ -1329,7 +1502,9 @@ endfunction
 " If we are in our explorer, then we attempt to open the buffer under the
 " cursor in the previous window.
 "
-function! <SID>MBESelectBuffer()
+" Split indicates whether to open with split, 0 no split, 1 split horizontally
+"
+function! <SID>MBESelectBuffer(split)
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering MBESelectBuffer()' ,10)
   call <SID>DEBUG('===========================',10)
@@ -1373,12 +1548,19 @@ function! <SID>MBESelectBuffer()
       endif
     endif
 
-    exec('b! '.l:bufnr)
+    if a:split == 0
+	exec('b! '.l:bufnr)
+    elseif a:split == 1
+	exec('sb! '.l:bufnr)
+    elseif a:split == 2
+	exec('vertical sb! '.l:bufnr)
+    endif
+
     if (l:resize)
       resize
     endif
     let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
-    call <SID>AutoUpdate(-1)
+    call <SID>AutoUpdate(-1,bufname("%"))
 
   endif
 
@@ -1399,7 +1581,7 @@ endfunction
 " window, this routine will attempt to get different buffers into the 
 " windows that will be affected so that windows don't get removed.
 "
-function! <SID>MBEDeleteBuffer()
+function! <SID>MBEDeleteBuffer(prevBufName)
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering MBEDeleteBuffer()' ,10)
   call <SID>DEBUG('===========================',10)
@@ -1489,7 +1671,7 @@ function! <SID>MBEDeleteBuffer()
     exec('silent! bd '.l:selBuf)
 
     let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate 
-    call <SID>DisplayBuffers(-1)
+    call <SID>DisplayBuffers(-1,a:prevBufName)
     call cursor(l:curLine, l:curCol)
 
   endif
@@ -1508,7 +1690,7 @@ endfunction
 "
 function! s:MBEClick()
   call <SID>DEBUG('Entering MBEClick()',10)
-  call <SID>MBESelectBuffer()
+  call <SID>MBESelectBuffer(0)
 endfunction
 
 "
@@ -1516,7 +1698,7 @@ endfunction
 "
 function! s:MBEDoubleClick()
   call <SID>DEBUG('Entering MBEDoubleClick()',10)
-  call <SID>MBESelectBuffer()
+  call <SID>MBESelectBuffer(0)
 endfunction
 
 " }}}
@@ -1561,7 +1743,7 @@ function! <SID>CycleBuffer(forward)
 
   let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
   if (l:saveAutoUpdate == 1)
-    call <SID>AutoUpdate(-1)
+    call <SID>AutoUpdate(-1,bufname("%"))
   endif
 
 endfunction
@@ -1642,7 +1824,39 @@ endfunc " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"      History: 6.3.2 o For some reason there was still a call to StopExplorer
+"      History: 6.4.0 o Added Emacs-like 'uniquify' feature where MBE will
+"                       show a parent directory when there are 2 buffers with
+"                       the same filename. Example: There are 2 buffers, one
+"                       is /ProjectA/Application/CSS/style.css and
+"                       /ProjectB/Applications/CSS/style.css. Originally, MBE
+"                       would just display 'style.css' for both buffers. Now,
+"                       MBE crawls up the directory tree to find the first
+"                       differentiating parent directory for both buffers, so
+"                       MBE will show 'ProjectA/style.css' and
+"                       'ProjectB/style.css' for each buffer name.
+"                     o Now setting winfixheight and winfixwidth for the MBE
+"                       buffer so that it does not get resized automatically
+"                       by window resizing commands such as 'CTRL W='.
+"               6.3.7 o MBE now uses it's own status line format to reduce the
+"                       amount of visual clutter. This can be customized.
+"               6.3.6 o MBE now updates current buffer's status on buffer save
+"                       and when a buffer is modified. Patched by Federico
+"                       Holgado (fholgado at gmail dot com).
+"               6.3.5 o Added highlighting for currently active buffer.
+"                       Patched by Federico Holgado (fholgado at gmail dot
+"                       com).
+"               6.3.4 o Now returns to augroup NONE after setting augroup
+"      			        commands. Big thanks to Maciej Laszcz for the bug
+"      			        report!
+"      	    	6.3.3 o Added additional keybindings. In addition to <TAB> and
+"      		        	<S-TAB>, l and h can now be used. In addition to <CR>,
+"      		        	and e can now be used.
+"      		          o You can open the selected buffer in a new split window 
+"      		            by pressing s while in the minibufexplorer window.
+"      		          o You can open the selected buffer in a new vertically
+"      		            split window while pressing v while in the
+"      		            minibufexplorer window. Patched by Oliver Uvman.
+"      	    	6.3.2 o For some reason there was still a call to StopExplorer
 "                       with 2 params. Very old bug. I know I fixed before, 
 "                       any way many thanks to Jason Mills for reporting this!
 "               6.3.1 o Include folds in source so that it's easier to 
