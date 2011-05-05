@@ -46,9 +46,15 @@
 'snippets'	snipMate.txt	/*'snippets'*
 .snippet	snipMate.txt	/*.snippet*
 .snippets	snipMate.txt	/*.snippets*
+:Ack	ack.txt	/*:Ack*
+:AckAdd	ack.txt	/*:AckAdd*
+:AckFile	ack.txt	/*:AckFile*
+:AckFromSearch	ack.txt	/*:AckFromSearch*
 :CommandT	command-t.txt	/*:CommandT*
 :CommandTBuffer	command-t.txt	/*:CommandTBuffer*
 :CommandTFlush	command-t.txt	/*:CommandTFlush*
+:LAck	ack.txt	/*:LAck*
+:LAckAdd	ack.txt	/*:LAckAdd*
 :MkVimball	pi_vimball.txt	/*:MkVimball*
 :NERDTree	NERD_tree.txt	/*:NERDTree*
 :NERDTreeClose	NERD_tree.txt	/*:NERDTreeClose*
@@ -149,6 +155,9 @@ Tlist_Get_Tagname_By_Line()	taglist.txt	/*Tlist_Get_Tagname_By_Line()*
 Tlist_Set_App()	taglist.txt	/*Tlist_Set_App()*
 Tlist_Update_File_Tags()	taglist.txt	/*Tlist_Update_File_Tags()*
 Vimball-copyright	pi_vimball.txt	/*Vimball-copyright*
+ack	ack.txt	/*ack*
+ack-author	ack.txt	/*ack-author*
+ack.txt	ack.txt	/*ack.txt*
 basic-snippet	snippets_emu.txt	/*basic-snippet*
 command-t	command-t.txt	/*command-t*
 command-t-authors	command-t.txt	/*command-t-authors*

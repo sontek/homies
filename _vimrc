@@ -134,6 +134,8 @@ syntax on                   " and turn on per-filetype syntax highlighting.
 """ Key Mappings
 map <silent><C-Left> <C-T>
 map <silent><C-Right> <C-]>
+" Ack searching 
+nmap <Leader>a <Esc>:Ack 
 
 " easily move around tabs
 map <silent><A-Right> :tabnext<CR>
