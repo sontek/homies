@@ -16,3 +16,6 @@
 [submodule "_vim/bundle/supertab"]
 	path = _vim/bundle/supertab
 	url = https://github.com/ervandew/supertab.git
+[submodule "_vim/bundle/minibufexpl"]
+	path = _vim/bundle/minibufexpl
+	url = https://github.com/sontek/minibufexpl.vim.git
