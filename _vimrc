@@ -53,6 +53,7 @@
 " ==========================================================
 " Shortcuts 
 " ==========================================================
+set nocompatible              " Don't be compatible with vi
 let mapleader=","             " change the leader to be a comma vs slash
 
 " Seriously, guys. It's not like :W is bound to anything anyway.
@@ -201,10 +202,10 @@ function! PressedEnter()
     end
 endfunction
 
-"nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
+nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
 
 " ==========================================================
-" Javascript 
+" Javascript
 " ==========================================================
 au BufRead *.js set makeprg=jslint\ %
 
