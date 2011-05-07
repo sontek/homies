@@ -31,3 +31,6 @@
 [submodule "_vim/bundle/gundo"]
 	path = _vim/bundle/gundo
 	url = https://github.com/sjl/gundo.vim.git
+[submodule "_vim/bundle/pydoc"]
+	path = _vim/bundle/pydoc
+	url = https://github.com/fs111/pydoc.vim.git
