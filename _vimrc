@@ -178,7 +178,7 @@ colorscheme vividchalk
 " ==========================================================
 " Python
 " ==========================================================
-au BufRead *.py compiler nose
+"au BufRead *.py compiler nose
 au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
 " clear the search buffer when hitting return and update pyflakes checks
