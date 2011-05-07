@@ -58,8 +58,13 @@ let mapleader=","             " change the leader to be a comma vs slash
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
 
-" run makeprg
-map <Leader>tt <Plug>MakeGreen " change from <Leader>t to <Leader>]
+" run py.test's
+nmap <silent><Leader>tf <Esc>:Pytest file<CR>
+nmap <silent><Leader>tc <Esc>:Pytest class<CR>
+nmap <silent><Leader>tm <Esc>:Pytest method<CR>
+nmap <silent><Leader>tn <Esc>:Pytest next<CR>
+nmap <silent><Leader>tp <Esc>:Pytest previous<CR>
+nmap <silent><Leader>te <Esc>:Pytest error<CR>
 
 " Run django tests
 map <leader>dt :set makeprg=python\ manage.py\ test\|:call MakeGreen()<CR>
@@ -196,7 +201,7 @@ function! PressedEnter()
     end
 endfunction
 
-nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
+"nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
 
 " ==========================================================
 " Javascript 
