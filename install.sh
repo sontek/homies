@@ -10,5 +10,5 @@ do
 #    fi
 done
 
-cd _vim/ropevim/
-./install.sh
+#cd _vim/ropevim/
+#./install.sh
