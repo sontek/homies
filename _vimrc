@@ -72,7 +72,6 @@ map <c-h> <c-w>h
 "  happen as if in command mode )
 imap <C-W> <C-O><C-W>
 
-
 " Ack searching 
 nmap <Leader>a <Esc>:Ack 
 
@@ -109,15 +108,10 @@ autocmd BufEnter * lcd %:p:h
 set completeopt=menuone,longest,preview
 set pumheight=6             " Keep a small completion window
 
-
-
-
-
 " show a line at column 79
  if exists("&colorcolumn")
     set colorcolumn=79
 endif
-
 
 """ Moving Around/Editing
 set cursorline              " have a line indicate the cursor location
@@ -149,7 +143,6 @@ set noautoread              " Don't automatically re-read changed files.
 set modeline                " Allow vim options to be embedded in files;
 set modelines=5             " they must be within the first or last 5 lines.
 set ffs=unix,dos,mac        " Try recognizing dos, unix, and mac line endings.
-
 
 """" Messages, Info, Status
 set ls=2                    " allways show status line
@@ -190,7 +183,6 @@ function! PressedEnter()
 endfunction
 
 nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
-
 
 " ==========================================================
 " Javascript 
