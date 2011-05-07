@@ -43,3 +43,6 @@
 [submodule "_vim/bundle/pytest"]
 	path = _vim/bundle/pytest
 	url = https://github.com/alfredodeza/pytest.vim.git
+[submodule "_vim/bundle/makegreen"]
+	path = _vim/bundle/makegreen
+	url = https://github.com/reinh/vim-makegreen

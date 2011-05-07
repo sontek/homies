@@ -6,6 +6,7 @@
 " Pyflakes
 " Ack
 " Rake & Ruby for command-t
+" nose, django-nose
 
 " ==========================================================
 " Plugins included
@@ -42,7 +43,13 @@
 "
 " Surround
 "    Allows you to surround text with open/close tags
-
+"
+" Py.test
+"    Run py.test test's from within vim 
+"
+" MakeGreen
+"    Generic test runner that works with nose
+"
 " ==========================================================
 " Shortcuts 
 " ==========================================================
@@ -50,6 +57,12 @@ let mapleader=","             " change the leader to be a comma vs slash
 
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
+
+" run makeprg
+map <Leader>tt <Plug>MakeGreen " change from <Leader>t to <Leader>]
+
+" Run django tests
+map <leader>dt :set makeprg=python\ manage.py\ test\|:call MakeGreen()<CR>
 
 " ,v brings up my .vimrc
 " ,V reloads it -- making all changes active (have to save first)
@@ -102,7 +115,7 @@ set wildignore+=*.o,*.obj,.git,*.pyc
 set grepprg=ack-grep          " replace the default grep program with ack
 
 " Auto change the directory to the current file I'm working on
-autocmd BufEnter * lcd %:p:h
+"autocmd BufEnter * lcd %:p:h
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
