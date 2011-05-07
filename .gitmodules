@@ -4,3 +4,6 @@
 [submodule "_vim/bundle/fugitive"]
 	path = _vim/bundle/fugitive
 	url = http://github.com/tpope/vim-fugitive.git
+[submodule "_vim/bundle/snipmate"]
+	path = _vim/bundle/snipmate
+	url = https://github.com/msanders/snipmate.vim.git
