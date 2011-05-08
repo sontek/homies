@@ -46,3 +46,6 @@
 [submodule "_vim/bundle/makegreen"]
 	path = _vim/bundle/makegreen
 	url = https://github.com/reinh/vim-makegreen
+[submodule "_vim/bundle/tasklist"]
+	path = _vim/bundle/tasklist
+	url = https://github.com/vim-scripts/TaskList.vim.git
