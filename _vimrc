@@ -62,6 +62,9 @@ command! W :w
 " Toggle the tasklist
 map <leader>td <Plug>TaskList
 
+" Run pep8
+let g:pep8_map='<leader>8'
+
 " run py.test's
 nmap <silent><Leader>tf <Esc>:Pytest file<CR>
 nmap <silent><Leader>tc <Esc>:Pytest class<CR>
@@ -200,6 +203,7 @@ colorscheme vividchalk
 " ==========================================================
 "au BufRead *.py compiler nose
 au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+au BufRead,BufNewFile *.py nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
 
 " clear the search buffer when hitting return and update pyflakes checks
 function! PressedEnter()
@@ -209,7 +213,7 @@ function! PressedEnter()
     end
 endfunction
 
-nnoremap <CR> :nohlsearch\|:call PressedEnter()<cr>
+
 
 " ==========================================================
 " Javascript
