@@ -93,7 +93,9 @@ map <c-h> <c-w>h
 imap <C-W> <C-O><C-W>
 
 " Ack searching 
-nmap <Leader>a <Esc>:Ack 
+nmap <leader>a <Esc>:Ack 
+
+map <leader>g :GundoToggle<CR>
 
 " ==========================================================
 " Pathogen - Allows us to organize our vim plugins
