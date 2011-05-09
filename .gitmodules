@@ -21,7 +21,7 @@
 	url = https://github.com/wincent/Command-T.git
 [submodule "_vim/bundle/pyflakes"]
 	path = _vim/bundle/pyflakes
-	url = https://github.com/kevinw/pyflakes-vim.git
+	url = https://github.com/mitechie/pyflakes-pathogen.git
 [submodule "_vim/bundle/ack"]
 	path = _vim/bundle/ack
 	url = https://github.com/mileszs/ack.vim.git
