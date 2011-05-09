@@ -98,6 +98,9 @@ map <c-h> <c-w>h
 "  happen as if in command mode )
 imap <C-W> <C-O><C-W>
 
+" Open NerdTree
+map <leader>n :NERDTreeToggle<CR>
+
 " Ack searching 
 nmap <leader>a <Esc>:Ack 
 
@@ -202,8 +205,12 @@ colorscheme vividchalk
 " Python
 " ==========================================================
 "au BufRead *.py compiler nose
+au FileType python set omnifunc=pythoncomplete#Complete
 au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+
+" turn of hlsearch and update pyflakes on enter
 au BufRead,BufNewFile *.py nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
+nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
 
 " clear the search buffer when hitting return and update pyflakes checks
 function! PressedEnter()
@@ -212,8 +219,6 @@ function! PressedEnter()
         :PyflakesUpdate
     end
 endfunction
-
-
 
 " ==========================================================
 " Javascript

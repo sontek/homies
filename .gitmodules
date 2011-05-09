@@ -49,3 +49,6 @@
 [submodule "_vim/bundle/tasklist"]
 	path = _vim/bundle/tasklist
 	url = https://github.com/vim-scripts/TaskList.vim.git
+[submodule "_vim/bundle/nerdtree"]
+	path = _vim/bundle/nerdtree
+	url = https://github.com/vim-scripts/The-NERD-tree.git
