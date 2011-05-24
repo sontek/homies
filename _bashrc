@@ -169,5 +169,7 @@ export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 
 source /usr/local/bin/virtualenvwrapper.sh
 
+export EDITOR=vim
+
 # Add git and svn branch names
 export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "

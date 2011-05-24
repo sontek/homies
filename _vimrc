@@ -220,16 +220,7 @@ au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\
 let g:pyflakes_use_quickfix = 0
 
 " turn of hlsearch and update pyflakes on enter
-au BufRead,BufNewFile *.py nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
-nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
-
-" clear the search buffer when hitting return and update pyflakes checks
-function! PressedEnter()
-    :nohlsearch
-    if &filetype == 'python'
-        :PyflakesUpdate
-    end
-endfunction
+map <leader>s :nohlsearch<CR>
 
 " ==========================================================
 " Javascript
