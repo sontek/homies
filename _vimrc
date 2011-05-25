@@ -144,7 +144,7 @@ set grepprg=ack-grep          " replace the default grep program with ack
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=menuone,longest,preview
+set completeopt=menuone,preview
 set pumheight=6             " Keep a small completion window
 
 " show a line at column 79
@@ -215,7 +215,7 @@ colorscheme vividchalk
 "au BufRead *.py compiler nose
 au FileType python set omnifunc=pythoncomplete#Complete
 au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
-
+"
 " Don't let pyflakes use the quickfix window
 let g:pyflakes_use_quickfix = 0
 
@@ -227,11 +227,8 @@ map <leader>s :nohlsearch<CR>
 " ==========================================================
 au BufRead *.js set makeprg=jslint\ %
 
-" ==========================================================
-" SuperTab - Allows us to get code completion with tab
-" ==========================================================
-" Try different completion methods depending on its context
-let g:SuperTabDefaultCompletionType = "context"
+imap <expr> <Tab> pumvisible() ? "<C-N>" : "<Tab>"
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Add the virtualenv's site-packages to vim path
 py << EOF
