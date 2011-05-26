@@ -144,7 +144,7 @@ set grepprg=ack-grep          " replace the default grep program with ack
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=menuone,preview
+set completeopt=menuone,longest,preview
 set pumheight=6             " Keep a small completion window
 
 " show a line at column 79
@@ -227,8 +227,25 @@ map <leader>s :nohlsearch<CR>
 " ==========================================================
 au BufRead *.js set makeprg=jslint\ %
 
-imap <expr> <Tab> pumvisible() ? "<C-N>" : "<Tab>"
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Don't allow snipmate to take over tab
+autocmd VimEnter * ino <c-j> <c-r>=TriggerSnippet()<cr>
+" Use tab to scroll through autocomplete menus
+autocmd VimEnter * imap <expr> <Tab> pumvisible() ? "<C-N>" : "<Tab>"
+autocmd VimEnter * imap <expr> <S-Tab> pumvisible() ? "<C-P>" : "<S-Tab>"
+snor <c-j> <esc>i<right><c-r>=TriggerSnippet()<cr>
+let g:acp_completeoptPreview=1
+
+" ===========================================================
+" FileType specific changes
+" ============================================================
+" Mako/HTML
+autocmd BufNewFile,BufRead *.mako,*.mak setlocal ft=html
+autocmd FileType html,xhtml,xml,css setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+
+" Python
+autocmd FileType python setlocal expandtab shiftwidth=4 tabstop=4 softtabstop=4
 
 " Add the virtualenv's site-packages to vim path
 py << EOF
