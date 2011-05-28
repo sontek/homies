@@ -12,7 +12,7 @@
 " Plugins included
 " ==========================================================
 " Pathogen
-"     Better Management of VIM plugins 
+"     Better Management of VIM plugins
 "
 " GunDo
 "     Visual Undo in vim with diff's to check the differences
@@ -21,7 +21,7 @@
 "     Runs your Python tests in Vim.
 "
 " Commant-T
-"     Allows easy search and opening of files within a given path 
+"     Allows easy search and opening of files within a given path
 "
 " Snipmate
 "     Configurable snippets to avoid re-typing common comands
@@ -45,19 +45,23 @@
 "    Allows you to surround text with open/close tags
 "
 " Py.test
-"    Run py.test test's from within vim 
+"    Run py.test test's from within vim
 "
 " MakeGreen
 "    Generic test runner that works with nose
 "
 " ==========================================================
-" Shortcuts 
+" Shortcuts
 " ==========================================================
 set nocompatible              " Don't be compatible with vi
 let mapleader=","             " change the leader to be a comma vs slash
 
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
+
+" sudo write this
+cmap W! w !sudo tee % >/dev/null
+
 
 " Toggle the tasklist
 map <leader>td <Plug>TaskList
@@ -103,8 +107,8 @@ map <leader>n :NERDTreeToggle<CR>
 
 " Run command-t file search
 map <leader>f :CommandT<CR>
-" Ack searching 
-nmap <leader>a <Esc>:Ack! 
+" Ack searching
+nmap <leader>a <Esc>:Ack!
 
 " Load the Gundo window
 map <leader>g :GundoToggle<CR>
@@ -123,7 +127,7 @@ call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 
 " ==========================================================
-" Basic Settings 
+" Basic Settings
 " ==========================================================
 syntax on                     " syntax highlighing
 filetype on                   " try to detect filetypes
@@ -135,12 +139,20 @@ set title                     " show title in console title bar
 set wildmenu                  " Menu completion in command mode on <Tab>
 set wildmode=full             " <Tab> cycles between all matching choices.
 
+" don't bell or blink
+set noerrorbells
+set vb t_vb=
+
 " Ignore these files when completing
-set wildignore+=*.o,*.obj,.git,*.pyc 
+set wildignore+=*.o,*.obj,.git,*.pyc
 set grepprg=ack-grep          " replace the default grep program with ack
 
-" Auto change the directory to the current file I'm working on
-"autocmd BufEnter * lcd %:p:h
+" Set working directory
+nnoremap <leader>. :lcd %:p:h<CR>
+
+" Disable the colorcolumn when switching modes.  Make sure this is the
+" first autocmd for the filetype here
+autocmd FileType * setlocal colorcolumn=0
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
@@ -160,7 +172,6 @@ set virtualedit=block       " Let cursor move past the last char in <C-v> mode
 set scrolloff=3             " Keep 3 context lines above and below the cursor
 set backspace=2             " Allow backspacing over autoindent, EOL, and BOL
 set showmatch               " Briefly jump to a paren once it's balanced
-set matchtime=2             " (for only .2 seconds).
 set nowrap                  " don't wrap text
 set linebreak               " don't wrap textin the middle of a word
 set autoindent              " always set autoindenting on
@@ -173,6 +184,7 @@ set shiftround              " rounds indent to a multiple of shiftwidth
 set matchpairs+=<:>         " show matching <> (html mainly) as well
 set foldmethod=indent       " allow us to fold on indents
 set foldlevel=99            " don't fold by default
+set foldcolumn=1            " show the fold column
 
 " don't outdent hashes
 inoremap # #
@@ -198,7 +210,7 @@ set report=0                " : commands always print changed line count.
 set shortmess+=a            " Use [+]/[RO]/[w] for modified/readonly/written.
 set ruler                   " Show some info, even without statuslines.
 set laststatus=2            " Always show statusline, even if only 1 window.
-set statusline=%<%f\ (%{&ft})%=%-19(%3l,%02c%03V%)%{fugitive#statusline()}
+set statusline=[%l,%v\ %P%M]\ %f\ %r%h%w\ (%{&ff})\ %{fugitive#statusline()}
 
 " displays tabs with :set list & displays when a line runs off-screen
 set listchars=tab:>-,eol:$,trail:-,precedes:<,extends:>
@@ -207,44 +219,54 @@ set list
 """ Searching and Patterns
 set ignorecase              " Default to using case insensitive searches,
 set smartcase               " unless uppercase letters are used in the regex.
+set smarttab                " Handle tabs more intelligently 
 set hlsearch                " Highlight searches by default.
 set incsearch               " Incrementally search while typing a /regex
 
 """" Display
 colorscheme vividchalk
 
-" ==========================================================
-" Python
-" ==========================================================
-"au BufRead *.py compiler nose
-au FileType python set omnifunc=pythoncomplete#Complete
-au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+" Quit window on <leader>q
+nnoremap <leader>q :q<CR>
+"
+" hide matches on <leader>space
+nnoremap <leader><space> :nohlsearch<cr>
 
-" Don't let pyflakes use the quickfix window
-let g:pyflakes_use_quickfix = 0
+" Remove trailing whitespace on <leader>S
+nnoremap <leader>S :%s/\s\+$//<cr>:let @/=''<CR>
 
-" turn of hlsearch and update pyflakes on enter
-au BufRead,BufNewFile *.py nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
-nnoremap <buffer><CR> :nohlsearch\|:call PressedEnter()<cr>
-
-" clear the search buffer when hitting return and update pyflakes checks
-function! PressedEnter()
-    :nohlsearch
-    if &filetype == 'python'
-        :PyflakesUpdate
-    end
-endfunction
+" Select the item in the list with enter
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " ==========================================================
 " Javascript
 " ==========================================================
 au BufRead *.js set makeprg=jslint\ %
 
-" ==========================================================
-" SuperTab - Allows us to get code completion with tab
-" ==========================================================
-" Try different completion methods depending on its context
-let g:SuperTabDefaultCompletionType = "context"
+" Don't allow snipmate to take over tab
+autocmd VimEnter * ino <c-j> <c-r>=TriggerSnippet()<cr>
+" Use tab to scroll through autocomplete menus
+autocmd VimEnter * imap <expr> <Tab> pumvisible() ? "<C-N>" : "<Tab>"
+autocmd VimEnter * imap <expr> <S-Tab> pumvisible() ? "<C-P>" : "<S-Tab>"
+snor <c-j> <esc>i<right><c-r>=TriggerSnippet()<cr>
+let g:acp_completeoptPreview=1
+
+" ===========================================================
+" FileType specific changes
+" ============================================================
+" Mako/HTML
+autocmd BufNewFile,BufRead *.mako,*.mak setlocal ft=html
+autocmd FileType html,xhtml,xml,css setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+
+" Python
+"au BufRead *.py compiler nose
+au FileType python set omnifunc=pythoncomplete#Complete
+au FileType python setlocal expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
+au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+" Don't let pyflakes use the quickfix window
+let g:pyflakes_use_quickfix = 0
+
+
 
 " Add the virtualenv's site-packages to vim path
 py << EOF
