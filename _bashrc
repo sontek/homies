@@ -167,8 +167,6 @@ parse_svn_repository_root() {
 
 export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 
-source /usr/local/bin/virtualenvwrapper.sh
-
 export EDITOR=vim
 
 # Add git and svn branch names
