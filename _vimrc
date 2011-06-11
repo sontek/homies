@@ -184,7 +184,6 @@ set shiftround              " rounds indent to a multiple of shiftwidth
 set matchpairs+=<:>         " show matching <> (html mainly) as well
 set foldmethod=indent       " allow us to fold on indents
 set foldlevel=99            " don't fold by default
-set foldcolumn=1            " show the fold column
 
 " don't outdent hashes
 inoremap # #
@@ -224,7 +223,14 @@ set hlsearch                " Highlight searches by default.
 set incsearch               " Incrementally search while typing a /regex
 
 """" Display
-colorscheme vividchalk
+if has("gui_running")
+    colorscheme solarized
+else
+    colorscheme torte
+endif
+
+" Paste from clipboard
+map <leader>p "+gP
 
 " Quit window on <leader>q
 nnoremap <leader>q :q<CR>
