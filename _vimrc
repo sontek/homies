@@ -54,7 +54,7 @@
 " Shortcuts
 " ==========================================================
 set nocompatible              " Don't be compatible with vi
-let mapleader=","             " change the leader to be a comma vs slash
+"let mapleader=","             " change the leader to be a comma vs slash
 
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
@@ -176,7 +176,7 @@ set nowrap                  " don't wrap text
 set linebreak               " don't wrap textin the middle of a word
 set autoindent              " always set autoindenting on
 set smartindent             " use smart indent if there is no indent file
-set tabstop=4               " <tab> inserts 4 spaces 
+set tabstop=4               " <tab> inserts 4 spaces
 set shiftwidth=4            " but an indent level is 2 spaces wide.
 set softtabstop=4           " <BS> over an autoindent deletes both spaces.
 set expandtab               " Use spaces, not tabs, for autoindent/tab key.
@@ -207,7 +207,6 @@ set confirm                 " Y-N-C prompt if closing with unsaved changes.
 set showcmd                 " Show incomplete normal mode commands as I type.
 set report=0                " : commands always print changed line count.
 set shortmess+=a            " Use [+]/[RO]/[w] for modified/readonly/written.
-set ruler                   " Show some info, even without statuslines.
 set laststatus=2            " Always show statusline, even if only 1 window.
 set statusline=[%l,%v\ %P%M]\ %f\ %r%h%w\ (%{&ff})\ %{fugitive#statusline()}
 
@@ -218,7 +217,7 @@ set list
 """ Searching and Patterns
 set ignorecase              " Default to using case insensitive searches,
 set smartcase               " unless uppercase letters are used in the regex.
-set smarttab                " Handle tabs more intelligently 
+set smarttab                " Handle tabs more intelligently
 set hlsearch                " Highlight searches by default.
 set incsearch               " Incrementally search while typing a /regex
 
@@ -240,6 +239,9 @@ nnoremap <leader><space> :nohlsearch<cr>
 
 " Remove trailing whitespace on <leader>S
 nnoremap <leader>S :%s/\s\+$//<cr>:let @/=''<CR>
+" Remove trailing whitespace on save:
+au BufWritePre *.py mark `|:%s/\s\+$//e|normal “
+
 
 " Select the item in the list with enter
 "inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
@@ -290,3 +292,99 @@ EOF
 if filereadable($VIRTUAL_ENV . '/.vimrc')
     source $VIRTUAL_ENV/.vimrc
 endif
+
+
+
+
+"fixes the bug in Insert-Visual/Select mode
+nmap <silent><C-A>      :cal SmartHome("n")<CR>
+nmap <silent><C-E>       :cal SmartEnd("n")<CR>
+imap <silent><C-A>     <C-r>=SmartHome("i")<CR>
+imap <silent><C-E>      <C-r>=SmartEnd("i")<CR>
+vmap <silent><C-A> <Esc>:cal SmartHome("v")<CR>
+vmap <silent><C-E>  <Esc>:cal SmartEnd("v")<CR>
+
+nmap <silent><Home>      :cal SmartHome("n")<CR>
+nmap <silent><End>       :cal SmartEnd("n")<CR>
+imap <silent><Home>     <C-r>=SmartHome("i")<CR>
+imap <silent><End>      <C-r>=SmartEnd("i")<CR>
+vmap <silent><Home> <Esc>:cal SmartHome("v")<CR>
+vmap <silent><End>  <Esc>:cal SmartEnd("v")<CR> 
+
+""""""""""""""""""""
+"smart home function
+function SmartHome(mode)
+  let curcol = col(".")
+
+  "gravitate towards beginning for wrapped lines
+  if curcol > indent(".") + 2
+    call cursor(0, curcol - 1)
+  endif
+
+  if curcol == 1 || curcol > indent(".") + 1
+    if &wrap
+      normal g^
+    else
+      normal ^
+    endif
+  else
+    if &wrap
+      normal g0
+    else
+      normal 0
+    endif
+  endif
+
+  if a:mode == "v"
+    normal msgv`s
+  endif
+
+  return ""
+endfunction
+
+"""""""""""""""""""
+"smart end function
+function SmartEnd(mode)
+  let curcol = col(".")
+  let lastcol = a:mode == "i" ? col("$") : col("$") - 1
+
+  "gravitate towards ending for wrapped lines
+  if curcol < lastcol - 1
+    call cursor(0, curcol + 1)
+  endif
+
+  if curcol < lastcol
+    if &wrap
+      normal g$
+    else
+      normal $
+    endif
+  else
+    normal g_
+  endif
+
+  "correct edit mode cursor position, put after current character
+  if a:mode == "i"
+    call cursor(0, col(".") + 1)
+  endif
+
+  if a:mode == "v"
+    normal msgv`s
+  endif
+
+  return ""
+endfunction
+
+"Run pyflakes
+map <leader>p :!pyflakes %<CR>
+
+"rainbow parens, braces, and brackets:
+let g:rainbow = 1
+let g:rainbow_nested = 1
+let g:rainbow_paren = 1
+let g:rainbow_brace = 1
+let g:rainbow_bracket = 1
+
+"Get rid of annoying mac title bar thingy
+set guioptions=egmrLt
+
