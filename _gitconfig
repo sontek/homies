@@ -1,13 +1,10 @@
 [user]
-    name = John Anderson
-    email = sontek@gmail.com
-
+	name = Sean Talts
+	email = sean@lot18.com
 [color]
     diff = auto
     status = auto
     branch = auto
 
-[push]
-    default = matching
 [core]
-    editor = vim
+	editor = ~/bin/vim
