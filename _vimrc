@@ -156,7 +156,9 @@ autocmd FileType * setlocal colorcolumn=0
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-set completeopt=menuone,longest,preview
+"set completeopt=menuone,longest,preview
+set completeopt=menuone,longest
+let g:SuperTabDefaultCompletionType = "context"
 set pumheight=6             " Keep a small completion window
 
 " show a line at column 79
@@ -376,7 +378,7 @@ function SmartEnd(mode)
 endfunction
 
 "Run pyflakes
-map <leader>p :!pyflakes %<CR>
+"map <leader>pf :!pyflakes %<CR>
 
 "rainbow parens, braces, and brackets:
 let g:rainbow = 1
@@ -388,3 +390,18 @@ let g:rainbow_bracket = 1
 "Get rid of annoying mac title bar thingy
 set guioptions=egmrLt
 
+" This beauty remembers where you were the last time you edited the file, and returns to the same position.
+au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
+
+let python_highlight_all = 1
+
+python << EOF
+import os
+import sys
+import vim
+for p in sys.path:
+    if os.path.isdir(p):
+        vim.command(r"set path+=%s" % (p.replace(" ", r"\ ")))
+EOF
+
+set tags+=$HOME/.vim/tags/python2.6.ctags

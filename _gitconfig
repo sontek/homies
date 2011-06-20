@@ -6,5 +6,8 @@
     status = auto
     branch = auto
 
+[push]
+    default = matching
+
 [core]
 	editor = ~/bin/vim
