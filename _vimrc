@@ -114,10 +114,17 @@ nmap <leader>a <Esc>:Ack!
 map <leader>g :GundoToggle<CR>
 
 " Jump to the definition of whatever the cursor is on
-map <leader>j :RopeGotoDefinition<CR>
+map <leader>d :RopeGotoDefinition<CR>
 
 " Rename whatever the cursor is on (including references to it)
 map <leader>r :RopeRename<CR>
+
+" Ropevim use vim's complete function in insert mode
+let ropevim_vim_completion=1
+let ropevim_extended_complete=1
+let g:ropevim_autoimport_modules = ["os", "shutil", "sys"]
+
+
 " ==========================================================
 " Pathogen - Allows us to organize our vim plugins
 " ==========================================================
@@ -311,7 +318,7 @@ nmap <silent><End>       :cal SmartEnd("n")<CR>
 imap <silent><Home>     <C-r>=SmartHome("i")<CR>
 imap <silent><End>      <C-r>=SmartEnd("i")<CR>
 vmap <silent><Home> <Esc>:cal SmartHome("v")<CR>
-vmap <silent><End>  <Esc>:cal SmartEnd("v")<CR> 
+vmap <silent><End>  <Esc>:cal SmartEnd("v")<CR>
 
 """"""""""""""""""""
 "smart home function
