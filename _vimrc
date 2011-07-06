@@ -111,10 +111,12 @@ map <leader>f :CommandT<CR>
 nmap <leader>a <Esc>:Ack!
 
 " Load the Gundo window
-map <leader>g :GundoToggle<CR>
+map <leader>u :GundoToggle<CR>
 
 " Jump to the definition of whatever the cursor is on
-map <leader>d :RopeGotoDefinition<CR>
+map <leader>g :RopeGotoDefinition<CR>
+
+map <leader>d :RopeShowDoc<CR>
 
 " Rename whatever the cursor is on (including references to it)
 map <leader>r :RopeRename<CR>
@@ -163,8 +165,8 @@ autocmd FileType * setlocal colorcolumn=0
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
-"set completeopt=menuone,longest,preview
-set completeopt=menuone,longest
+set completeopt=menuone,longest,preview
+"set completeopt=menuone,longest
 "let g:SuperTabDefaultCompletionType = "tags"
 set pumheight=6             " Keep a small completion window
 
@@ -386,7 +388,7 @@ function SmartEnd(mode)
 endfunction
 
 "Run pyflakes
-"map <leader>pf :!pyflakes %<CR>
+map <leader>pf :!pyflakes %<CR>
 
 "rainbow parens, braces, and brackets:
 let g:rainbow = 1
@@ -413,3 +415,21 @@ for p in sys.path:
 EOF
 
 set tags+=$HOME/.vim/tags/python2.6.ctags
+
+" Code to execute current buffer 
+fu! DoRunPyBuffer2()
+pclose! " force preview window closed
+setlocal ft=python
+
+" copy the buffer into a new window, then run that buffer through python
+sil %y a | below 10 new | sil put a | sil %!python -
+" indicate the output window as the current previewwindow
+setlocal previewwindow ro nomodifiable nomodified
+
+" back into the original window
+winc p
+endfu
+
+"command! RunPyBuffer call DoRunPyBuffer2()
+"map <C-k> :RunPyBuffer<CR>
+
