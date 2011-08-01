@@ -152,7 +152,9 @@ nnoremap <leader>. :lcd %:p:h<CR>
 
 " Disable the colorcolumn when switching modes.  Make sure this is the
 " first autocmd for the filetype here
-autocmd FileType * setlocal colorcolumn=0
+if exists("&colorcolumn")
+    autocmd FileType * setlocal colorcolumn=0
+endif
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
@@ -160,7 +162,7 @@ set completeopt=menuone,longest,preview
 set pumheight=6             " Keep a small completion window
 
 " show a line at column 79
- if exists("&colorcolumn")
+if exists("&colorcolumn")
     set colorcolumn=79
 endif
 
