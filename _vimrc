@@ -21,7 +21,7 @@
 " Pytest
 "     Runs your Python tests in Vim.
 "
-" Commant-T
+" FuzzyFinder
 "     Allows easy search and opening of files within a given path
 "
 " Snipmate
@@ -110,7 +110,7 @@ imap <C-W> <C-O><C-W>
 map <leader>n :NERDTreeToggle<CR>
 
 " Run command-t file search
-map <leader>f :CommandT<CR>
+map <leader>f :FufFile<CR>
 " Ack searching
 nmap <leader>a <Esc>:Ack!
 
@@ -296,3 +296,11 @@ EOF
 if filereadable($VIRTUAL_ENV . '/.vimrc')
     source $VIRTUAL_ENV/.vimrc
 endif
+
+" ===================================
+" guioptions
+" ===================================
+set guioptions-=T
+set guioptions+=LlRrb
+set guioptions-=LlRrb
+

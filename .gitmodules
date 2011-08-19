@@ -52,3 +52,9 @@
 [submodule "_vim/bundle/taglist"]
 	path = _vim/bundle/taglist
 	url = git://github.com/vim-scripts/taglist.vim.git
+[submodule "_vim/bundle/fuzzyfinder"]
+	path = _vim/bundle/fuzzyfinder
+	url = git://github.com/vim-scripts/FuzzyFinder.git
+[submodule "_vim/bundle/L9"]
+	path = _vim/bundle/L9
+	url = git://github.com/vim-scripts/L9.git
