@@ -243,7 +243,7 @@ nnoremap <leader><space> :nohlsearch<cr>
 " Remove trailing whitespace on <leader>S
 nnoremap <leader>S :%s/\s\+$//<cr>:let @/=''<CR>
 " Remove trailing whitespace on save:
-"au BufWritePre *.py mark `|:%s/\s\+$//e|normal “
+au BufWritePre *.py mark `|:%s/\s\+$//e|normal “
 
 
 " Select the item in the list with enter
