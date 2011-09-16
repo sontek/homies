@@ -84,8 +84,8 @@ if $TERM_IS_COLOR && ( dircolors --help && ls --color ) &> /dev/null; then
     [[ -f "$POSSIBLE_DIR_COLORS" ]] && [[ -r "$POSSIBLE_DIR_COLORS" ]] && eval `dircolors -b "$POSSIBLE_DIR_COLORS"` && break
   done
 
-  alias ls="ls --color=auto"
-  alias ll="ls --color=auto -l"
+  alias ls="ls --color=auto -F "
+  alias ll="ls --color=auto -l -F"
   alias grep='grep --color=auto'
   alias fgrep='fgrep --color=auto'
   alias egrep='egrep --color=auto'
@@ -131,10 +131,8 @@ if [ -x "/Applications/MacVim.app/Contents/MacOS/Vim" ]; then
     PATH=/Applications/MacVim.app/Contents/MacOS/:$PATH
 fi
 
-PATH=/usr/local/sbin:$PATH:/usr/local/mysql/bin
+PATH=~/bin:/usr/local/sbin:$PATH:/usr/local/mysql/bin
 export PATH
-
-
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
@@ -156,7 +154,3 @@ parse_svn_repository_root() {
 export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 
 export EDITOR=vim
-
-# Add git and svn branch names
-export EDITOR=vim
-
