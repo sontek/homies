@@ -154,11 +154,3 @@ parse_svn_repository_root() {
 export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 
 export EDITOR=vim
-
-if [ -f ~/.bashrc ]; then
-    . ~/.bashrc
-fi
-
-if [ -f ~/.profile ]; then
-    ~/.profile
-fi
