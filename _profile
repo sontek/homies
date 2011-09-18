@@ -26,29 +26,6 @@ fi
 alias ls='ls -G -F'
 EDITOR='vim'
 
-# Dynamically add the git branch to the terminal output
-function parse_git_branch {
-  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
-}
-
-function proml {
-  case $TERM in
-    xterm*)
-    TITLEBAR='\[\033[0;34m\]\h\[\033[1;30m\] \w\[\033[00m\]'
-    ;;
-    *)
-    TITLEBAR=""
-    ;;
-  esac
-
-PS1="${TITLEBAR} \[\033[0;36m\]\$(parse_git_branch)\[\033[00m\] $ "
-}
-proml
-
-if [ -e ~/.git-completion.bash ]; then
-    source ~/.git-completion.bash
-fi
-
 # Colorize the Terminal
 export CLICOLOR=1;
 

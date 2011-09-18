@@ -10,4 +10,4 @@
     default = matching
 
 [core]
-	editor = ~/bin/vim
+	editor = 'vim'
