@@ -13,9 +13,6 @@
 [submodule "_vim/bundle/minibufexpl"]
 	path = _vim/bundle/minibufexpl
 	url = https://github.com/sontek/minibufexpl.vim.git
-[submodule "_vim/bundle/command-t"]
-	path = _vim/bundle/command-t
-	url = https://github.com/wincent/Command-T.git
 [submodule "_vim/bundle/pyflakes"]
 	path = _vim/bundle/pyflakes
 	url = https://github.com/mitechie/pyflakes-pathogen.git
@@ -52,3 +49,12 @@
 [submodule "_vim/bundle/solarized"]
 	path = _vim/bundle/solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
+[submodule "_vim/bundle/taglist"]
+	path = _vim/bundle/taglist
+	url = git://github.com/vim-scripts/taglist.vim.git
+[submodule "_vim/bundle/fuzzyfinder"]
+	path = _vim/bundle/fuzzyfinder
+	url = git://github.com/vim-scripts/FuzzyFinder.git
+[submodule "_vim/bundle/L9"]
+	path = _vim/bundle/L9
+	url = git://github.com/vim-scripts/L9.git
