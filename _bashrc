@@ -133,20 +133,22 @@ fi
   }
 } >/dev/null 2>/dev/null
 
-venwrap=`type -P virtualenvwrapper_bashrc`
+venwrap=`type -P virtualenvwrapper.sh`
 if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
+
+vim=`type -P vim`
+if [ "$vim" == "" ]; then
+    vim="gvim -v"
+fi
+
+alias vim="$vim"
 
 # osx vim
 if [ -x "/Applications/MacVim.app/Contents/MacOS/Vim" ]; then
     PATH=/Applications/MacVim.app/Contents/MacOS/:$PATH
 fi
-
-PATH=/usr/local/sbin:$PATH:/usr/local/mysql/bin
-export PATH
-
-
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
@@ -165,10 +167,8 @@ parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
 
-export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
-
-export EDITOR=vim
+export EDITOR="$vim"
+export GIT_EDITOR="$vim"
 
 # Add git and svn branch names
 export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "
-export EDITOR=vim
