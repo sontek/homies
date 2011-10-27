@@ -9,5 +9,6 @@
 
 [push]
     default = matching
+
 [core]
     editor = vim
