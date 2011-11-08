@@ -11,3 +11,10 @@
 
 [core]
 	editor = ~/bin/vim
+
+[merge]
+    tool = mvim
+
+[mergetool "mvim"]
+    cmd=mvim -d -g $LOCAL $MERGED $REMOTE
+    keepbackup=false

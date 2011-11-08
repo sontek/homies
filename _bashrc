@@ -160,3 +160,6 @@ export EDITOR=vim
 # Add git and svn branch names
 export EDITOR=vim
 
+# append to bash rc instead of overwriting it, from
+# http://briancarper.net/blog/248/
+shopt -s histappend
