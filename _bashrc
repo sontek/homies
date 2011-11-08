@@ -142,6 +142,7 @@ export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 # Dynamically add the git branch to the terminal output
 function parse_git_branch {
   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+<<<<<<< HEAD
 }
 
 function proml {
@@ -155,18 +156,42 @@ function proml {
   esac
 
 PS1="${TITLEBAR} \[\033[0;36m\]\$(parse_git_branch)\[\033[00m\] $ "
+=======
+>>>>>>> ea8fa49f66151d5f94f08817b74dbb7ab2af4cee
 }
 proml
+
+<<<<<<< HEAD
+if [ -e ~/.git-completion.bash ]; then
+    source ~/.git-completion.bash
+fi
+=======
+function proml {
+  case $TERM in
+    xterm*)
+    TITLEBAR='\[\033[0;34m\]\h\[\033[1;30m\] \w\[\033[00m\]'
+    ;;
+    *)
+    TITLEBAR=""
+    ;;
+  esac
+
+PS1="${TITLEBAR} \[\033[0;36m\]\$(parse_git_branch)\[\033[00m\] $ "
+}
+proml
+>>>>>>> ea8fa49f66151d5f94f08817b74dbb7ab2af4cee
 
 if [ -e ~/.git-completion.bash ]; then
     source ~/.git-completion.bash
 fi
 
-export EDITOR=vim
-
+<<<<<<< HEAD
 # append to bash rc instead of overwriting it, from
 # http://briancarper.net/blog/248/
 shopt -s histappend
 
 #add these two to prompt command to update history 
 export PROMPT_COMMAND="history -n; history -a"
+=======
+export EDITOR=vim
+>>>>>>> ea8fa49f66151d5f94f08817b74dbb7ab2af4cee
