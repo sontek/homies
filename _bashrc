@@ -84,8 +84,8 @@ if $TERM_IS_COLOR && ( dircolors --help && ls --color ) &> /dev/null; then
     [[ -f "$POSSIBLE_DIR_COLORS" ]] && [[ -r "$POSSIBLE_DIR_COLORS" ]] && eval `dircolors -b "$POSSIBLE_DIR_COLORS"` && break
   done
 
-  alias ls="ls --color=auto"
-  alias ll="ls --color=auto -l"
+  alias ls="ls --color=auto -F "
+  alias ll="ls --color=auto -l -F"
   alias grep='grep --color=auto'
   alias fgrep='fgrep --color=auto'
   alias egrep='egrep --color=auto'
@@ -131,35 +131,42 @@ if [ -x "/Applications/MacVim.app/Contents/MacOS/Vim" ]; then
     PATH=/Applications/MacVim.app/Contents/MacOS/:$PATH
 fi
 
-PATH=/usr/local/sbin:$PATH:/usr/local/mysql/bin
+PATH=~/bin:/usr/local/sbin:$PATH:/usr/local/mysql/bin
 export PATH
-
-
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
 
-parse_git_branch ()
-{
-  git name-rev HEAD 2> /dev/null | sed 's#HEAD\ \(.*\)#(git::\1)#'
-}
-parse_svn_branch() {
-  parse_svn_url | sed -e 's#^'"$(parse_svn_repository_root)"'##g' | awk -F / '{print "(svn::"$1 "/" $2 ")"}'
-}
-parse_svn_url() {
-  svn info 2>/dev/null | sed -ne 's#^URL: ##p'
-}
-parse_svn_repository_root() {
-  svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
-}
-
 export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 
-export EDITOR=vim
+# Dynamically add the git branch to the terminal output
+function parse_git_branch {
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
 
-# Add git and svn branch names
+function proml {
+  case $TERM in
+    xterm*)
+    TITLEBAR='\[\033[0;34m\]\h\[\033[1;30m\] \w\[\033[00m\]'
+    ;;
+    *)
+    TITLEBAR=""
+    ;;
+  esac
+
+PS1="${TITLEBAR} \[\033[0;36m\]\$(parse_git_branch)\[\033[00m\] $ "
+}
+proml
+
+if [ -e ~/.git-completion.bash ]; then
+    source ~/.git-completion.bash
+fi
+
 export EDITOR=vim
 
 # append to bash rc instead of overwriting it, from
 # http://briancarper.net/blog/248/
 shopt -s histappend
+
+#add these two to prompt command to update history 
+export PROMPT_COMMAND="history -n; history -a"

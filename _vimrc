@@ -436,8 +436,12 @@ map <leader>k :RunPyBuffer<CR>
 " Solarized Colorscheme Config
 " ------------------------------------------------------------------
 syntax enable
-set background=light
 colorscheme solarized
+if has("gui_running")
+    set background=light
+else
+    set background=dark
+endif
 " ------------------------------------------------------------------
 
 " The following items are available options, but do not need to be
