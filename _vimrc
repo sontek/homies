@@ -35,9 +35,6 @@
 " Git
 "    Syntax highlighting for git config files
 "
-" Minibufexpl
-"    Visually display what buffers are currently opened
-"
 " Pydoc
 "    Opens up pydoc within vim
 "
@@ -266,7 +263,7 @@ let g:acp_completeoptPreview=1
 " FileType specific changes
 " ============================================================
 " Mako/HTML
-autocmd BufNewFile,BufRead *.mako,*.mak setlocal ft=html
+autocmd BufNewFile,BufRead *.mako,*.mak,*.jinja2 setlocal ft=html
 autocmd FileType html,xhtml,xml,css setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 
 " Python
