@@ -166,7 +166,7 @@ parse_svn_url() {
 parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
-
+set -o emacs
 export EDITOR="$vim"
 export GIT_EDITOR="$vim"
 

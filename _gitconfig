@@ -6,12 +6,14 @@
     diff = auto
     status = auto
     branch = auto
+    ui = auto
 
 [push]
     default = matching
 
 [core]
     editor = vim
+    pager = less -R
 
 [alias]
     diverges = !bash -c 'diff -u <(git rev-list --first-parent "${1}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
@@ -21,4 +23,8 @@
     co = checkout
     df = diff
     lg = log -p
+    up = !sh -c 'git pull --rebase --prune && git log --pretty=format:\"%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\" HEAD@{1}..'
+    lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    ls = ls-files
 

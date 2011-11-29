@@ -56,6 +56,20 @@ let mapleader=","             " change the leader to be a comma vs slash
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
 
+fu! SplitScroll()
+    :wincmd v
+    :wincmd w
+    execute "normal! \<C-d>"
+    :set scrollbind
+    :wincmd w
+    :set scrollbind
+endfu
+
+nmap <leader>sb :call SplitScroll()<CR>
+
+
+"<CR><C-w>l<C-f>:set scrollbind<CR>
+
 " sudo write this
 cmap W! w !sudo tee % >/dev/null
 
@@ -149,17 +163,13 @@ nnoremap <leader>. :lcd %:p:h<CR>
 
 " Disable the colorcolumn when switching modes.  Make sure this is the
 " first autocmd for the filetype here
-autocmd FileType * setlocal colorcolumn=0
+"autocmd FileType * setlocal colorcolumn=0
 
 """ Insert completion
 " don't select first item, follow typing in autocomplete
 set completeopt=menuone,longest,preview
 set pumheight=6             " Keep a small completion window
 
-" show a line at column 79
- if exists("&colorcolumn")
-    set colorcolumn=79
-endif
 
 """ Moving Around/Editing
 set cursorline              " have a line indicate the cursor location
@@ -221,7 +231,7 @@ set incsearch               " Incrementally search while typing a /regex
 
 """" Display
 if has("gui_running")
-    colorscheme solarized
+    colorscheme desert
     " Remove menu bar
     set guioptions-=m
 
@@ -244,7 +254,7 @@ nnoremap <leader><space> :nohlsearch<cr>
 nnoremap <leader>S :%s/\s\+$//<cr>:let @/=''<CR>
 
 " Select the item in the list with enter
-"inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " ==========================================================
 " Javascript
@@ -292,3 +302,5 @@ EOF
 if filereadable($VIRTUAL_ENV . '/.vimrc')
     source $VIRTUAL_ENV/.vimrc
 endif
+
+set colorcolumn=79
