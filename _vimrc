@@ -73,7 +73,6 @@ nmap <leader>sb :call SplitScroll()<CR>
 " sudo write this
 cmap W! w !sudo tee % >/dev/null
 
-
 " Toggle the tasklist
 map <leader>td <Plug>TaskList
 
@@ -91,9 +90,7 @@ nmap <silent><Leader>te <Esc>:Pytest error<CR>
 " Run django tests
 map <leader>dt :set makeprg=python\ manage.py\ test\|:call MakeGreen()<CR>
 
-" ,v brings up my .vimrc
-" ,V reloads it -- making all changes active (have to save first)
-map <leader>v :sp ~/.vimrc<CR><C-W>_
+" Reload Vimrc
 map <silent> <leader>V :source ~/.vimrc<CR>:filetype detect<CR>:exe ":echo 'vimrc reloaded'"<CR>
 
 " open/close the quickfix window
@@ -156,7 +153,11 @@ set vb t_vb=
 
 " Ignore these files when completing
 set wildignore+=*.o,*.obj,.git,*.pyc
-set grepprg=ack-grep          " replace the default grep program with ack
+set wildignore+=eggs/**
+set wildignore+=*.egg-info/**
+
+set grepprg=ack         " replace the default grep program with ack
+
 
 " Set working directory
 nnoremap <leader>. :lcd %:p:h<CR>
@@ -242,7 +243,7 @@ else
 endif
 
 " Paste from clipboard
-map <leader>p "+gP
+map <leader>p "+p
 
 " Quit window on <leader>q
 nnoremap <leader>q :q<CR>

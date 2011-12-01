@@ -28,6 +28,8 @@ $if mode=vi
     # auto-complete from the history
     "\C-p": history-search-backward
     "\C-n": history-search-forward
+    "\C-s": yank-last-arg
+    "\C-a":yank-last-arg
 $endif
 
 # IPython needs this to appear at the bottom of the
