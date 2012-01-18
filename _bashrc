@@ -161,12 +161,11 @@ proml
 if [ -e ~/.git-completion.bash ]; then
     source ~/.git-completion.bash
 fi
-
-export EDITOR=vim
-
 # append to bash rc instead of overwriting it, from
 # http://briancarper.net/blog/248/
 shopt -s histappend
 
 #add these two to prompt command to update history 
 export PROMPT_COMMAND="history -a; history -n"
+
+export EDITOR=vim
