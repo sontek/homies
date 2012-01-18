@@ -10,7 +10,7 @@
     default = matching
 
 [core]
-	editor = 'vim'
+	editor = ~/bin/vim
 
 [merge]
     tool = mvim

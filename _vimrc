@@ -68,6 +68,7 @@ map <leader>td <Plug>TaskList
 
 " Run pep8
 let g:pep8_map='<leader>8'
+let g:pep8_args='--repeat --ignore=E501,W293'
 
 " run py.test's
 "nmap <silent><Leader>tf <Esc>:Pytest file<CR>

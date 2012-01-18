@@ -169,4 +169,4 @@ export EDITOR=vim
 shopt -s histappend
 
 #add these two to prompt command to update history 
-export PROMPT_COMMAND="history -n; history -a"
+export PROMPT_COMMAND="history -a; history -n"
