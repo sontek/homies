@@ -49,3 +49,15 @@
 [submodule "_vim/bundle/markdown"]
 	path = _vim/bundle/markdown
 	url = https://github.com/plasticboy/vim-markdown.git
+[submodule "_vim/bundle/snipmate"]
+	path = _vim/bundle/snipmate
+	url = https://github.com/garbas/vim-snipmate.git
+[submodule "_vim/bundle/vim-addon-mw-utils"]
+	path = _vim/bundle/vim-addon-mw-utils
+	url = https://github.com/MarcWeber/vim-addon-mw-utils.git
+[submodule "_vim/bundle/tlib"]
+	path = _vim/bundle/tlib
+	url = https://github.com/tomtom/tlib_vim.git
+[submodule "_vim/bundle/snippets"]
+	path = _vim/bundle/snippets
+	url = https://github.com/honza/snipmate-snippets.git
