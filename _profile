@@ -8,7 +8,7 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-TZ='America/Chicago'; export TZ
+TZ='Europe/Sofia'; export TZ
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
@@ -19,6 +19,15 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
+for addPath in "/opt/android-sdk-linux_x86/platform-tools/" "/opt/android-sdk-linux_x86/tools/" "$HOME/bin" "$HOME/depot_tools" "/opt/android-ndk-r7/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/" "/opt/android-ndk-r7/"
+do
+ if [ -d $addPath ] ; then
+     PATH="$addPath:$PATH"
+ fi
+done
+
+export LANGUAGE="en_US:en"
+export LC_MESSAGES="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+export LC_COLLATE="en_US.UTF-8"
+_byobu_sourced=1 . byobu-launch
