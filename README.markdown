@@ -31,3 +31,4 @@ From this top-level directory.
 
 ## Requirements
 * bash
+* rake
