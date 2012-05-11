@@ -10,6 +10,11 @@ function link_file {
     ln -sf ${source} ${target}
 }
 
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ln -sf $DIR/_vim $DIR/_vim/_vim
+ln -sf $DIR/_vim $DIR/_vim/.vim
+
 if [ "$1" = "vim" ]; then
     for i in _vim*
     do
