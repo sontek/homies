@@ -4,3 +4,5 @@
 _vim/ropevim/src*
 _vim/ropevim/pylibs*
 _vim/.vim
+_vim/.netrwhist
+_fonts/fonts.dir
