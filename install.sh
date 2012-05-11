@@ -3,7 +3,9 @@ function link_file {
     source="${PWD}/$1"
     target="${HOME}/${1/_/.}"
 
-    if [ -e "${target}" ] && [ ! -L "${target}" ]; then
+    if [ -L "${target}" ]; then
+        rm ${target}
+    elif [ -e "${target}" ]; then
         mv $target $target.bak
     fi
 
@@ -12,7 +14,7 @@ function link_file {
 
 DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-ln -sf $DIR/_vim $DIR/_vim/_vim
+[ -e $DIR/_vim/.vim ] && rm $DIR/_vim/.vim
 ln -sf $DIR/_vim $DIR/_vim/.vim
 
 if [ "$1" = "vim" ]; then
