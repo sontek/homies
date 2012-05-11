@@ -30,10 +30,10 @@
 #  (The pipes indicate the edges of the xterm/console).
 
 # Green text, time, and date; windows in blue:
-hardstatus alwayslastline "%{=b}%{G} Screen(s): %{b}%w %=%{kG}%C%A  %D, %M/%d/%Y "
+# hardstatus alwayslastline "%{=b}%{G} Screen(s): %{b}%w %=%{kG}%C%A  %D, %M/%d/%Y "
 
 # Turn off start message:
-startup_message off
+# startup_message off
 
 # Set messages timeout to one second:
-msgwait 1
+# msgwait 1
