@@ -8,6 +8,8 @@ export CLICOLOR=1
 HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 # ... or force ignoredups and ignorespace
 HISTCONTROL=ignoreboth
+export HISTCONTROL=erasedups
+export HISTSIZE=10000
 
 # append to the history file, don't overwrite it
 shopt -s histappend
@@ -161,9 +163,6 @@ proml
 if [ -e ~/.git-completion.bash ]; then
     source ~/.git-completion.bash
 fi
-# append to bash rc instead of overwriting it, from
-# http://briancarper.net/blog/248/
-shopt -s histappend
 
 #add these two to prompt command to update history 
 export PROMPT_COMMAND="history -a; history -n"

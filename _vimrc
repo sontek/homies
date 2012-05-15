@@ -133,7 +133,7 @@ let g:ropevim_autoimport_modules = ["os", "shutil", "sys"]
 " ==========================================================
 " Load pathogen with docs for all plugins
 filetype off
-call pathogen#runtime_append_all_bundles()
+call pathogen#infect()
 call pathogen#helptags()
 
 " ==========================================================

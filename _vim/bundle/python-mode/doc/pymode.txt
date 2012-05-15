@@ -1,0 +1,492 @@
+*pymode.txt*  *python-mode.txt*  Python-mode for vim!
+
+    ____  _  _  ____  _   _  _____  _  _     __  __  _____  ____  ____      ~
+   (  _ \( \/ )(_  _)( )_( )(  _  )( \( )___(  \/  )(  _  )(  _ \( ___)     ~
+    )___/ \  /   )(   ) _ (  )(_)(  )  ((___))    (  )(_)(  )(_) ))__)      ~
+   (__)   (__)  (__) (_) (_)(_____)(_)\_)   (_/\/\_)(_____)(____/(____)     ~
+
+
+                          Version: 0.6.1
+
+==============================================================================
+CONTENTS                                                  *Python-mode-contents*
+
+    1.Intro...................................|PythonMode|
+    2.Options.................................|PythonModeOptions|
+        2.1.Customisation details.............|PythonModeOptionsDetails|
+    3.Default Keys............................|PythonModeKeys|
+    4.Commands................................|PythonModeCommands|
+    5.FAQ.....................................|PythonModeFAQ|
+    6.Credits.................................|PythonModeCredits|
+    7.License.................................|PythonModeLicense|
+
+==============================================================================
+1. Intro ~
+                                                                    *PythonMode*
+
+Python-mode is a vim plugin that allows you to use the pylint, rope, pydoc
+library in vim to provide features like python code looking for bugs,
+refactoring and some other usefull things.
+
+This plugin allow you create python code in vim very easily. There is no need
+to install the pylint or rope library on your system.
+
+
+==============================================================================
+2. Options ~
+                                                             *PythonModeOptions*
+
+	Note:
+        Pylint options (ex. disable messages) may be defined in '$HOME/pylint.rc'
+        See pylint documentation.
+
+The script provides the following options that can customise the behaviour the
+PythonMode. These options should be set in your vimrc.
+
+|'pymode_doc'|                      Turns off the documentation script
+
+|'pymode_doc_key'|                  Key for show documentation
+
+|'pymode_run'|                      Turns off the run code script
+
+|'pymode_run_key'|                  Key for run python code
+
+|'pymode_lint'|                     Turns off pylint script
+
+|'pymode_lint_checker'|             Switch code checkers (pylint, pyflakes, pep8, mccabe)
+
+|'pymode_lint_ignore'|              Skip errors and warnings
+
+|'pymode_lint_select'|              Select errors and warnings
+
+|'pymode_lint_onfly'|               Run linter on the fly
+
+|'pymode_lint_config'|              Filepath to pylinc configuration
+
+|'pymode_lint_write'|               Check code every save
+
+|'pymode_lint_cwindow'|             Show cwindow
+
+|'pymode_lint_message'|             Show current line errors in bottom
+
+|'pymode_lint_signs'|               Place signs
+
+|'pymode_lint_jump'|                Auto jump on first error
+
+|'pymode_lint_hold'|                Hold cursor in current window
+
+|'pymode_lint_minheight'|           Minimal height of pylint error window
+
+|'pymode_lint_mccabe_complexity'|   Maximum allowed mccabe complexity
+
+|'pymode_lint_maxheight'|           Maximal height of pylint error window
+
+|'pymode_rope'|                     Turns off rope script
+
+|'pymode_folding'|                  Turns on/off python folding
+
+|'pymode_breakpoint'|               Turns off breakpoint script
+
+|'pymode_breakpoint_key'|           Key for breakpoint
+
+|'pymode_utils'|                    Turns off utils
+
+|'pymode_virtualenv'|               Turns off virtualenv
+
+|'pymode_utils_whitespaces'|        Remove unused whitespaces
+
+|'pymode_syntax'|                   Turns off the custom syntax highlighting
+
+|'pymode_options_indent'|           Set default pymode options for
+                                  python indentation
+
+|'pymode_options_other'|            Set default pymode options for
+                                  python codding
+
+|'pymode_motion'|                   Enable pymode motion stuff
+
+        Note:
+        Also see |ropevim.txt|
+
+
+------------------------------------------------------------------------------
+2.1. Customisation details ~
+                                                      *PythonModeOptionsDetails*
+
+To enable any of the below options you should put the given line in your
+'$HOME/.vimrc'. See |vimrc-intro|.
+
+------------------------------------------------------------------------------
+                                                                  *'pymode_doc'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then docs script is disabled.
+
+------------------------------------------------------------------------------
+                                                              *'pymode_doc_key'*
+Default: 'K'.
+
+Set key for show python documentation.
+
+------------------------------------------------------------------------------
+                                                                  *'pymode_run'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then run script is disabled.
+
+------------------------------------------------------------------------------
+                                                              *'pymode_run_key'*
+Default: '<leader>r'.
+
+Set key for run python code.
+
+------------------------------------------------------------------------------
+                                                                 *'pymode_lint'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then pylint script is disabled.
+
+------------------------------------------------------------------------------
+                                                         *'pymode_lint_checker'*
+Values: "pylint", "pyflakes", "pep8", "mccabe"
+        You can set many checkers. E.g. "pyflakes,pep8,mccabe" ~
+
+Default: "pyflakes,pep8,mccabe".
+
+This option set code checkers.
+
+------------------------------------------------------------------------------
+                                                          *'pymode_lint_ignore'*
+Values: IDs of errors, separated by commas or empty string
+        E.g. "E501,W002", "E2,W" (Skip all Warnings and Errors startswith E2) and etc ~
+
+Default: "E501".
+
+Skip errors and warnings.
+See also: |'pymode_lint_select'|, |'pymode_lint_config'|
+
+------------------------------------------------------------------------------
+                                                         *'pymode_lint_select'*
+Values: IDs of errors, separated by commas or empty string
+        E.g. "W002,C" Force W002 and all C-ids ~
+
+Default: "".
+
+Select errors and warnings.
+See also: |'pymode_lint_ignore'|, |'pymode_lint_config'|
+
+------------------------------------------------------------------------------
+                                                           *'pymode_lint_onfly'*
+Values: 0 or 1
+Default: 0
+
+This option enabled "on the fly" code checking
+
+------------------------------------------------------------------------------
+                                                          *'pymode_lint_config'*
+Values: 'Path to pylint configuration file'
+Default: "$HOME/.pylintrc"
+
+If this option is set path to pylint configuration. If configuration not found
+uses file 'pylintrc' from python-mode sources.
+
+See also: |'pymode_lint_ignore'|, |'pymode_lint_select'|
+
+------------------------------------------------------------------------------
+                                                           *'pymode_lint_write'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then pylint auto check every save is disabled.
+
+------------------------------------------------------------------------------
+                                                         *'pymode_lint_cwindow'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then pylint not show cwindow.
+
+------------------------------------------------------------------------------
+                                                         *'pymode_lint_message'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then pylint not show errors in bottom
+
+------------------------------------------------------------------------------
+                                                           *'pymode_lint_signs'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then pylint not place error signs.
+
+------------------------------------------------------------------------------
+                                                            *'pymode_lint_jump'*
+Values: 0 or 1.
+Default: 0.
+
+If this option is set to 0 then pylint not jump on first error.
+
+------------------------------------------------------------------------------
+                                                            *'pymode_lint_hold'*
+Values: 0 or 1.
+Default: 0.
+
+If this option is set to 0 then pylint switch on quickfix window when it open
+Not working when |'pymode_lint_jump'| enabled.
+
+------------------------------------------------------------------------------
+                                                       *'pymode_lint_minheight'*
+Values: int
+Default: 3.
+
+Set minimal height for pylint cwindow
+
+------------------------------------------------------------------------------
+                                               *'pymode_lint_mccabe_complexity'*
+Values: int
+Default: 8.
+
+Set minimal complexity for mccabe linter.
+
+------------------------------------------------------------------------------
+                                                       *'pymode_lint_maxheight'*
+Values: int
+Default: 6.
+
+Set maximal height for pylint cwindow
+
+------------------------------------------------------------------------------
+                                                                 *'pymode_rope'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then rope script is disabled.
+
+------------------------------------------------------------------------------
+                                                           *'pymode_breakpoint'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then breakpoint script is disabled.
+
+------------------------------------------------------------------------------
+                                                       *'pymode_breakpoint_key'*
+Default: '<leader>b'.
+
+ Key for set/unset breakpoint
+
+------------------------------------------------------------------------------
+                                                                *'pymode_utils'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then utils script is disabled.
+
+------------------------------------------------------------------------------
+                                                           *'pymode_virtualenv'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then virtualenv support is disabled.
+
+------------------------------------------------------------------------------
+                                                    *'pymode_utils_whitespaces'*
+Values: 0 or 1.
+Default: 1.
+
+Autoremove unused whitespaces
+
+------------------------------------------------------------------------------
+                                                               *'pymode_syntax'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 0 then the custom syntax highlighting will
+not be used.
+
+------------------------------------------------------------------------------
+                                                       *'pymode_options_indent'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 1, pymode enable next options for python buffers: >
+
+    setlocal cinwords=if,elif,else,for,while,try,except,finally,def,class
+    setlocal cindent
+    setlocal tabstop=4
+    setlocal softtabstop=4
+    setlocal shiftwidth=4
+    setlocal shiftround
+    setlocal smartindent
+    setlocal smarttab
+    setlocal expandtab
+    setlocal autoindent
+<
+------------------------------------------------------------------------------
+                                                              *'pymode_folding'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 1, pymode enable python-folding.
+
+------------------------------------------------------------------------------
+                                                        *'pymode_options_other'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 1, pymode enable next options for python buffers: >
+
+    setlocal complete+=t
+    setlocal formatoptions-=t
+    setlocal number
+    setlocal nowrap
+    setlocal textwidth=80
+<
+------------------------------------------------------------------------------
+                                                               *'pymode_motion'*
+Values: 0 or 1.
+Default: 1.
+
+If this option is set to 1, pymode enable some python motions. Pymode-motion
+is beta.
+
+================  ============================
+Key               Command
+================  ============================
+[[                Jump on previous class or function (normal, visual, operator modes)
+]]                Jump on next class or function  (normal, visual, operator modes)
+[M                Jump on previous class or method (normal, visual, operator modes)
+]M                Jump on next class or method (normal, visual, operator modes)
+aC                Select a class. Ex: vaC, daC, yaC, caC (normal, operator modes)
+iC                Select inner class. Ex: viC, diC, yiC, ciC (normal, operator modes)
+aM                Select a function or method. Ex: vaM, daM, yaM, caM (normal, operator modes)
+iM                Select inner function or method. Ex: viM, diM, yiM, ciM (normal, operator modes)
+================  ============================
+
+
+==============================================================================
+3. Default Keys ~
+                                                                *PythonModeKeys*
+
+For redifine keys see: |PythonModeOptions|
+
+================  ============================
+Key               Command
+================  ============================
+K                 Show python docs for current word under cursor
+C-Space           Rope code assist
+<leader>r         Run current buffer
+<leader>b         Set breakpoints
+[[                Jump on previous class or function (normal, visual, operator modes)
+]]                Jump on next class or function  (normal, visual, operator modes)
+[M                Jump on previous class or method (normal, visual, operator modes)
+]M                Jump on next class or method (normal, visual, operator modes)
+aC C              Operation with a class.
+                  Ex: vaC, daC, dC, yaC, yC, caC, cC (normal, operator modes)
+iC                Operation with inner class.
+                  Ex: viC, diC, yiC, ciC (normal, operator modes)
+aM M              Operation with function or method.
+                  Ex: vaM, daM, dM, yaM, yM, caM, cM (normal, operator modes)
+iM                Operation with inner function or method.
+                  Ex: viM, diM, yiM, ciM (normal, operator modes)
+================  ============================
+
+	Note:
+        Also see: |RopeShortcuts|
+
+
+==============================================================================
+4. Commands ~
+                                                            *PythonModeCommands*
+
+*:Pydoc* <args>                                                            *Pydoc*
+    Show python documentation
+
+*:PyLintToggle*                                                     *PyLintToggle*
+    Enable, disable pylint
+
+*:PyLint*                                                                 *PyLint*
+    Check current buffer
+                                 
+*:Pyrun*                                                                   *Pyrun*
+    Run current buffer
+
+
+==============================================================================
+5. FAQ ~
+                                                                 *PythonModeFAQ*
+
+Rope completion is very slow
+----------------------------
+
+To work rope_ creates a service directory: `.ropeproject`.
+If |'pymode_rope_guess_project'| set on (by default) and `.ropeproject` in current dir not found, rope scan `.ropeproject` on every dir in parent path.
+If rope finded `.ropeproject` in parent dirs, rope set project for all child dir and scan may be slow for many dirs and files.
+
+Solutions:
+
+- Disable |'pymode_rope_guess_project'| to make rope always create `.ropeproject` in current dir.
+- Delete `.ropeproject` from dip parent dir to make rope create `.ropeproject` in current dir.
+- Press `<C-x>po` or `:RopeOpenProject` to make force rope create `.ropeproject` in current dir.
+
+
+
+Pylint check is very slow
+-------------------------
+
+In some projects pylint_ may check slowly, because it also scan imported modules if posible.
+Try use pyflakes, see |'pymode_lint_checker'|.
+
+You may set |exrc| and |secure| in your |vimrc| for auto set custom settings from `.vimrc` from your projects directories.
+>
+    Example: On Flask projects I automaticly set 'g:pymode_lint_checker = "pyflakes"', on django 'g:pymode_lint_cheker = "pylint"'
+<
+
+
+==============================================================================
+6. Credits ~
+                                                             *PythonModeCredits* 
+    Kirill Klenov
+        http://klen.github.com/
+        http://github.com/klen/
+
+    Rope
+        Copyright (C) 2006-2010 Ali Gholami Rudi
+        Copyright (C) 2009-2010 Anton Gritsay
+
+    Pylint
+        Copyright (C) 2003-2011 LOGILAB S.A. (Paris, FRANCE).
+        http://www.logilab.fr/
+
+    Pyflakes:
+        Copyright (c) 2005 Divmod, Inc.
+        http://www.divmod.com/
+
+    PEP8:
+        Copyright (C) 2006 Johann C. Rocholl <johann@rocholl.net>
+        http://github.com/jcrocholl/pep8
+
+    Python syntax for vim:
+        Copyright (c) 2010 Dmitry Vasiliev
+        http://www.hlabs.spb.ru/vim/python.vim
+
+
+==============================================================================
+7. License ~
+                                                             *PythonModeLicense*
+
+The Python-mode is released under the GNU lesser general public license.
+See: http://www.gnu.org/copyleft/lesser.html
+
+If you like this plugin, you can send me postcard :) 
+My address is here: "Russia, 143401, Krasnogorsk, Shkolnaya 1-19" to "Kirill Klenov".
+Thanks for support!
+
+
+------------------------------------------------------------------------------
+
+ vim:tw=78:ts=8:ft=help:norl:
