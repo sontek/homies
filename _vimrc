@@ -461,7 +461,10 @@ endif
 " let g:solarized_menu=1
 
 " Disable pylint checking every save
-" let g:pymode_lint_write = 0
+let g:pymode_lint_write = 0
+
 let g:pymode_lint_checker = "pyflakes,pep8"
 
 let g:pymode_lint_ignore = "E501,W293"
+
+let g:pymode_rope_guess_project = 0
