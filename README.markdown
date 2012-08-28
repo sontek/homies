@@ -29,5 +29,26 @@ It's as simple as running:
 
 From this top-level directory.
 
+### Only install and build vim Files
+Because this bit is pretty portable
+
+    ./install.sh vim
+
+### Restore old source Files
+To replace installed files with the originals:
+
+    ./install.sh restore
+
+Note that if there was not an original version, the installed links will not be removed.
+
 ## Requirements
+### Shell
 * bash
+
+### Vim
+* python
+  * pep8
+  * pyflakes
+  * rope
+* ruby
+  * rake
