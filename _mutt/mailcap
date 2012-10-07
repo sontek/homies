@@ -1,0 +1,6 @@
+image/*; /usr/bin/xdg-open '%s' & sleep 5; test=test -n "$DISPLAY";
+#text/html; /usr/bin/google-chrome %s & sleep 5; test=test -n "$DISPLAY";
+text/html; /usr/bin/w3m %s; nametemplate=%s.html;
+#text/html; lynx -stdin -dump -force_html ; copiousoutput
+text/html; w3m -I %{charset} -T text/html -dump; copiousoutput;
+text/plain; more %s;

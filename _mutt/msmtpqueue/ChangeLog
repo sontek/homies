@@ -1,0 +1,28 @@
+2008-07-28:
+- Use '#!/usr/bin/env bash' instead of '#!/bin/sh' because the scripts might
+  use features that are only available in bash and not in POSIX /bin/sh.
+- Avoid the variable name SECONDS in msmtp-runqueue.sh because it is predefined
+  by bash.
+
+2008-06-12:
+- Fix msmtp-runqueue.sh. An error made while applying the previous patch
+  accidently broke it. Reported by Thomas Weber. Thanks!
+
+2008-01-27:
+- Print the recipients of a mail in msmtp-runqueue.sh. Patch by Konrad
+  Schrempf. Thanks!
+
+2008-01-25:
+- Pass options from msmtp-runqueue.sh to msmtp. Patch by Thomas Weber. Thanks!
+
+Version 0.5:
+- Added the msmtp-listqueue.sh script, contributed by Andreas Kneib.
+
+Version 0.4:
+- Frank Thieme sent the following improvements:
+  - msmtp-runqueue.sh now uses a lock file to prevent two instances of the
+    script from running simultaneously.
+  - msmtp-enqueue.sh now checks if you're online, and calls msmtp-runqueue.sh
+    immediately if this is the case.
+    This functionality is commented out; you have to adapt the online check to
+    your system before activating it.

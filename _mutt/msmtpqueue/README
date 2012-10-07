@@ -1,0 +1,56 @@
+****************************************************************************
+* NOTE: Please have a look at the msmtpq scripts by Chris Gianniotis. They *
+* provide a more advanced alternative to the msmtpqueue scripts.           *
+****************************************************************************
+
+
+Scripts to queue mails and send them all at a later point with msmtp.
+
+These scripts may be useful for dialup connections: You can "send" all your
+mails offline (they will be queued by msmtp-enqueue.sh) and really send them
+all later when you are online (by running msmtp-runqueue.sh).
+
+1. msmtp-enqueue.sh
+   Let your MUA "send" mails with this script.
+   It will store all mails in a queue directory for later delivery.
+   This script will save two files for each mail: one contains the mail, the
+   other one contains the command line for msmtp (including options and the
+   recipients). Thus you can use all msmtp options with this script.
+   
+   Example (using Mutt):
+     In your Mutt configuration file, replace 
+     set sendmail="/path/to/msmtp [options]"
+     with
+     set sendmail="/path/to/msmtp-enqueue.sh [options]"
+   
+   This script cannot detect errors in its command line or the msmtp
+   configuration file. You won't see error messages before msmtp-runqueue.sh 
+   runs msmtp to send the mails. So test your msmtp configuration before using
+   msmtp-enqueue.sh.
+
+2. msmtp-runqueue.sh
+   Run this script when you are online to send all mails in the queue
+   directory.
+   It will use the saved msmtp command line for each mail.
+   Mails sent successfully will be deleted from the queue directory.
+   Mails whose delivery failed will be left untouched; you may want to edit
+   them, delete them by hand or simply run msmtp-runqueue.sh at a later time.
+
+3. msmtp-listqueue.sh
+   This script lists all the mails in the queue.
+
+Notes:
+- If you want to change the queue directory, change the value of QUEUEDIR
+  in *all* scripts.
+- The scripts expect exclusive access to the queue directory. Don't save other
+  files in it!
+- Each mail will be saved in a file called cc-yy-mm-hh.mm.ss[-x].mail where
+  cc-yy-mm is the current date, hh.mm.ss is the current time, and x is a
+  consecutive number only appended if you send more than one mail per second.
+  The msmtp command line will be saved in a file called
+  cc-yy-mm-hh.mm.ss[-x].msmtp (the same file name with ".msmtp" instead of
+  ".mail").
+
+These scripts are simple and dumb. Change them to meet your requirements!
+Please send any improvements you make to <marlam@marlam.de> for inclusion in
+later versions.
