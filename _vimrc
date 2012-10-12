@@ -67,8 +67,9 @@ cmap W! w !sudo tee % >/dev/null
 map <leader>td <Plug>TaskList
 
 " Run pep8
-let g:pep8_map='<leader>8'
-let g:pep8_args='--repeat --ignore=E501,W293'
+map <leader>8 :call Pep8()<CR>
+"let g:pep8_map='<leader>8'
+let g:pep8_args='--ignore=E711,E128,E127,E501,W293,E125,E124,E126'
 
 " run py.test's
 "nmap <silent><Leader>tf <Esc>:Pytest file<CR>
@@ -273,6 +274,7 @@ autocmd FileType html,xhtml,xml,css setlocal expandtab shiftwidth=2 tabstop=2 so
 " Python
 "au BufRead *.py compiler nose
 au FileType python setlocal omnifunc=pythoncomplete#Complete
+"au FileType python setlocal omnifunc=RopeCompleteFunc
 au FileType python setlocal expandtab shiftwidth=4 tabstop=8 softtabstop=4
 "au FileType python setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
