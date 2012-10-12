@@ -17,38 +17,12 @@
 " GunDo
 "     Visual Undo in vim with diff's to check the differences
 "
-" Pytest
-"     Runs your Python tests in Vim.
-"
-" Commant-T
-"     Allows easy search and opening of files within a given path
-"
-" Snipmate
-"     Configurable snippets to avoid re-typing common comands
-"
-" PyFlakes
-"     Underlines and displays errors with Python on-the-fly
-"
 " Fugitive
 "    Interface with git from vim
-"
-" Git
-"    Syntax highlighting for git config files
 "
 " Minibufexpl
 "    Visually display what buffers are currently opened
 "
-" Pydoc
-"    Opens up pydoc within vim
-"
-" Surround
-"    Allows you to surround text with open/close tags
-"
-" Py.test
-"    Run py.test test's from within vim
-"
-" MakeGreen
-"    Generic test runner that works with nose
 "
 " ==========================================================
 " Shortcuts
@@ -62,25 +36,10 @@ command! W :w
 " sudo write this
 cmap W! w !sudo tee % >/dev/null
 
-
-" Toggle the tasklist
-map <leader>td <Plug>TaskList
-
 " Run pep8
 map <leader>8 :call Pep8()<CR>
 "let g:pep8_map='<leader>8'
 let g:pep8_args='--ignore=E711,E128,E127,E501,W293,E125,E124,E126'
-
-" run py.test's
-"nmap <silent><Leader>tf <Esc>:Pytest file<CR>
-"nmap <silent><Leader>tc <Esc>:Pytest class<CR>
-"nmap <silent><Leader>tm <Esc>:Pytest method<CR>
-"nmap <silent><Leader>tn <Esc>:Pytest next<CR>
-"nmap <silent><Leader>tp <Esc>:Pytest previous<CR>
-"nmap <silent><Leader>te <Esc>:Pytest error<CR>
-
-" Run django tests
-"map <leader>dt :set makeprg=python\ manage.py\ test\|:call MakeGreen()<CR>
 
 " ,v brings up my .vimrc
 " ,V reloads it -- making all changes active (have to save first)
@@ -103,9 +62,6 @@ map <c-h> <c-w>h
 " and lets make these all work in insert mode too ( <C-O> makes next cmd
 "  happen as if in command mode )
 imap <C-W> <C-O><C-W>
-
-" Open NerdTree
-map <leader>n :NERDTreeToggle<CR>
 
 " Run command-t file search
 map <leader>f :CommandT<CR>
@@ -247,23 +203,6 @@ nnoremap <leader>S :%s/\s\+$//<cr>:let @/=''<CR>
 au BufWritePre *.py mark `|:%s/\s\+$//e|normal “
 
 
-" Select the item in the list with enter
-"inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" ==========================================================
-" Javascript
-" ==========================================================
-au BufRead *.js set makeprg=jslint\ %
-
-" Don't allow snipmate to take over tab
-autocmd VimEnter * ino <c-j> <c-r>=TriggerSnippet()<cr>
-" Use tab to scroll through autocomplete menus
-autocmd VimEnter * imap <expr> <Tab> pumvisible() ? "<C-N>" : "<Tab>"
-autocmd VimEnter * imap <expr> <S-Tab> pumvisible() ? "<C-P>" : "<S-Tab>"
-snor <c-j> <esc>i<right><c-r>=TriggerSnippet()<cr>
-" preview
-let g:acp_completeoptPreview=1
-
 " ===========================================================
 " FileType specific changes
 " ============================================================
@@ -280,7 +219,6 @@ au FileType python setlocal expandtab shiftwidth=4 tabstop=8 softtabstop=4
 au BufRead *.py set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 " Don't let pyflakes use the quickfix window
 let g:pyflakes_use_quickfix = 0
-
 
 
 " Add the virtualenv's site-packages to vim path
@@ -411,7 +349,7 @@ EOF
 
 set tags+=$HOME/.vim/tags/python2.6.ctags
 
-" Code to execute current buffer 
+" Code to execute current buffer
 fu! DoRunPyBuffer2()
 pclose! " force preview window closed
 setlocal ft=python
@@ -464,9 +402,7 @@ endif
 
 " Disable pylint checking every save
 let g:pymode_lint_write = 0
-
+let g:pymode_utils_whitespaces = 0
 let g:pymode_lint_checker = "pyflakes,pep8"
-
-let g:pymode_lint_ignore = "E501,W293"
-
-let g:pymode_rope_guess_project = 0
+let g:pymode_lint_ignore = "E711,E128,E127,E501,W293,E125,E124,E126"
+"let g:pymode_rope_guess_project = 0
