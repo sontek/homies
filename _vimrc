@@ -36,11 +36,6 @@ command! W :w
 " sudo write this
 cmap W! w !sudo tee % >/dev/null
 
-" Run pep8
-map <leader>8 :call Pep8()<CR>
-"let g:pep8_map='<leader>8'
-let g:pep8_args='--ignore=E711,E128,E127,E501,W293,E125,E124,E126'
-
 " ,v brings up my .vimrc
 " ,V reloads it -- making all changes active (have to save first)
 map <leader>v :sp ~/.vimrc<CR><C-W>_
@@ -212,7 +207,7 @@ autocmd FileType html,xhtml,xml,css setlocal expandtab shiftwidth=2 tabstop=2 so
 
 " Python
 "au BufRead *.py compiler nose
-au FileType python setlocal omnifunc=pythoncomplete#Complete
+"au FileType python setlocal omnifunc=pythoncomplete#Complete
 "au FileType python setlocal omnifunc=RopeCompleteFunc
 au FileType python setlocal expandtab shiftwidth=4 tabstop=8 softtabstop=4
 "au FileType python setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
@@ -400,9 +395,12 @@ endif
 " let g:solarized_hitrail=0
 " let g:solarized_menu=1
 
+"pymode stuff!
 " Disable pylint checking every save
 let g:pymode_lint_write = 0
 let g:pymode_utils_whitespaces = 0
 let g:pymode_lint_checker = "pyflakes,pep8"
 let g:pymode_lint_ignore = "E711,E128,E127,E501,W293,E125,E124,E126"
 "let g:pymode_rope_guess_project = 0
+map <leader>8 :PyLint<CR>
+map <leader>88 :PyLintAuto<CR>
