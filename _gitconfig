@@ -1,6 +1,7 @@
 [user]
 	name = Randall Mason
 	email = ClashTheBunny@gmail.com
+	signingkey = 63E5D468
 [color]
     diff = auto
     status = auto

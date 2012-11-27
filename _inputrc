@@ -5,7 +5,7 @@ set bind-tty-special-chars off
 
 # Completion Options
 set page-completions on
-set completion-ignore-case on
+# set completion-ignore-case on
 set completion-query-items 200
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
