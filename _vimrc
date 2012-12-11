@@ -407,3 +407,4 @@ let g:pymode_lint_ignore = "E711,E128,E127,E501,W293,E125,E124,E126"
 "let g:pymode_rope_guess_project = 0
 map <leader>8 :PyLint<CR>
 map <leader>88 :PyLintAuto<CR>
+let g:acp_completeoptPreview=1
