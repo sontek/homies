@@ -75,9 +75,9 @@ map <leader>d :RopeShowDoc<CR>
 map <leader>r :RopeRename<CR>
 
 " Ropevim use vim's complete function in insert mode
-let ropevim_vim_completion=1
-let ropevim_extended_complete=1
-let g:ropevim_autoimport_modules = ["os", "shutil", "sys"]
+"let ropevim_vim_completion=1
+"let ropevim_extended_complete=1
+"let g:ropevim_autoimport_modules = ["os", "shutil", "sys"]
 
 
 " ==========================================================
@@ -401,6 +401,9 @@ let g:pymode_lint_write = 0
 let g:pymode_utils_whitespaces = 0
 let g:pymode_lint_checker = "pyflakes,pep8"
 let g:pymode_lint_ignore = "E711,E128,E127,E501,W293,E125,E124,E126"
+"let g:pymode_rope_vim_completion = 0
+"let g:pymode_rope_sorted_completions = 0
+"let g:pymode_rope_extended_complete = 0
 "let g:pymode_rope_guess_project = 0
 map <leader>8 :PyLint<CR>
 map <leader>88 :PyLintAuto<CR>

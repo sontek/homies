@@ -19,3 +19,6 @@
 [submodule "_vim/bundle/pyflakes-vim"]
 	path = _vim/bundle/pyflakes-vim
 	url = git://github.com/kevinw/pyflakes-vim.git
+[submodule "_vim/bundle/acp"]
+	path = _vim/bundle/acp
+	url = https://github.com/vim-scripts/AutoComplPop.git
