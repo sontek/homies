@@ -207,7 +207,7 @@ autocmd FileType html,xhtml,xml,css setlocal expandtab shiftwidth=2 tabstop=2 so
 
 " Python
 "au BufRead *.py compiler nose
-"au FileType python setlocal omnifunc=pythoncomplete#Complete
+au FileType python setlocal omnifunc=pythoncomplete#Complete
 "au FileType python setlocal omnifunc=RopeCompleteFunc
 au FileType python setlocal expandtab shiftwidth=4 tabstop=8 softtabstop=4
 "au FileType python setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
