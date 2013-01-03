@@ -1,5 +1,51 @@
-*logs*
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+*.pyo
+
+# Logs #
+########
 *.log
-*~
-_vim/ropevim/src*
-_vim/ropevim/pylibs*
+
+# OS generated files #
+######################
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+.project
+.TemporaryItems*
+
+# Text editor temp files #
+##########################
+*.swp
+*.swo
+*.swn
+.#*
+*.tmpproj
+
+# Vagrant status #
+##################
+.vagrant
+
+# build directories #
+#####################
+build/
+
+# crash dumps #
+###############
+erl_crash.dump
+
+# chef generated files #
+########################
+config/services_config.py
+
+# db migration status file #
+############################
+.migrations
