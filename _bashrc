@@ -130,7 +130,7 @@ fi
 
 # osx vim
 if [ -x "/Applications/MacVim.app/Contents/MacOS/Vim" ]; then
-    PATH=/Applications/MacVim.app/Contents/MacOS/:$PATH
+    PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
 fi
 
 PATH=~/bin:/usr/local/sbin:$PATH:/usr/local/mysql/bin
@@ -138,8 +138,6 @@ export PATH
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
-
-export DYLD_LIBRARY_PATH=/usr/local/mysql/lib/
 
 # Dynamically add the git branch to the terminal output
 function parse_git_branch {
