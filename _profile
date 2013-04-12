@@ -37,3 +37,5 @@ if [ -n "$BASH_VERSION" ]; then
         . "$HOME/.venvburrito/startup.sh"
     fi
 fi
+
+alias glol="git log --all --color --graph --pretty=format:'%Cred%h%Creset%x09%C(yellow)%d%Creset %s %C(cyan)(%cr) %C(blue)[%an]%Creset' --abbrev-commit"

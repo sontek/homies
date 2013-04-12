@@ -22,3 +22,6 @@
 [submodule "_vim/bundle/acp"]
 	path = _vim/bundle/acp
 	url = https://github.com/vim-scripts/AutoComplPop.git
+[submodule "_vim/bundle/VimClojure"]
+	path = _vim/bundle/VimClojure
+	url = git://github.com/vim-scripts/VimClojure.git

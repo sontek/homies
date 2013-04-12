@@ -184,7 +184,7 @@ set hlsearch                " Highlight searches by default.
 set incsearch               " Incrementally search while typing a /regex
 
 " Paste from clipboard
-map <leader>p "+gP
+"map <leader>p "+gP
 
 " Quit window on <leader>q
 nnoremap <leader>q :q<CR>
