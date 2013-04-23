@@ -114,7 +114,8 @@ imap <C-W> <C-O><C-W>
 map <leader>n :NERDTreeToggle<CR>
 
 " Run command-t file search
-map <leader>f :CommandT<CR>
+map <leader>f :CtrlP<CR>
+map <leader>b :CtrlPBuffer<CR>
 " Ack searching
 nmap <leader>a <Esc>:Ack!
 
@@ -232,15 +233,14 @@ set incsearch               " Incrementally search while typing a /regex
 
 """" Display
 if has("gui_running")
-    colorscheme desert
     " Remove menu bar
     set guioptions-=m
 
     " Remove toolbar
     set guioptions-=T
-else
-    colorscheme torte
 endif
+
+colorscheme molokai
 
 " Paste from clipboard
 map <leader>p "+p
