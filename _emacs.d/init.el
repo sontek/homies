@@ -11,7 +11,6 @@
 ; Use a dark color schema
 
 (require 'package)
-(package-initialize)
 
 ; Require ido everywhere
 (setq ido-enable-flex-matching t)
@@ -22,9 +21,20 @@
     '("marmalade" .
       "http://marmalade-repo.org/packages/"))
 
-(add-to-list 'package-archives 
-    '("melpa" .
-      "http://melpa.milkbox.net/packages/"))
+(package-initialize)
+
+; Make sure all our packages are installed
+(defvar sontek-packages
+  '(clojure-mode gist magit markdown-mode sass-mode scss-mode yaml-mode
+        projectile yasnippet undo-tree csv-mode rainbow-mode nose
+        pep8 pylint pyflakes pytest git-commit flymake flymake-easy
+        flymake-python-pyflakes flymake-cursor
+   )
+  "A list of packages to ensure are installed at launch.")
+
+(dolist (p sontek-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
 
 (load-theme 'wombat t)
 
@@ -60,3 +70,10 @@
 
 ; Never insert tabs
 (setq-default indent-tabs-mode nil)
+
+; Setup the python checker
+(eval-after-load 'flymake '(require 'flymake-cursor))
+
+(require 'flymake-python-pyflakes)
+(add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
+(setq flymake-python-pyflakes-executable "flake8")
