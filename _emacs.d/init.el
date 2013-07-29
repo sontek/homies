@@ -32,6 +32,7 @@
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pep8 pylint pyflakes pytest git-commit flymake flymake-easy
         flymake-python-pyflakes flymake-cursor rainbow-delimiters
+        move-text jedi deferred
    )
   "A list of packages to ensure are installed at launch.")
 
@@ -41,6 +42,14 @@
 
 ; Handle non-unqiue buffers better
 (setq uniquify-buffer-name-style 'forward)
+(require 'undo-tree)
+(global-undo-tree-mode 1)
+
+(require 'rainbow-delimiters)
+(global-rainbow-delimiters-mode)
+
+(require 'move-text)
+(move-text-default-bindings)
 
 ; Configure whitespace settings to display when we are over 80chars
 (setq whitespace-style '(face empty tabs lines-tail trailing))
@@ -89,3 +98,11 @@
 (require 'flymake-python-pyflakes)
 (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
 (setq flymake-python-pyflakes-executable "flake8")
+;; (add-hook 'python-mode-hook
+;;   (lambda ()
+;;          (auto-complete-mode 1)))
+
+;; ; Setup jedis autocompletion
+;; (add-hook 'python-mode-hook 'jedi:setup)
+;; (setq jedi:setup-keys t)                      ; optional
+;; (setq jedi:complete-on-dot t)                 ; optional
