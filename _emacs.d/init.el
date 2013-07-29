@@ -29,12 +29,20 @@
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pep8 pylint pyflakes pytest git-commit flymake flymake-easy
         flymake-python-pyflakes flymake-cursor
+        rainbow-delimiters
    )
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p sontek-packages)
   (when (not (package-installed-p p))
     (package-install p)))
+
+; Load whitespace module
+(require 'whitespace)
+;(setq whitespace-style '(tabs trailing lines tab-mark))
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+(setq whitespace-line-column 79)
+(global-whitespace-mode 1)
 
 (load-theme 'wombat t)
 
