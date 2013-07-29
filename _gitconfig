@@ -12,7 +12,7 @@
     default = matching
 
 [core]
-    editor = vim
+    editor = emacs
     pager = less -R
 
 [alias]
@@ -22,7 +22,7 @@
     br = branch
     co = checkout
     df = diff
-    lg = log -p
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
     up = !sh -c 'git pull --rebase --prune && git log --pretty=format:\"%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\" HEAD@{1}..'
     lol = log --graph --decorate --pretty=oneline --abbrev-commit
     lola = log --graph --decorate --pretty=oneline --abbrev-commit --all

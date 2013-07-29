@@ -1,0 +1,39 @@
+RELEASE INFO 23.03.2008
+
+116 script files for GIMP 2.4.
+
+License info:
+  Scripts contained in this pack are licensed under GPL license,
+  either version 2 or version 3 or in some cases public domain
+  according to the authors preference.
+  The used license is outlined in each scripts header.
+
+How to use this release:
+   Extract the downloaded pack and copy the files to
+   your scripts folder.
+   * Default scripts folder under your profile is a bit
+   uncomfortable to use, as the path ends to be hidden by 
+   the system. The easiest way to manage your own scripts 
+   is to add a more comfortable scripts path from Preferences->Paths.
+
+This release has online documentation and single script download available
+at http://gimpfx-foundry.sourceforge.net/browse/. List of individual
+script authors can be found at  http://gimpfx-foundry.sourceforge.net/browse/index_author_name.html
+
+CAUTIONS!
+   If you practice renaming script files and are doing an
+   update make sure no older versions of files are left in
+   scripts paths, as it is undetermined which of the
+   function versions will ultimately be called.
+   
+   If you have a lot of scripts already and adding these
+   breaks everything, remove some scripts and try again.
+   Script-fu has a limit to how many script elements it
+   can handle and will not work if that border is crossed.
+ 
+Fixing and maintenance:
+  The GIMP FX Foundry devlopers.
+  Join us at http://gimpfx-foundry.sourceforge.net/
+  Please file bugreports and feature requests to our tracker 
+  and ask for help or propose scripts for inclusion in our forums. 
+
