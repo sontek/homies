@@ -10,14 +10,17 @@
 
 ; Use a dark color schema
 
+
 (require 'package)
+(require 'uniquify)
+(require 'whitespace)
 
 ; Require ido everywhere
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
-(ido-mode 1) 
+(ido-mode 1)
 
-(add-to-list 'package-archives 
+(add-to-list 'package-archives
     '("marmalade" .
       "http://marmalade-repo.org/packages/"))
 
@@ -28,8 +31,7 @@
   '(clojure-mode gist magit markdown-mode sass-mode scss-mode yaml-mode
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pep8 pylint pyflakes pytest git-commit flymake flymake-easy
-        flymake-python-pyflakes flymake-cursor
-        rainbow-delimiters
+        flymake-python-pyflakes flymake-cursor rainbow-delimiters
    )
   "A list of packages to ensure are installed at launch.")
 
@@ -37,12 +39,14 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
-; Load whitespace module
-(require 'whitespace)
-;(setq whitespace-style '(tabs trailing lines tab-mark))
+; Handle non-unqiue buffers better
+(setq uniquify-buffer-name-style 'forward)
+
+; Configure whitespace settings to display when we are over 80chars
 (setq whitespace-style '(face empty tabs lines-tail trailing))
 (setq whitespace-line-column 79)
 (global-whitespace-mode 1)
+(setq-default fill-column 79)
 
 (load-theme 'wombat t)
 
@@ -65,7 +69,7 @@
 (setq make-backup-files nil)
 
 ; stop creating those #autosave# files
-(setq auto-save-default nil) 
+(setq auto-save-default nil)
 
 ; highlight the current line we are editing
 (global-hl-line-mode 1)
