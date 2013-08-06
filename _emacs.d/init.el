@@ -30,15 +30,19 @@
 (defvar sontek-packages
   '(clojure-mode gist magit markdown-mode sass-mode scss-mode yaml-mode
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
-        pep8 pylint pyflakes pytest git-commit flymake flymake-easy
-        flymake-python-pyflakes flymake-cursor rainbow-delimiters
-        move-text jedi deferred
+        pytest git-commit rainbow-delimiters move-text jedi deferred
+        flycheck
    )
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p sontek-packages)
   (when (not (package-installed-p p))
     (package-install p)))
+
+;; On the fly syntax checking
+(require 'flycheck)
+(global-flycheck-mode)
+(setq flycheck-highlighting-mode 'lines)
 
 ; Handle non-unqiue buffers better
 (setq uniquify-buffer-name-style 'forward)
@@ -57,7 +61,7 @@
 (global-whitespace-mode 1)
 (setq-default fill-column 79)
 
-(load-theme 'wombat t)
+;(load-theme 'wombat t)
 
 ;; no startup msg
 (setq inhibit-startup-message t)
@@ -92,16 +96,6 @@
 ; Never insert tabs
 (setq-default indent-tabs-mode nil)
 
-; Setup the python checker
-(eval-after-load 'flymake '(require 'flymake-cursor))
-
-(require 'flymake-python-pyflakes)
-(add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
-(setq flymake-python-pyflakes-executable "flake8")
-;; (add-hook 'python-mode-hook
-;;   (lambda ()
-;;          (auto-complete-mode 1)))
-
 ;; ; Setup jedis autocompletion
 ;; (add-hook 'python-mode-hook 'jedi:setup)
 ;; (setq jedi:setup-keys t)                      ; optional
@@ -123,3 +117,26 @@
 
 (global-set-key (kbd "<C-return>") 'open-line-below)
 (global-set-key (kbd "<C-M-return>") 'open-line-above)
+
+(defun add-py-debug ()
+      "add debug code and move line down"
+    (interactive)
+    (move-beginning-of-line 1)
+    (insert "import pdb; pdb.set_trace();\n"))
+
+(defun annotate-pdb ()
+  (interactive)
+  (highlight-lines-matching-regexp "import pdb")
+  (highlight-lines-matching-regexp "pdb.set_trace()"))
+
+(add-hook 'python-mode-hook 'annotate-pdb)
+
+(defun python-add-breakpoint ()
+  (interactive)
+  (newline-and-indent)
+  (insert "import ipdb; ipdb.set_trace()")
+  (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+
+(add-hook 'python-mode-hook
+    (lambda ()
+        (define-key python-mode-map (kbd "C-c C-p") 'python-add-breakpoint)))
