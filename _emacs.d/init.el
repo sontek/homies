@@ -31,7 +31,7 @@
   '(clojure-mode gist magit markdown-mode sass-mode scss-mode yaml-mode
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pytest git-commit rainbow-delimiters move-text jedi deferred
-        flycheck
+        flycheck flymake flymake-python-pyflakes flymake-easy flymake-cursor
    )
   "A list of packages to ensure are installed at launch.")
 
@@ -43,6 +43,14 @@
 (require 'flycheck)
 (global-flycheck-mode)
 (setq flycheck-highlighting-mode 'lines)
+
+(add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
+
+(require 'flymake-python-pyflakes)
+(eval-after-load 'flymake '(require 'flymake-cursor))
+
+(add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
+(setq flymake-python-pyflakes-executable "flake8")
 
 ; Handle non-unqiue buffers better
 (setq uniquify-buffer-name-style 'forward)
