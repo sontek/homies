@@ -21,6 +21,9 @@
 (ido-mode 1)
 
 (add-to-list 'package-archives
+  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+(add-to-list 'package-archives
     '("marmalade" .
       "http://marmalade-repo.org/packages/"))
 
@@ -32,12 +35,15 @@
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pytest git-commit rainbow-delimiters move-text jedi deferred
         flycheck flymake flymake-python-pyflakes flymake-easy flymake-cursor
+        multiple-cursors
    )
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p sontek-packages)
   (when (not (package-installed-p p))
     (package-install p)))
+
+(require 'multiple-cursors)
 
 ;; On the fly syntax checking
 (require 'flycheck)
@@ -148,3 +154,6 @@
 (add-hook 'python-mode-hook
     (lambda ()
         (define-key python-mode-map (kbd "C-c C-p") 'python-add-breakpoint)))
+
+(setq c-default-style "linux"
+      c-basic-offset 4)
