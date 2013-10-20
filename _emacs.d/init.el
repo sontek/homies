@@ -35,7 +35,7 @@
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pytest git-commit rainbow-delimiters move-text jedi deferred
         flycheck flymake flymake-python-pyflakes flymake-easy flymake-cursor
-        multiple-cursors
+        multiple-cursors ack-and-a-half
    )
   "A list of packages to ensure are installed at launch.")
 
@@ -44,6 +44,7 @@
     (package-install p)))
 
 (require 'multiple-cursors)
+(require 'ack-and-a-half)
 
 ;; On the fly syntax checking
 (require 'flycheck)
