@@ -35,7 +35,7 @@
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pytest git-commit rainbow-delimiters move-text jedi deferred
         flycheck flymake flymake-python-pyflakes flymake-easy flymake-cursor
-        multiple-cursors ack-and-a-half
+        multiple-cursors ack-and-a-half dash s etags-select
    )
   "A list of packages to ensure are installed at launch.")
 
@@ -45,6 +45,27 @@
 
 (require 'multiple-cursors)
 (require 'ack-and-a-half)
+(require 'projectile)
+
+(projectile-global-mode)
+
+(setq projectile-tags-command "ctags -e -R --extra=+fq --exclude=.git --exclude=.tox --exclude=.tests -f ")
+
+(defun my-find-tag ()
+  (interactive)
+  (if (file-exists-p (concat (projectile-project-root) "TAGS"))
+      (visit-project-tags)
+    (build-ctags))
+  (etags-select-find-tag-at-point))
+
+(defun visit-project-tags ()
+  (interactive)
+  (let ((tags-file (concat (projectile-project-root) "TAGS")))
+    (visit-tags-table tags-file)
+    (message (concat "Loaded " tags-file))))
+
+(global-set-key (kbd "M-.") 'my-find-tag)
+
 
 ;; On the fly syntax checking
 (require 'flycheck)
