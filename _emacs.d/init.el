@@ -35,7 +35,7 @@
         projectile yasnippet undo-tree csv-mode rainbow-mode nose
         pytest git-commit rainbow-delimiters move-text jedi deferred
         flycheck flymake flymake-python-pyflakes flymake-easy flymake-cursor
-        multiple-cursors ack-and-a-half dash s etags-select
+        multiple-cursors ack-and-a-half dash s etags-select smartscan
    )
   "A list of packages to ensure are installed at launch.")
 
@@ -46,6 +46,8 @@
 (require 'multiple-cursors)
 (require 'ack-and-a-half)
 (require 'projectile)
+
+(smartscan-mode 1)
 
 (projectile-global-mode)
 
@@ -131,11 +133,6 @@
 
 ; Never insert tabs
 (setq-default indent-tabs-mode nil)
-
-;; ; Setup jedis autocompletion
-;; (add-hook 'python-mode-hook 'jedi:setup)
-;; (setq jedi:setup-keys t)                      ; optional
-;; (setq jedi:complete-on-dot t)                 ; optional
 
 ; Allow creating lines above and below
 (defun open-line-below ()
