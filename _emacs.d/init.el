@@ -176,3 +176,33 @@
 
 (setq c-default-style "linux"
       c-basic-offset 4)
+
+(defun show-onelevel ()
+  "show entry and children in outline mode"
+  (interactive)
+  (show-entry)
+  (show-children))
+
+(defun cjm-outline-bindings ()
+  "sets shortcut bindings for outline minor mode"
+  (interactive)
+  (local-set-key [?\C-,] 'hide-sublevels)
+  (local-set-key [?\C-.] 'show-all)
+  (local-set-key [C-up] 'outline-previous-visible-heading)
+  (local-set-key [C-down] 'outline-next-visible-heading)
+  (local-set-key [C-left] 'hide-subtree)
+  (local-set-key [C-right] 'show-onelevel)
+  (local-set-key [M-up] 'outline-backward-same-level)
+  (local-set-key [M-down] 'outline-forward-same-level)
+  (local-set-key [M-left] 'hide-subtree)
+  (local-set-key [M-right] 'show-subtree))
+
+(add-hook 'outline-minor-mode-hook
+          'cjm-outline-bindings)
+
+(add-hook 'python-mode-hook
+          '(lambda ()
+             (outline-minor-mode)
+             (setq outline-regexp " *\\(def \\|clas\\|#hea\\)")
+             (hide-sublevels 1)))
+   
