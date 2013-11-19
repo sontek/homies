@@ -1,6 +1,8 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+
 #osx color terminal
 export CLICOLOR=1
 # don't put duplicate lines in the history. See bash(1) for more options
@@ -140,8 +142,8 @@ fi
 
 alias vim="emacs"
 
-PYTHONSTARTUP=~/.pythonrc.py
-export PYTHONSTARTUP
+"PYTHONSTARTUP=~/.pythonrc.py
+"export PYTHONSTARTUP
 
 parse_git_branch ()
 {
@@ -181,6 +183,8 @@ _complete_hosts () {
     COMPREPLY=( $(compgen -W "${host_list}" -- $cur))
     return 0
 }
+
+alias clean_pycs='find . -name "*.pyc" -exec rm {} \;'
 
 complete -F _complete_hosts ssh
 complete -F _complete_hosts host
