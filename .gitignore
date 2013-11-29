@@ -5,3 +5,5 @@ _vim/ropevim/src*
 _vim/ropevim/pylibs*
 *.swp
 *.pyc
+_emacs.d/elpa
+_emacs.d/projectile*
