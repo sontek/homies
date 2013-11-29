@@ -76,16 +76,16 @@
 
   (defun annotate-pdb ()
     (interactive)
-    (highlight-lines-matching-regexp "import pdb")
-    (highlight-lines-matching-regexp "pdb.set_trace()"))
+    (highlight-lines-matching-regexp "import p?db")
+    (highlight-lines-matching-regexp "p?db.set_trace()"))
 
   (add-hook 'python-mode-hook 'annotate-pdb)
 
   (defun python-add-breakpoint ()
     (interactive)
     (newline-and-indent)
-    (insert "import ipdb; ipdb.set_trace()")
-    (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+    (insert "import pudb; pudb.set_trace()")
+    (highlight-lines-matching-regexp "^[ ]*import pudb; pudb.set_trace()"))
 
   (add-hook 'python-mode-hook
     (lambda ()
