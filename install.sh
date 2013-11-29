@@ -2,6 +2,9 @@
 function link_file {
     source="${PWD}/$1"
     target="${HOME}/${1/_/.}"
+    if [ -L "${target}" ]; then
+        unlink $target
+    fi
 
     if [ -e "${target}" ] && [ ! -L "${target}" ]; then
         mv $target $target.df.bak
@@ -20,12 +23,7 @@ function unlink_file {
     fi
 }
 
-if [ "$1" = "vim" ]; then
-    for i in _vim*
-    do
-       link_file $i
-    done
-elif [ "$1" = "restore" ]; then
+if [ "$1" = "restore" ]; then
     for i in _*
     do
         unlink_file $i
@@ -37,6 +35,3 @@ else
         link_file $i
     done
 fi
-
-git submodule update --init --recursive
-git submodule foreach --recursive git pull origin master
