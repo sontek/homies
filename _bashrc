@@ -142,9 +142,6 @@ fi
 
 alias vim="emacs"
 
-"PYTHONSTARTUP=~/.pythonrc.py
-"export PYTHONSTARTUP
-
 parse_git_branch ()
 {
   git branch 2> /dev/null | grep '*' | sed 's#*\ \(.*\)#(git::\1)#'
