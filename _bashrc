@@ -158,7 +158,7 @@ parse_svn_url() {
 parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
-set -o vi
+
 export EDITOR="emacs"
 export GIT_EDITOR="emacs"
 
@@ -184,6 +184,7 @@ _complete_hosts () {
     return 0
 }
 
+export LESS="-X"
 alias clean_pycs='find . -name "*.pyc" -exec rm {} \;'
 
 complete -F _complete_hosts ssh
