@@ -225,7 +225,12 @@
 
   ;; C indent style
   (setq c-default-style "linux"
-        c-basic-offset 4))
+        c-basic-offset 4)
+
+  (require 'auto-complete)
+  (global-auto-complete-mode t)
+
+)
 
 (setup-packaging-system)
 (setup-flycheck)
