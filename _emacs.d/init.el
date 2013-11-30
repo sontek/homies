@@ -135,6 +135,20 @@
   (global-set-key (kbd "C->") 'mc/skip-to-next-like-this)
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines))
 
+(defun setup-hide-show ()
+  (global-set-key (kbd "C-c S") 'hs-show-all)
+  (global-set-key (kbd "C-c s") 'hs-show-block)
+  (global-set-key (kbd "C-c h") 'hs-hide-block)
+  (global-set-key (kbd "C-c H") 'hs-hide-all)
+
+  (add-hook 'c-mode-common-hook   'hs-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+  (add-hook 'java-mode-hook       'hs-minor-mode)
+  (add-hook 'lisp-mode-hook       'hs-minor-mode)
+  (add-hook 'perl-mode-hook       'hs-minor-mode)
+  (add-hook 'sh-mode-hook         'hs-minor-mode)
+  (add-hook 'python-mode-hook     'hs-minor-mode)
+)
 (defun setup-remaining-packages ()
   (package-require 'gist)
   (package-require 'magit)
@@ -220,60 +234,8 @@
 (setup-frontend)
 (setup-projectile)
 (setup-multiple-cursors)
+(setup-hide-show)
 (setup-remaining-packages)
 (setup-random-emacs)
-
-;; ; Allow creating lines above and below
-;; (defun open-line-below ()
-;;   (interactive)
-;;   (end-of-line)
-;;   (newline)
-;;   (indent-for-tab-command))
-
-;; (defun open-line-above ()
-;;   (interactive)
-;;   (beginning-of-line)
-;;   (newline)
-;;   (forward-line -1)
-;;   (indent-for-tab-command))
-
-;; (global-set-key (kbd "<C-return>") 'open-line-below)
-;; (global-set-key (kbd "<C-M-return>") 'open-line-above)
-
-;; (defun show-onelevel ()
-;;   "show entry and children in outline mode"
-;;   (interactive)
-;;   (show-entry)
-;;   (show-children))
-
-;; (defun cjm-outline-bindings ()
-;;   "sets shortcut bindings for outline minor mode"
-;;   (interactive)
-;;   (local-set-key [?\C-,] 'hide-sublevels)
-;;   (local-set-key [?\C-.] 'show-all)
-;;   (local-set-key [C-up] 'outline-previous-visible-heading)
-;;   (local-set-key [C-down] 'outline-next-visible-heading)
-;;   (local-set-key [C-left] 'hide-subtree)
-;;   (local-set-key [C-right] 'show-onelevel)
-;;   (local-set-key [M-up] 'outline-backward-same-level)
-;;   (local-set-key [M-down] 'outline-forward-same-level)
-;;   (local-set-key [M-left] 'hide-subtree)
-;;   (local-set-key [M-right] 'show-subtree))
-
-;; (add-hook 'outline-minor-mode-hook
-;;           'cjm-outline-bindings)
-
-;; (add-hook 'python-mode-hook
-;;           '(lambda ()
-;;              (outline-minor-mode)
-;;              (setq outline-regexp " *\\(def \\|clas\\|#hea\\)")
-;;              (hide-sublevels 1)))
-
-
-
-;; (package-require 'uniquify)
-;; (package-require 'whitespace)
-;; (package-require 'iy-go-to-char)
-;; (package-require 'auto-complete)
 
 ;;; init.el ends here
