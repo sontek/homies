@@ -96,6 +96,8 @@
 (defun setup-projectile ()
   (package-require 'projectile)
   (projectile-global-mode)
+  (setq projectile-require-project-root nil)
+  (setq projectile-completion-system 'grizzl)
   (setq projectile-tags-command
     "ctags -e -R --extra=+fq --exclude=.git --exclude=.tox --exclude=.tests -f ")
 
@@ -122,8 +124,16 @@
 
   (global-flycheck-mode)
   (setq flycheck-highlighting-mode 'lines)
-  (eval-after-load 'flymake '(require 'flymake-cursor))
-)
+  (eval-after-load 'flymake '(require 'flymake-cursor)))
+
+(defun setup-multiple-cursors ()
+  (package-require 'multiple-cursors)
+  (global-set-key (kbd "C-.") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-,") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-!") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-<") 'mc/skip-to-previous-like-this)
+  (global-set-key (kbd "C->") 'mc/skip-to-next-like-this)
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines))
 
 (defun setup-remaining-packages ()
   (package-require 'gist)
@@ -136,13 +146,13 @@
   (package-require 'git-commit)
   (package-require 'move-text)
   (package-require 'deferred)
-  (package-require 'multiple-cursors)
   (package-require 'ack-and-a-half)
   (package-require 'dash)
   (package-require 's)
   (package-require 'etags-select)
   (package-require 'smartscan)
   (package-require 'color-theme-sanityinc-solarized)
+  (package-require 'grizzl)
 
   (setq ido-enable-flex-matching t)
   (setq ido-everywhere t)
@@ -156,7 +166,11 @@
   (setq whitespace-style '(face empty tabs lines-tail trailing))
   (setq whitespace-line-column 79)
   (global-whitespace-mode 1)
-  (setq-default fill-column 79))
+  (setq-default fill-column 79)
+
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (autoload 'ibuffer "ibuffer" "List buffers." t)
+)
 
 (defun setup-random-emacs ()
   ;; Nice color scheme
@@ -204,6 +218,8 @@
 (setup-clojure)
 (setup-python)
 (setup-frontend)
+(setup-projectile)
+(setup-multiple-cursors)
 (setup-remaining-packages)
 (setup-random-emacs)
 
