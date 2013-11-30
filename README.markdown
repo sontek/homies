@@ -1,10 +1,10 @@
 ## Files
-.vim
-    directory of file type configurations and plugins
-.vimrc
-    my vim configuration
+.emacs.d
+    directory for emacs configuration
+
 .screenrc
     my screen configuration
+    
 .weechat
     my configuration for weechat, a great irc client
 .gimp
@@ -29,10 +29,6 @@ It's as simple as running:
 
 From this top-level directory.
 
-### Only install and build vim Files
-Because this bit is pretty portable
-
-    ./install.sh vim
 
 ### Restore old source Files
 To replace installed files with the originals:
@@ -44,9 +40,3 @@ Note that if there was not an original version, the installed links will not be 
 ## Requirements
 ### Shell
 * bash
-
-### Vim
-* python
-  * pep8
-  * pyflakes
-  * rope
