@@ -15,9 +15,9 @@
   (when window-system
     (require 'package))
   (add-to-list 'package-archives
-               '("marmalade" . "http://marmalade-repo.org/packages/") t)
+	       '("marmalade" . "http://marmalade-repo.org/packages/") t)
   (add-to-list 'package-archives
-               '("melpa" . "http://melpa.milkbox.net/packages/") t)
+	       '("melpa" . "http://melpa.milkbox.net/packages/") t)
   (add-to-list 'load-path "~/.emacs.d")
   (package-initialize)
 
@@ -32,12 +32,24 @@
    tries to require again (y benzap on #emacs)"
   (if (not (require package-name nil t))
       (progn
-        (if (not package-refresh-first-time)
-            (save-excursion
-              (package-refresh-contents)
-              (setq package-refresh-contents t)))
-        (package-install package-name)
-        (require package-name nil t))))
+	(if (not package-refresh-first-time)
+	    (save-excursion
+	      (package-refresh-contents)
+	      (setq package-refresh-contents t)))
+	(package-install package-name)
+	(require package-name nil t))))
+
+(defun whitespace-cleanup-all ()
+  (interactive)
+  (setq indent-tab-mode nil)
+  (whitespace-cleanup))
+
+(defun whitespace-clean-and-compile ()
+  "Cleans up whitespace and compiles. The compile-command is a
+   varies with the active mode."
+  (interactive)
+  (whitespace-cleanup-all)
+  (compile compile-command))
 
 (defun setup-cider ()
   (package-require 'cider)
@@ -45,10 +57,10 @@
   (setq cider-repl-popup-stacktraces t)
   (setq cider-repl-history-file "~/.emacs.d/nrepl-history")
   (add-hook 'nrepl-connected-hook
-            (defun pnh-clojure-mode-eldoc-hook ()
-              (add-hook 'clojure-mode-hook 'cider-turn-on-eldoc-mode)
-              (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode) ;;?
-              (cider-enable-on-existing-clojure-buffers)))
+	    (defun pnh-clojure-mode-eldoc-hook ()
+	      (add-hook 'clojure-mode-hook 'cider-turn-on-eldoc-mode)
+	      (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode) ;;?
+	      (cider-enable-on-existing-clojure-buffers)))
   (add-hook 'cider-mode-hook 'subword-mode)
   (package-require 'ac-nrepl)
   (eval-after-load "auto-complete"
@@ -92,6 +104,92 @@
       (define-key python-mode-map (kbd "C-c C-p") 'python-add-breakpoint)))
 
 )
+(defun setup-javascript ()
+  (package-require 'js2-mode)
+  (package-require 'js-comint)
+  (setq inferior-js-program-command "node")
+  (setq js-prog "node")
+
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+
+  (setq inferior-js-mode-hook
+	(lambda ()
+	  ;; We like nice colors
+	  (ansi-color-for-comint-mode-on)
+	  ;; Deal with some prompt nonsense
+	  (add-to-list
+	   'comint-preoutput-filter-functions
+	   (lambda (output)
+	     (replace-regexp-in-string "\033\\[[0-9]+[A-Z]" "" output)))))
+
+  (defun starts-with-js-comment (line)
+    (equal 0 (string-match "^[[:space:]]*//" line)))
+
+  (defun remove-js-comments (mystr)
+    "Remove lines starting with // and return as single line of JS code.
+     See: http://www.emacswiki.org/emacs/ElispCookbook
+    "
+    (mapconcat 'identity
+	       (remove-if 'starts-with-js-comment
+			  (split-string mystr "\n"))
+	       " "
+	       ))
+
+  (defun js-send-region (start end)
+    "Send the current region to the inferior Javascript process."
+    (interactive "r")
+
+    ;; BSS: echo for node and node_emacs
+    (if (or (equal js-prog "node_emacs")
+	    (equal js-prog "node"))
+	(setq comint-process-echoes t)
+      )
+    (run-js inferior-js-program-command t)
+
+    (setq curwindow (selected-window))
+    (save-excursion (let ((jscode (remove-js-comments (buffer-substring start end))))
+		      (set-buffer "*js*")
+		      (insert jscode)
+		      (comint-send-input)
+		      ))
+    (select-window curwindow))
+
+  (defun js-send-line ()
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (let ((end (point)))
+	(beginning-of-line)
+	(js-send-region (point) end))))
+
+
+  (setq jshint-cli "jshint --show-non-errors ")
+
+  (setq compilation-error-regexp-alist-alist
+        (cons '(jshint-cli "^\\([a-zA-Z\.0-9_/-]+\\): line \\([0-9]+\\), col \\([0-9]+\\)"
+                1 ;; file
+                2 ;; line
+                3 ;; column
+                )
+              compilation-error-regexp-alist-alist))
+
+  (setq compilation-error-regexp-alist
+        (cons 'jshint-cli compilation-error-regexp-alist))
+
+  (add-hook 'js2-mode-hook '(lambda ()
+    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
+    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
+    (local-set-key "\C-cb" 'js-send-buffer)
+    (local-set-key "\C-cr" 'js-send-region)
+    (local-set-key "\C-cl" 'js-send-line)
+    (set (make-local-variable 'compile-command)
+	 (let ((file buffer-file-name)) (concat jshint-cli file)))
+    (set (make-local-variable 'compilation-read-command) nil)
+    (local-set-key "\C-c\C-u" 'whitespace-clean-and-compile)
+    ))
+
+ )
 
 (defun setup-projectile ()
   (package-require 'projectile)
@@ -154,7 +252,7 @@
   (package-require 'magit)
   (package-require 'markdown-mode)
   (package-require 'undo-tree)
-;  (package-require 'csv-mode)
+  (package-require 'comint)
   (package-require 'rainbow-mode)
   (package-require 'rainbow-delimiters)
   (package-require 'git-commit)
@@ -225,11 +323,10 @@
 
   ;; C indent style
   (setq c-default-style "linux"
-        c-basic-offset 4)
+	c-basic-offset 4)
 
   (require 'auto-complete)
   (global-auto-complete-mode t)
-
 )
 
 (setup-packaging-system)
@@ -237,6 +334,7 @@
 (setup-clojure)
 (setup-python)
 (setup-frontend)
+(setup-javascript)
 (setup-projectile)
 (setup-multiple-cursors)
 (setup-hide-show)
