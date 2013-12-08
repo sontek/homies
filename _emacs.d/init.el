@@ -81,6 +81,7 @@
 
 (defun setup-python ()
   (package-require 'pytest)
+  (package-require 'virtualenv)
   (package-require 'flymake-python-pyflakes)
   (add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
   (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
@@ -103,7 +104,21 @@
     (lambda ()
       (define-key python-mode-map (kbd "C-c C-p") 'python-add-breakpoint)))
 
+  (setq python-shell-interpreter-args "--colors Linux --no-autoindent")
+
+  (setq
+   python-shell-interpreter "ipython"
+   python-shell-interpreter-args ""
+   python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+   python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+   python-shell-completion-setup-code
+   "from IPython.core.completerlib import module_completion"
+   python-shell-completion-module-string-code
+   "';'.join(module_completion('''%s'''))\n"
+   python-shell-completion-string-code
+   "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
 )
+
 (defun setup-javascript ()
   (package-require 'js2-mode)
   (package-require 'js-comint)
@@ -327,6 +342,12 @@
 
   (require 'auto-complete)
   (global-auto-complete-mode t)
+
+  ;; This closes emacs without prompting if we want to close all processes,
+  ;; for example, if python shell is running
+  (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+    "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+    (flet ((process-list ())) ad-do-it))
 )
 
 (setup-packaging-system)
