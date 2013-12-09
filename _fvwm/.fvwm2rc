@@ -1,0 +1,97 @@
+# Default Applications
+SetEnv fvwm_webbrowser chromium-browser
+SetEnv fvwm_term uxrvt
+SetEnv fvwm_mail mutt
+SetEnv fvwm_media_player /usr/bin/xmms
+SetEnv fvwm_video_player /usr/bin/mplayer
+SetEnv fvwm_im pidgin
+
+# Images
+SetEnv fvwm_img $[FVWM_USERDIR]/images
+SetEnv fvwm_icon $[FVWM_USERDIR]/icons
+SetEnv fvwm_scrpt $[FVWM_USERDIR]/scripts
+SetEnv fvwm_wallpapers $[FVWM_USERDIR]/wallpaper
+
+# Terminal Configuration
+
+
+ImagePath $[fvwm_icon]:$[fvwm_icon];.png:$[fvwm_wallpapers]:+
+
+# Virtual Desktops
+DesktopSize 3x3
+DesktopName 0 Main
+DesktopName 1 Work
+DesktopName 2 Games
+EdgeScroll 100 100
+EdgeResistance 150  150
+EdgeThickness 1
+
+# Mouse and Focus Behavior
+ClickTime 350
+MoveThreshold 3
+Style * SloppyFocus, MouseFocusClickRaises
+
+# Setup Wallpaper
+SetEnv fvwm_wallpaper $[FVWM_USERDIR]/wallpaper/current.png
+
+Key P      A    M    exec dmenu_run
+
+# Set theme
+#read themes/zenburn
+
+#DefaultFont "xft:Sans:size=10:alias=True"
+DefaultFont "xft:DejaVu Sans:size=10.5"
+# Setup Nice Fonts
+
+# FvwmTaskBar
+Style "FvwmTaskBar" NoTitle, !Handles, !Borders, Sticky, WindowListSkip, \
+  CirculateSkip, StaysOnBottom, FixedPosition, FixedSize, !Iconifiable
+DestroyModuleConfig FvwmTaskBar: *
+*FvwmTaskBar: Geometry +0-0
+*FvwmTaskBar: Rows 1
+*FvwmTaskBar: Font "xft:Sans:Bold:pixelsize=12:minispace=True:antialias=True"
+*FvwmTaskBar: SelFont "xft:Sans:Bold:pixelsize=12:minispace=True:antialias=True"
+*FvwmTaskBar: StatusFont "xft:Sans:Bold:pixelsize=12:minispace=True:antialias=True"
+*FvwmTaskBar: Colorset 9
+*FvwmTaskBar: IconColorset 9
+*FvwmTaskBar: FocusColorset 9
+*FvwmTaskBar: TipsColorset 9
+*FvwmTaskBar: UseSkipList
+*FvwmTaskBar: UseIconNames
+*FvwmTaskBar: ShowTips
+*FvwmTaskBar: StartName FVWM
+*FvwmTaskBar: StartMenu FvwmRootMenu
+#*FvwmTaskBar: Button Title ATerm, Icon mini/xterm.png, Action (Mouse 1) FvwmATerm
+*FvwmTaskBar: Action Click3 Menu FvwmWindowOpsMenu
+*FvwmTaskBar: StartIcon mini/fvwm.png
+#####
+# FvwmPager
+###########
+Style "FvwmPager" NoTitle, !Handles, !Borders, Sticky, WindowListSkip, \
+  CirculateSkip, StaysOnBottom, FixedPosition, FixedSize, !Iconifiable
+
+DestroyModuleConfig FvwmPager: *
+*FvwmPager: Geometry 150x150-0+0
+*FvwmPager: Colorset * 9
+*FvwmPager: HilightColorset * 10
+*FvwmPager: BalloonColorset * 9
+*FvwmPager: WindowColorsets 9 10
+*FvwmPager: Font "xft:Sans:Bold:pixelsize=12:minspace=True:antialias=True"
+*FvwmPager: Balloons All
+*FvwmPager: BalloonFont "xft:Sans:Bold:pixelsize=12:minspace=True:antialias=True"
+*FvwmPager: BallonYOffset +2
+*FvwmPager: Window3dBorders
+*FvwmPager: MiniIcons
+*FvwmPager: UseSkipList
+*FvwmPager: Rows 3
+
+DestroyFunc StartFunction
+AddToFunc   StartFunction
+  + I Module FvwmTaskBar
+  + I Module FvwmPager 0 2
+
+DestroyFunc InitFunction
+AddToFunc   InitFunction
+  + I Exec fvwm-root --retain-pixmap $[fvwm_wallpaper]
+  + I Exec xrdb -merge ~/.Xresources
+  + I Exec dmenu_run
