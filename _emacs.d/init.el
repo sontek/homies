@@ -117,6 +117,22 @@
    "';'.join(module_completion('''%s'''))\n"
    python-shell-completion-string-code
    "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
+
+  (add-hook 'python-mode-hook
+     (lambda ()
+       ;; Make C-M-q do something useful.  Oddly, "indent-sexp"
+       ;; doesn't quite do what I want; it lines up the first word
+       ;; after the opening paren (
+       ;;                           like_this
+       ;; whereas my preferred style is to dedent that word, (
+       ;;   like_this
+       (local-set-key
+        (kbd "C-M-q")
+        (lambda ()
+          (interactive)
+          (mark-sexp)
+          (indent-region (point) (mark))
+          (deactivate-mark)))))
 )
 
 (defun setup-javascript ()

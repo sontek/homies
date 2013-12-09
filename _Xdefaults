@@ -1,69 +1,13 @@
 xterm*background: black
 xterm*foreground: white
 
+URxvt*termName: screen-256color
 URxvt.buffered:         true
-URxvt.background:       black
-URxvt.foreground:       white
-URxvt.cursorColor:      green
 URxvt.perl-ext-common:  default,matcher
 URxvt.urlLauncher:      /usr/bin/chromium
 URxvt.matcher.button:   1
 URxvt.scrollBar:        false
 
-! urxvt defaults:
-! color0       (black)            = Black
-! color1       (red)              = Red3
-! color2       (green)            = Green3
-! color3       (yellow)           = Yellow3
-! color4       (blue)             = Blue3
-! color5       (magenta)          = Magenta3
-! color6       (cyan)             = Cyan3
-! color7       (white)            = AntiqueWhite
-! color8       (bright black)     = Grey25
-! color9       (bright red)       = Red
-! color10      (bright green)     = Green
-! color11      (bright yellow)    = Yellow
-! color12      (bright blue)      = Blue
-! color13      (bright magenta)   = Magenta
-! color14      (bright cyan)      = Cyan
-! color15      (bright white)     = White
-
-! Black
-!URxvt.color1:          Black
-! Red
-URxvt.color1:           brown2
-! Green
-URxvt.color2:           SpringGreen2
-! Yellow
-URxvt.color3:           yellow2
-! Blue
-URxvt.color4:           DeepSkyBlue2
-! Magenta
-URxvt.color5:           magenta2
-! Cyan
-URxvt.color6:           DarkSlateGray1
-! White
-URxvt.color7:           MintCream
-! Bright black
-!URxvt.color8:          Grey25
-! Bright red
-URxvt.color9:           firebrick1
-! Bright green
-URxvt.color10:          SpringGreen1
-! Bright yellow
-URxvt.color11:          yellow1
-! Bright blue
-URxvt.color12:          DeepSkyBlue1
-! Bright magenta
-URxvt.color13:          magenta1
-! Bright cyan
-URxvt.color14:          cyan1
-! Bright white
-!URxvt.color15:         White
-
-! Alternatives
-! Blue: lighter (looks closer to cyan, but it is an option if deepsky is too
-! dark to read (it might be a good idea to make symlinks green))
-!URxvt.color4:          SteelBlue2
-!URxvt.color12:         SteelBlue1
-!URxvt.color6:          cyan1
+! Fonts
+URxvt.allow_bold:           true
+URxvt*font: xft:DejaVu Sans Mono:pixelsize=15
