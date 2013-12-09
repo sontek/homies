@@ -4,7 +4,7 @@ xterm*foreground: white
 URxvt*termName: screen-256color
 URxvt.buffered:         true
 URxvt.perl-ext-common:  default,matcher
-URxvt.urlLauncher:      /usr/bin/chromium
+URxvt.urlLauncher:      chromium-browser
 URxvt.matcher.button:   1
 URxvt.scrollBar:        false
 

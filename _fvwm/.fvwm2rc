@@ -28,9 +28,42 @@ DesktopName 2 Games
 EdgeResistance -1
 Style * EdgeMoveDelay 250
 Style * EdgeMoveResistance 20
-
 # Set thickness of the edge of the screen to 1
 EdgeThickness 1
+
+# Moving and resizing windows should affect the live window, instead of
+# leaving the window alone (and just displaying a rectangle) until the
+# operation is complete.
+OpaqueMoveSize unlimited
+Style * ResizeOpaque
+
+# Add a special window title that I can give to windows that I want to
+# remain on top, that never get obscured by other windows.
+Style StayOnTop StaysOnTop, !Borders, !Title
+Style Borderless !Borders, !Title
+
+# Minimalist windows: no handles or buttons.
+
+Style * BorderWidth 6, HandleWidth 6
+Style * Icon unknown1.xpm, Color lightgrey/dimgrey
+Style * MwmBorder, MWMFunctions, MWMDecor, HintOverride
+Style * DecorateTransient, NoPPosition
+Style * MinOverlapPlacement
+
+BorderStyle -- HiddenHandles
+
+# Speed up window operations at the expense of a bit of RAM.
+Style * BackingStore, SaveUnder
+
+# Autoraise windows if the mouse stays in them for 0.3 seconds, unless
+# the window is nethack-qt, which will thereby overlay its own dratted
+# dialog boxes.  Maybe I should find an alternative to nethack-qt.
+DestroyFunc MaybeRaise
+AddToFunc MaybeRaise
++ I Current (!nethack-qt) Raise
+
+FvwmAuto 600 MaybeRaise Nop
+
 
 # Mouse and Focus Behavior
 ClickTime 350
@@ -40,14 +73,32 @@ Style * SloppyFocus, MouseFocusClickRaises
 # Setup Wallpaper
 SetEnv fvwm_wallpaper $[FVWM_USERDIR]/wallpaper/current.png
 
-Key P      A    M    exec dmenu_run
+# Key Bindings
+# Windows F, run app
+Key n      A    4    exec dmenu_run
 
-# Set theme
-#read themes/zenburn
+# Windows Q, close window
+Key q      A    4    Close
 
+# Windows key plus an arrow key moves between windows without the mouse.
+Key Up    A     4  Direction North Flipfocus
+Key Down  A     4  Direction South Flipfocus
+Key Right A     4  Direction East Flipfocus
+Key Left  A     4  Direction West Flipfocus
+
+Key f     A     4  FuncMaximizeBorderlessly
+
+# Setup Nice Fonts
 #DefaultFont "xft:Sans:size=10:alias=True"
 DefaultFont "xft:DejaVu Sans:size=10.5"
-# Setup Nice Fonts
+
+
+DestroyFunc FuncMaximizeBorderlessly
+AddToFunc FuncMaximizeBorderlessly
++ I ThisWindow (!Maximized) WindowStyle BorderWidth 0, HandleWidth 0, !Title
++ I ThisWindow (Maximized) WindowStyle BorderWidth 6, HandleWidth 6, Title
++ I UpdateStyles
++ I Maximize Toggle 100 100
 
 # FvwmTaskBar
 Style "FvwmTaskBar" NoTitle, !Handles, !Borders, Sticky, WindowListSkip, \
@@ -100,4 +151,11 @@ DestroyFunc InitFunction
 AddToFunc   InitFunction
   + I Exec fvwm-root --retain-pixmap $[fvwm_wallpaper]
   + I Exec xrdb -merge ~/.Xresources
+  + I Exec setxkbmap -option ctrl:nocaps
+  + I Exec setxkbmap -rules evdev -model evdev -layout us -variant altgr-intl
   + I Exec dmenu_run
+
+AddToFunc SessionInitFunction
+  # Utter magic: why did I wait so many years before looking for a utility
+  # to unify the two different cut-and-paste buffers under X Windows?
+  + I Exec exec autocutsel
