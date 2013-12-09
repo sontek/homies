@@ -22,8 +22,14 @@ DesktopSize 3x3
 DesktopName 0 Main
 DesktopName 1 Work
 DesktopName 2 Games
-EdgeScroll 100 100
-EdgeResistance 150  150
+
+# Disable EdgeScrolling but make it possible
+# to move windows over the screen edge
+EdgeResistance -1
+Style * EdgeMoveDelay 250
+Style * EdgeMoveResistance 20
+
+# Set thickness of the edge of the screen to 1
 EdgeThickness 1
 
 # Mouse and Focus Behavior
