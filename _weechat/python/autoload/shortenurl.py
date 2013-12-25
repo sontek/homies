@@ -33,7 +33,7 @@ from urllib2 import urlopen
 
 SCRIPT_NAME = "shortenurl"
 SCRIPT_AUTHOR = "John Anderson <sontek@gmail.com>"
-SCRIPT_VERSION = "0.5"
+SCRIPT_VERSION = "0.5.1"
 SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC = "Shorten long incoming and outgoing URLs"
 
@@ -71,15 +71,19 @@ if weechat.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE,
         if weechat.config_get_plugin(option) == "":
             weechat.config_set_plugin(option, default_value)
 
-    weechat.hook_modifier("weechat_print", "shorten_url_hook", "")
-    weechat.hook_modifier("irc_out_privmsg", "shorten_url_hook", "")
+    weechat.hook_modifier("weechat_print", "incoming_hook", "")
+    weechat.hook_modifier("irc_out_privmsg", "outgoing_hook", "")
 
 
-def shorten_url_hook(data, modifier, modifier_data, string):
+def incoming_hook(data, modifier, modifier_data, string):
     return find_and_process_urls(string)
 
 
-def find_and_process_urls(string):
+def outgoing_hook(data, modifier, modifier_data, string):
+    return find_and_process_urls(string, use_color=False)
+
+
+def find_and_process_urls(string, use_color=True):
     new_message = string
     color = weechat.color(weechat.config_get_plugin("color"))
     reset = weechat.color('reset')
@@ -89,12 +93,27 @@ def find_and_process_urls(string):
 
         if len(url) > max_url_length and not should_ignore_url(url):
             short_url = get_shortened_url(url)
+            if use_color:
+                new_message = new_message.replace(
+                    url, '%(url)s %(color)s[%(short_url)s]%(reset)s' % dict(
+                        color=color,
+                        short_url=short_url,
+                        reset=reset,
+                        url=url
+                    )
+                )
+            else:
+                new_message = new_message.replace(url, short_url)
+        elif use_color:
+            # Highlight the URL, even if we aren't going to shorting it
             new_message = new_message.replace(
-                url, '%s%s%s' % (color, short_url, reset))
-        else:
-            # Highlight the URL, even if we aren't going to short it
-            new_message = new_message.replace(
-                url, '%s%s%s' % (color, url, reset))
+                url, '%(url)s %(color)s[%(short_url)s]%(reset)s' % dict(
+                    color=color,
+                    short_url=short_url,
+                    reset=reset,
+                    url=url
+                )
+            )
 
     return new_message
 
