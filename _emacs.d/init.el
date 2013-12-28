@@ -135,6 +135,15 @@
           (deactivate-mark)))))
 )
 
+(defun setup-c ()
+  (package-rquire 'dtrt-indent)
+
+  ;; C indent style
+  (setq c-default-style "linux"
+	c-basic-offset 4)
+
+  (dtrt-indent-mode 1))
+
 (defun setup-javascript ()
   (package-require 'js2-mode)
   (package-require 'js-comint)
@@ -278,6 +287,7 @@
   (add-hook 'sh-mode-hook         'hs-minor-mode)
   (add-hook 'python-mode-hook     'hs-minor-mode)
 )
+
 (defun setup-remaining-packages ()
   (package-require 'gist)
   (package-require 'magit)
@@ -352,10 +362,6 @@
   ;; Never insert tabs
   (setq-default indent-tabs-mode nil)
 
-  ;; C indent style
-  (setq c-default-style "linux"
-	c-basic-offset 4)
-
   (require 'auto-complete)
   (global-auto-complete-mode t)
 
@@ -370,6 +376,7 @@
 (setup-flycheck)
 (setup-clojure)
 (setup-python)
+(setup-c)
 (setup-frontend)
 (setup-javascript)
 (setup-projectile)
