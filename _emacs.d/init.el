@@ -136,10 +136,10 @@
 )
 
 (defun setup-c ()
-  (package-rquire 'dtrt-indent)
+  (package-require 'dtrt-indent)
 
   ;; C indent style
-  (setq c-default-style "linux"
+  (setq c-default-style "java"
 	c-basic-offset 4)
 
   (dtrt-indent-mode 1))
