@@ -107,9 +107,8 @@ def find_and_process_urls(string, use_color=True):
         elif use_color:
             # Highlight the URL, even if we aren't going to shorting it
             new_message = new_message.replace(
-                url, '%(url)s %(color)s[%(short_url)s]%(reset)s' % dict(
+                url, '%(color)s %(url)s %(reset)s' % dict(
                     color=color,
-                    short_url=short_url,
                     reset=reset,
                     url=url
                 )
