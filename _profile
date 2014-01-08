@@ -49,13 +49,10 @@ alias gc='git checkout'
 alias ga='git add'
 alias gs='git status'
 alias gdc='git diff --cached'
-alias gdone='git checkout master && git pull && git branch -d'
 alias gbd='git branch -d'
 alias gundo='git reset --soft HEAD^'
 alias gd='git diff'
 alias gpum='git pull upstream master'
-alias qacassandra='cassandra-cli -host phx5qa01c-7058.stratus.phx.qa.ebay.com'
-alias prodcassandra='./cassandra-cli -host 10.43.104.21 -kebayks'
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"

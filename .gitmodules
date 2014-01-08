@@ -28,3 +28,9 @@
 [submodule "_vim/bundle/vim-scala"]
 	path = _vim/bundle/vim-scala
 	url = https://github.com/derekwyatt/vim-scala.git
+[submodule "arcanist"]
+	path = arcanist
+	url = git://github.com/facebook/arcanist.git
+[submodule "libphutil"]
+	path = libphutil
+	url = https://github.com/facebook/libphutil.git

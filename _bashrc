@@ -166,3 +166,4 @@ fi
 export PROMPT_COMMAND="history -a; history -n"
 
 export EDITOR=vim
+export PATH="$PATH:/Users/seantalts/scm/dotfiles/arcanist/bin"
