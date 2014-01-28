@@ -408,3 +408,11 @@ let g:pymode_lint_ignore = "E711,E128,E127,E501,W293,E125,E124,E126"
 map <leader>8 :PyLint<CR>
 map <leader>88 :PyLintAuto<CR>
 let g:acp_completeoptPreview=1
+
+"golang stuff
+filetype off
+filetype plugin indent off
+set runtimepath+=$GOROOT/misc/vim
+filetype plugin indent on
+syntax on
+autocmd FileType go autocmd BufWritePre <buffer> Fmt

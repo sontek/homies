@@ -53,8 +53,19 @@ alias gbd='git branch -d'
 alias gundo='git reset --soft HEAD^'
 alias gd='git diff'
 alias gpum='git pull upstream master'
+alias startpostgres="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
 #added by homebrew
-export PATH=/usr/local/bin:$PATH
+export PATH=$HOME/gocode/bin:/usr/local/bin:$PATH
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+export GOROOT="/usr/local/Cellar/go/1.2/libexec/"
+export GOPATH=$HOME/gocode:$HOME/scm/branded/go/
+
+export AWS_ACCESS_KEY_ID="AKIAJUPU67Y525WAWMFA"
+export AWS_SECRET_ACCESS_KEY="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"
+export OPSCODE_USERNAME=xitrium
+
+export ARCHFLAGS="-arch x86_64"
