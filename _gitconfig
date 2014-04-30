@@ -1,6 +1,6 @@
 [user]
-    name = John Anderson
-    email = sontek@gmail.com
+    name = Ki Sung Bae
+    email = realgsong@hotmail.com
 
 [color]
     diff = auto
@@ -12,7 +12,7 @@
     default = matching
 
 [core]
-    editor = emacs
+    editor = vim
     pager = less -R
 
 [alias]

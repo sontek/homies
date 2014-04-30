@@ -140,8 +140,6 @@ if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
 
-alias vim="emacs"
-
 parse_git_branch ()
 {
   git branch 2> /dev/null | grep '*' | sed 's#*\ \(.*\)#(git::\1)#'
@@ -155,9 +153,6 @@ parse_svn_url() {
 parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
-
-export EDITOR="emacs"
-export GIT_EDITOR="emacs"
 
 # Add git and svn branch names
 export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "
@@ -186,3 +181,7 @@ alias clean_pycs='find . -name "*.pyc" -exec rm {} \;'
 
 complete -F _complete_hosts ssh
 complete -F _complete_hosts host
+
+set -o vi
+export EDITOR='vim'
+export GIT_EDITOR='vim'
