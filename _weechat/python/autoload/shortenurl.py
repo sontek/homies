@@ -15,7 +15,7 @@
 
 # History
 # 2014-5-3, John Anderson <sontek@gmail.com>
-#   version 0.5.2: Fixed short_own bug introduced in 0.5, notify the short url
+#   version 0.5.3: Fixed short_own bug introduced in 0.5, notify the short url
 #                instead of appending to the message (returning to behavior
 #                from 0.4)
 # 2013-12-25, John Anderson <sontek@gmail.com>
