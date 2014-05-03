@@ -14,6 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # History
+# 2014-5-3, John Anderson <sontek@gmail.com>
+#   version 0.5.2: Fixed short_own bug introduced in 0.5, notify the short url
+#                instead of appending to the message (returning to behavior
+#                from 0.4)
 # 2013-12-25, John Anderson <sontek@gmail.com>
 #   version 0.5: Added support for latest weechat (0.4+)
 # 2011-10-24, Dmitry Geurkov <dmitry_627@mail.ru>
@@ -33,7 +37,7 @@ from urllib2 import urlopen
 
 SCRIPT_NAME = "shortenurl"
 SCRIPT_AUTHOR = "John Anderson <sontek@gmail.com>"
-SCRIPT_VERSION = "0.5.1"
+SCRIPT_VERSION = "0.5.2"
 SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC = "Shorten long incoming and outgoing URLs"
 
@@ -71,50 +75,51 @@ if weechat.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE,
         if weechat.config_get_plugin(option) == "":
             weechat.config_set_plugin(option, default_value)
 
-    weechat.hook_modifier("weechat_print", "incoming_hook", "")
-    weechat.hook_modifier("irc_out_privmsg", "outgoing_hook", "")
+    weechat.hook_print('', 'irc_privmsg', '', 1, 'notify', '')
+    short_own = weechat.config_get_plugin('short_own')
+
+    if short_own != 'off':
+        weechat.hook_modifier('irc_out_privmsg', 'outgoing_hook', '')
 
 
-def incoming_hook(data, modifier, modifier_data, string):
-    return find_and_process_urls(string)
-
-
-def outgoing_hook(data, modifier, modifier_data, string):
-    return find_and_process_urls(string, use_color=False)
-
-
-def find_and_process_urls(string, use_color=True):
-    new_message = string
-    color = weechat.color(weechat.config_get_plugin("color"))
+def notify(data, buf, date, tags, displayed, hilight, prefix, msg):
+    color = weechat.color(weechat.config_get_plugin('color'))
     reset = weechat.color('reset')
 
-    for url in urlRe.findall(string):
+    my_nick = weechat.buffer_get_string(buf, 'localvar_nick')
+    if prefix != my_nick:
+        urls = find_and_process_urls(msg)
+
+        for url, short_url in urls:
+            weechat.prnt(buf, '%(color)s[%(url)s)]%(reset)s' % dict(
+                color=color,
+                url=short_url,
+                reset=reset))
+
+    return weechat.WEECHAT_RC_OK
+
+
+def outgoing_hook(data, modifier, modifier_data, msg):
+    urls = find_and_process_urls(msg)
+    for url, short_url in urls:
+        msg = msg.replace(url, '%(short_url)s [%(url)s]' % dict(
+            url=url,
+            short_url=short_url))
+
+    return msg
+
+
+def find_and_process_urls(new_message):
+    urls = []
+
+    for url in urlRe.findall(new_message):
         max_url_length = int(weechat.config_get_plugin('urllength'))
 
         if len(url) > max_url_length and not should_ignore_url(url):
             short_url = get_shortened_url(url)
-            if use_color:
-                new_message = new_message.replace(
-                    url, '%(url)s %(color)s[%(short_url)s]%(reset)s' % dict(
-                        color=color,
-                        short_url=short_url,
-                        reset=reset,
-                        url=url
-                    )
-                )
-            else:
-                new_message = new_message.replace(url, short_url)
-        elif use_color:
-            # Highlight the URL, even if we aren't going to shorting it
-            new_message = new_message.replace(
-                url, '%(color)s %(url)s %(reset)s' % dict(
-                    color=color,
-                    reset=reset,
-                    url=url
-                )
-            )
+            urls.append((url, short_url))
 
-    return new_message
+    return urls
 
 
 def get_shortened_url(url):
