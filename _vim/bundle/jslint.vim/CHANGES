@@ -1,0 +1,13 @@
+# jslint.vim change log
+
+## v0.7
+
+- Updated jslint to version 2010-08-08.
+- Now checks for errors on leaving insert mode, cursor hold, and buffer save.
+- Changed from plugin to ftplugin specific to JavaScript files.
+- Supported JavaScript interpreters now include Node.js, Rhino, Spidermonkey,
+  Windows Script Host, and that interpreter that is installed by default in Mac
+  OS X.
+- Added support for overriding the JavaScript interpreter that is used by
+  setting a value for the JS_CMD environment variable.
+- Fixes bugs when running in Windows.

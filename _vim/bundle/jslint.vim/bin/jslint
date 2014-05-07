@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+target = File.expand_path(ARGV.first)
+
+if RUBY_PLATFORM =~ /win32/i
+  js_cmd = 'cscript'
+  runjslint_ext = 'wsf'
+  plugin_path = File.join(ENV['HOME'], 'vimfiles')
+else
+  if ENV['JS_CMD']
+    js_cmd = ENV['JS_CMD']
+  else
+    js_cmd = 'js'
+  end
+  runjslint_ext = 'js'
+  plugin_path = File.join(ENV['HOME'], '.vim')
+end
+
+Dir.chdir(File.join(plugin_path, 'ftplugin', 'javascript', 'jslint')) do |dir|
+  IO.popen("#{js_cmd} runjslint.#{runjslint_ext}", 'r+') do |jslint|
+    jslint.write(File.open(target, 'r') { |f| f.read })
+    jslint.close_write
+    $stdout.write(jslint.read)
+  end
+end

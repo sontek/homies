@@ -34,4 +34,6 @@ else
     do
         link_file $i
     done
+
+    sudo apt-get install rhino
 fi
