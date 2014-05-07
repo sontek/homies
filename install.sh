@@ -36,4 +36,5 @@ else
     done
 
     sudo apt-get install rhino
+    sudo pip install flake8
 fi
