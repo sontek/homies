@@ -180,3 +180,5 @@ complete -F _complete_hosts host
 set -o vi
 export EDITOR='vim'
 export GIT_EDITOR='vim'
+export WORKON_HOME='~/virtualenvs'
+source /usr/local/bin/virtualenvwrapper.sh
