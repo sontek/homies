@@ -182,3 +182,4 @@ export EDITOR='vim'
 export GIT_EDITOR='vim'
 export WORKON_HOME='~/virtualenvs'
 source /usr/local/bin/virtualenvwrapper.sh
+export PATH=$PATH:~/.aws_bin/eb/linux/python2.7

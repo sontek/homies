@@ -1,0 +1,54 @@
+{
+    "version": 1,               
+    "disable_existing_loggers": "False", 
+    "formatters": { 
+        "ebcli": { 
+			"format": "%(asctime)s %(name)s [%(levelname)s] %(message)s"
+        }
+    }, 
+    "handlers": { 
+        "default": { 
+        	"class": "logging.handlers.RotatingFileHandler", 
+            "level": "NOTSET",     
+            "formatter": "ebcli",
+            "mode": "a",
+            "maxBytes": 5242880,
+            "backupCount": 5
+        },
+        "to_stderr" : {
+        	"class": "logging.StreamHandler", 
+            "level": "NOTSET",     
+            "formatter": "ebcli",
+            "stream": "ext://sys.stderr" 
+        },
+        "null": {
+        	"class": "logging.NullHandler"
+        }   
+    },
+    "root": {
+    	"level": "NONE"
+    },
+    "loggers": { 
+        "cli": {                   
+            "level": "NOTSET",
+            "qualname": "cli",   
+            "propagate": 0   
+        }, 
+        "op": {                   
+            "level": "NOTSET",   
+            "qualname": "cli.op",   
+            "propagate": 0   
+        }, 
+        "eb": {                   
+            "level": "NOTSET",   
+            "qualname": "eb",   
+            "propagate": 0   
+        }, 
+        "aws": {                   
+            "level": "NOTSET",  
+            "qualname": "aws",   
+            "propagate": 0   
+        } 
+    } 
+} 
+

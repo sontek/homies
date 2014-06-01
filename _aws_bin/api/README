@@ -1,0 +1,68 @@
+== AWS Elastic Beanstalk README
+
+This package contains a pure Ruby client for AWS Elastic Beanstalk.  AWS
+Elastic Beanstalk provides easy application deployment and management utilizing
+various Amazon Web Services resources created on your behalf.
+
+== Requirements
+
+* Ruby 1.8.7+ or Ruby 1.9.2+
+* Rubygems with the JSON gem installed if using Ruby 1.8
+* An AWS account with access to AWS Elastic Beanstalk
+
+== Installation
+
+You must have Ruby installed.  
+
+Platform info:
+
+Mac OS X: Mac OS X 10.5+ ships with Ruby
+Linux: Consult your distro's package list
+Windows: See http://rubyinstaller.org/downloads/ for easy installation packages
+
+If you're using Ruby 1.8, you will have to install the JSON gem:
+
+gem install json
+
+Once you have downloaded the CLI package:
+
+1) Unzip this archive to a location of your choosing
+2) Create an AWS credential file that is formatted like:
+
+AWSAccessKeyId=<your key id>
+AWSSecretKey=<your secret key>
+
+Then export an environment variable called AWS_CREDENTIAL_FILE that
+points to this location.
+
+Linux:
+
+export AWS_CREDENTIAL_FILE=<file path>
+
+Windows:
+
+set AWS_CREDENTIAL_FILE=<file path>
+
+== Usage
+
+The AWS Elastic Beanstalk CLI package comes with both Unix scripts and
+Windows CMD files for each Elastic Beanstalk API call. The scripts take -h or
+--help to display a help message containing the options and usage
+information.
+
+To add the AWS Elastic Beanstalk CLI files to your path:
+
+Linux/Mac OS X (Bash shell):
+
+export $PATH="$PATH:/<path to Elastic Beanstalk CLI>/bin"
+
+Windows:
+
+path <path to Elastic Beanstalk CLI>\bin;%PATH%
+
+== Example
+
+>> elastic-beanstalk-describe-applications
+Will return a list of your applications
+
+For more information, see AWS Elastic Beanstalk documentation.

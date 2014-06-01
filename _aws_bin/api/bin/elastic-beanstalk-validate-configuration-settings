@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+###########################################################################
+# AWS Elastic Beanstalk Command Line Client
+# Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the “License”). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the “license” file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+#
+
+require File.join(File.dirname(__FILE__), 'setup.rb')
+require 'aws/elasticbeanstalk/cli/optionsettings'
+
+AWS::ElasticBeanstalk::OptionSettingsCLI.new do |client|
+  client.service_call   = lambda { |params| @elasticbeanstalk.validate_configuration_settings(params) }
+  client.result_key     = 'Messages'
+  client.empty_response = 'Configuration settings are valid.'
+  
+  client.option('-a', '--application-name NAME', 'Application name') do |app_name|
+    client.service_param('ApplicationName', app_name)
+  end
+
+  client.option('-t', '--template-name NAME', 'Template name') do |template_name|
+    client.service_param('TemplateName', template_name)
+  end
+
+  client.option('-e', '--environment-name NAME', 'Environment name') do |env_name|
+    client.service_param('EnvironmentName', env_name)
+  end
+
+  client.option('-f', '--options-file FILENAME', 'File containing JSON-formatted option settings') do |options_file|
+    client.parse_options_file('OptionSettings', options_file)
+  end
+end.run(ARGV)

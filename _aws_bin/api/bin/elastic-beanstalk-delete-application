@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+###########################################################################
+# AWS Elastic Beanstalk Command Line Client
+# Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the “License”). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the “license” file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+#
+
+require File.join(File.dirname(__FILE__), 'setup.rb')
+require 'aws/client/commandline'
+
+AWS::Client::CommandLine.new do |client|
+  client.service_call   = lambda { |params| @elasticbeanstalk.delete_application(params) }
+  client.empty_response = 'Application deleted.'
+  
+  client.option('-a', '--application-name NAME', 'Application name') do |name|
+    client.service_param('ApplicationName', name)
+  end
+  
+  client.option('-f', '--force-terminate-env [TRUE/FALSE]', 'Terminates all running environments before deleting the application. False if not specified.') do |terminate_env_by_force|
+    if (terminate_env_by_force.nil?)
+      terminate_env_by_force = true
+    else
+      terminate_env_by_force.downcase!
+    end
+    client.service_param('TerminateEnvByForce', terminate_env_by_force)
+  end
+  
+end.run(ARGV)

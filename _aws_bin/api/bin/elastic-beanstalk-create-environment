@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+###########################################################################
+# AWS Elastic Beanstalk Command Line Client
+# Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the “License”). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the “license” file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+#
+
+require File.join(File.dirname(__FILE__), 'setup.rb')
+require 'aws/elasticbeanstalk/cli/optionsettings'
+
+AWS::ElasticBeanstalk::OptionSettingsCLI.new do |client|
+  client.service_call = lambda { |params| @elasticbeanstalk.create_environment(params) }
+  client.result_key = 'Environment'
+  client.empty_response = 'No environment created.'
+
+  client.option('-a', '--application-name NAME', 'Name of the application') do |app_name|
+    client.service_param('ApplicationName', app_name)
+  end
+
+  client.option('-l', '--version-label LABEL', 'Version label') do |label|
+    client.service_param('VersionLabel', label)
+  end
+  
+  client.option('-e', '--environment-name NAME', 'Name of the environment') do |env_name|
+    client.service_param('EnvironmentName', env_name)
+  end
+
+  client.option('-t', '--template-name NAME', 'Name of the configuration template') do |template_name|
+    client.service_param('TemplateName', template_name)
+  end
+
+  client.option('-T', '--tier NAME', 'Environment tier with attributes separated by ::. E.g. WebServer::Standard::1.0') do |tier|
+    name, type, version = tier.split '::'
+    tier = {
+      'Name'    => name,
+      'Type'    => type,
+      'Version' => version
+    }
+    client.service_param('Tier', tier)
+  end
+
+  client.option('-s', '--solution-stack STACK', 'Solution stack name') do |solution_stack|
+    client.service_param('SolutionStackName', solution_stack)
+  end
+
+  client.option('-c', '--cname-prefix PREFIX', 'CNAME prefix to use') do |cname_prefix|
+    client.service_param('CNAMEPrefix', cname_prefix)
+  end
+
+  client.option('-d', '--description DESC', 'Description') do |description|
+    client.service_param('Description', description)
+  end
+
+  client.option('-f', '--options-file FILENAME', 'File containing JSON-formatted option settings') do |options_file|
+    client.parse_options_file('OptionSettings', options_file)
+  end
+
+  client.option('-F', '--options-to-remove-file FILENAME', 'File containing option settings to remove') do |remove_options_file|
+    client.parse_options_file('OptionsToRemove', remove_options_file)
+  end
+  
+  client.filter 'DateCreated' do |val| Time.at(val)  end
+  client.filter 'DateUpdated' do |val| Time.at(val)  end
+end.run(ARGV)

@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+###########################################################################
+# AWS Elastic Beanstalk Command Line Client
+# Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the “License”). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the “license” file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+#
+
+require File.join(File.dirname(__FILE__), 'setup.rb')
+require 'aws/client/commandline'
+
+AWS::Client::CommandLine.new do |client|
+  client.service_call = lambda { |params| @elasticbeanstalk.describe_environments(params) }
+  client.result_key = 'Environments'
+  client.empty_response = 'No environments found.'
+  
+  client.option('-e', '--environment-names NAMES', 'List of environment names') do |env_names| 
+    client.service_param('EnvironmentNames', env_names.split(','))
+  end
+
+  client.option('-E', '--environment-ids IDS', 'List of environment IDs') do |env_ids| 
+    client.service_param('EnvironmentIds', env_ids.split(','))
+  end
+
+  client.option('-a', '--application-name NAME', 'Name of application to get environments for') do |app_name| 
+    client.service_param('ApplicationName', app_name)
+  end
+  
+  client.option('-l', '--release-label LABEL', 'Name of release label') do |label| 
+    client.service_param('ReleaseLabel', label)
+  end
+
+  client.option('-d', '--include-deleted [TRUE/FALSE]', 'Include recently deleted environments. True if not specified.') do |include_deleted|
+    if (include_deleted.nil?)
+      include_deleted = true
+    else
+      include_deleted.downcase!
+    end
+    client.service_param('IncludeDeleted', include_deleted)
+  end
+
+  client.option('-D', '--include-deleted-back-to TIMESTAMP', 'Include deleted environments dating back to this time. Can be a timestamp (seconds since epoch) or a valid time string (e.g. YYYY-MM-DDTHH:MM:SSZ)') do |include_deleted_time|
+    client.service_param('IncludedDeletedBackTo', client.convert_time(include_deleted_time))
+  end
+
+  client.filter 'DateCreated' do |val| Time.at(val)  end
+  client.filter 'DateUpdated' do |val| Time.at(val)  end
+  client.filter 'Tier'        do |val| [val['Name'], val['Type'], val['Version']].join '::' end
+  client.exclude('Resources')
+end.run(ARGV)

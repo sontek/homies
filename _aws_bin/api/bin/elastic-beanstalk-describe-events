@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby
+###########################################################################
+# AWS Elastic Beanstalk Command Line Client
+# Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the “License”). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the “license” file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+#
+
+require File.join(File.dirname(__FILE__), 'setup.rb')
+require 'aws/client/commandline'
+
+AWS::Client::CommandLine.new do |client|
+  client.service_call = lambda { |params| @elasticbeanstalk.describe_events(params) }
+  client.result_key = 'Events'
+  client.empty_response = 'No events found.'
+
+  client.option('-a', '--application-name NAME', 'Name of application to get environments for') do |app_name| 
+    client.service_param('ApplicationName', app_name)
+  end
+
+  client.option('-l', '--version-label LABEL', 'Name of version label') do |label| 
+    client.service_param('VersionLabel', label)
+  end
+
+  client.option('-t', '--template-name NAME', 'Name of the configuration template') do |template_name| 
+    client.service_param('TemplateName', template_name)
+  end
+  
+  client.option('-e', '--environment-name NAME', 'Environment name') do |env_name| 
+    client.service_param('EnvironmentName', env_name)
+  end
+  
+  client.option('-E', '--environment-id ID', 'ID of the environment to terminate') do |env_id|
+    client.service_param('EnvironmentId', env_id)
+  end
+
+  client.option('-r', '--request-id ID', 'Request ID') do |request_id|
+    client.service_param('RequestId', request_id)
+  end
+
+  client.option('-s', '--severity LEVEL', 'Severity level to filter on') do |severity|
+    client.service_param('Severity', severity)
+  end
+  
+  client.option('-S', '--start-time TIMESTAMP', 'Start time for range of events. Can be a timestamp (seconds since epoch) or a valid time string (e.g. YYYY-MM-DDTHH:MM:SSZ)') do |start_time|
+    client.service_param('StartTime', client.convert_time(start_time))
+  end
+
+  client.option('-L', '--end-time TIMESTAMP', 'End time for range of events. Can be a timestamp (seconds since epoch) or a valid time string (e.g. YYYY-MM-DDTHH:MM:SSZ)') do |end_time|
+    client.service_param('EndTime', client.convert_time(end_time))
+  end
+  
+  client.option('-n', '--next-token TOKEN', 'Token to get next results in the set') do |next_token|
+    client.service_param('NextToken', next_token)
+  end
+
+  client.option('-m', '--max-records COUNT', 'Maximum number of events to return.') do |next_token|
+    client.service_param('MaxRecords', next_token)
+  end
+
+  client.filter 'EventDate' do |val| Time.at(val) end
+end.run(ARGV)

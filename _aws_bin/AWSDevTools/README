@@ -1,0 +1,24 @@
+This package contains a Git client extension for AWS Elastic
+Beanstalk. AWS DevTools enables you to deploy applications to AWS
+Elastic Beanstalk quickly. AWS DevTools can run on the Linux, Mac, and
+Windows operating systems. If you are already familiar with using the
+Git command line, then you'll want to use AWS DevTools.
+
+AWS Elastic Beanstalk is an even easier way for you to quickly deploy
+and manage applications in the AWS cloud. AWS Elastic Beanstalk
+leverages AWS services such as Amazon Elastic Compute Cloud (Amazon
+EC2), Amazon Simple Storage Service (Amazon S3), Amazon Simple
+Notification Service (Amazon SNS), Elastic Load Balancing, and Auto
+Scaling to deliver the same highly reliable, scalable, and
+cost-effective infrastructure that hundreds of thousands of businesses
+depend on today.
+
+For information on how to setup AWS DevTools and deploy a web
+application, go to
+http://docs.amazonwebservices.com/elasticbeanstalk/latest/dg/GettingStarted.GetSetup-devtools.html
+in the AWS Elastic Beanstalk Developer Guide. For more information
+about AWS Elastic Beanstalk, go to
+http://docs.amazonwebservices.com/elasticbeanstalk/latest/dg/Welcome.html
+in the AWS Elastic Beanstalk Developer Guide.
+
+NOTE: AWS DevTools requires boto 2.7.0 or later
