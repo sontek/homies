@@ -5,24 +5,29 @@
 ;; Author: John Anderson < sontek@gmail.com >
 ;; URL: http://sontek.net
 
-
 ;;; Commentary:
 ;; This file is not part of GNU Emacs.  It is the personal configuration
 ;; for John Anderson.
+
+;;; Code:
 (defun setup-packaging-system ()
   (when window-system
     (require 'package))
+
   (add-to-list 'package-archives
 	       '("marmalade" . "http://marmalade-repo.org/packages/") t)
   (add-to-list 'package-archives
 	       '("melpa" . "http://melpa.milkbox.net/packages/") t)
   (add-to-list 'load-path "~/.emacs.d")
+
   (package-initialize)
 
   (when (not package-archive-contents)
     (package-refresh-contents))
-)
 
+  ; packages we need
+  (package-install 'flycheck)
+)
 
 (defun setup-random-emacs ()
   ;; no startup msg
@@ -58,7 +63,11 @@
   ;; Never insert tabs
   (setq-default indent-tabs-mode nil)
 
-  ;; This closes emacs without prompting if we want to close all processes,
+
+  ;; setup flycheck globally for all languages
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+
+  ;; This closes Emacs without prompting if we want to close all processes,
   ;; for example, if python shell is running
   (add-hook 'comint-exec-hook
     (lambda ()
@@ -68,3 +77,7 @@
 )
 
 (setup-random-emacs)
+(provide 'init)
+
+;;; init.el ends here
+

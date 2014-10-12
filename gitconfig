@@ -7,3 +7,9 @@
 
 [commit]
   template = ~/.gitmessage
+
+[core]
+  editor = emacs
+
+[color]
+  ui = true
