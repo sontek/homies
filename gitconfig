@@ -1,0 +1,9 @@
+[user]
+  name = John Anderson
+  email = sontek@gmail.com
+
+[push]
+  default = current
+
+[commit]
+  template = ~/.gitmessage
