@@ -15,19 +15,6 @@ Then run:
     ./install.sh
 
 
-Emacs
---------------------------
-The first launch of emacs will not have the plugins installed, you must
-open emacs and run:
-
-.. code-block::
-
-    M-x eval-expression
-    (setup-packaging-system)
-
-Then you can close/re-open emacs
-
-
 Gnome Terminal
 --------------------------
 To get gnome-terminal with a solarized color scheme go into the

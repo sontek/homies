@@ -10,81 +10,35 @@
 ;; for John Anderson.
 
 ;;; Code:
-(defun setup-packaging-system ()
-  (require 'package)
+(defvar current-user
+      (getenv
+       (if (equal system-type 'windows-nt) "USERNAME" "USER")))
 
-  (add-to-list 'package-archives
-	       '("melpa" . "http://melpa.milkbox.net/packages/") t)
-  (add-to-list 'package-archives
-	       '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(message "sontek-mode is powering up... Be patient, Young Padawan %s!" current-user)
 
-  (add-to-list 'load-path "~/.emacs.d")
-
-  (package-initialize)
-
-  (when (not package-archive-contents)
-    (package-refresh-contents))
-
-  ; packages we need
-  (package-install 'flycheck)
-  (package-install 'multi-term)
-)
-
-(defun setup-random-emacs ()
-  ;; no startup msg
-  (setq inhibit-startup-message t)
-
-  ;; turn on paren match highlighting
-  (show-paren-mode 1)
-
-  ;; highlight entire bracket expression
-  (setq show-paren-style 'expression)
-
-  ;; display line numbers in margin
-  (global-linum-mode 1)
-  (setq linum-format "%d ")
-
-  ;; display the column and line our cursor is on
-  (column-number-mode 1)
-
-  ;; stop creating those backup~ files
-  (setq make-backup-files nil)
-
-  ;; stop creating those #autosave# files
-  (setq auto-save-default nil)
-
-  ;; highlight the current line we are editing
-  (global-hl-line-mode 1)
-
-  ;; disable the toolbar
-  (tool-bar-mode 0)
-
-  ;; disable the menubar
-  (menu-bar-mode 0)
-
-  ;; Never insert tabs
-  (setq-default indent-tabs-mode nil)
+(when (version< emacs-version "24.1")
+  (error "sontek-mode requires at least GNU Emacs 24.1, but you're running %s" emacs-version))
 
 
-  ;; setup flycheck globally for all languages
-  (add-hook 'after-init-hook #'global-flycheck-mode)
+;; Setup the directory structure
+(defvar sontek-dir (file-name-directory load-file-name)
+  "The root dir of the sontek-mode distribution.")
+(defvar sontek-core-dir (expand-file-name "core" sontek-dir)
+  "The home of sontek-mode's core functionality.")
+(defvar sontek-vendor-dir (expand-file-name "vendor" sontek-dir)
+  "This directory houses packages that are not yet available in ELPA (or MELPA).")
 
-  ;; This closes Emacs without prompting if we want to close all processes,
-  ;; for example, if python shell is running
-  (defun my-kill-emacs ()
-    "save some buffers, then exit unconditionally"
-    (interactive)
-    (save-some-buffers nil t)
-    (kill-emacs))
+;; add sontek-mode's directories to Emacs's `load-path`
+(add-to-list 'load-path sontek-core-dir)
+(add-to-list 'load-path sontek-vendor-dir)
 
-  (global-set-key (kbd "C-x C-c") 'my-kill-emacs)
-)
-(defun setup-shell ()
+;; warn when opening files bigger than 100MB
+(setq large-file-warning-threshold 100000000)
 
-)
+(require 'sontek-packages)
+(require 'sontek-editor)
+(require 'sontek-ui)
 
-(setup-random-emacs)
-(setup-shell)
-(provide 'init)
+(message "sontek-mode is ready to do thy bidding, Happy Hacking %s!" current-user)
 
 ;;; init.el ends here
