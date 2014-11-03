@@ -53,6 +53,9 @@
 ;; setup flycheck globally for all languages
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
+;; allow alt-up/alt-down to move text
+(require 'move-text)
+(move-text-default-bindings)
 
 (provide 'sontek-editor)
 ;;; sontek-editor.el ends here

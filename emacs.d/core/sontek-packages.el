@@ -12,6 +12,7 @@
 (defvar sontek-packages
   '(diminish
     flycheck
+    move-text
     multi-term
     smartparens
     solarized-theme
