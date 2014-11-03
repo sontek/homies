@@ -12,8 +12,11 @@
 (defvar sontek-packages
   '(diminish
     flycheck
+    grizzl
+    guru-mode
     move-text
     multi-term
+    projectile
     smartparens
     solarized-theme
     undo-tree

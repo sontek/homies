@@ -27,6 +27,8 @@
   "The home of sontek-mode's core functionality.")
 (defvar sontek-vendor-dir (expand-file-name "vendor" sontek-dir)
   "This directory houses packages that are not yet available in ELPA (or MELPA).")
+(defvar sontek-savefile-dir (expand-file-name "savefile" sontek-dir)
+  "This folder stores all the automatically generated save/history-files.")
 
 ;; add sontek-mode's directories to Emacs's `load-path`
 (add-to-list 'load-path sontek-core-dir)

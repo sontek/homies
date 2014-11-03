@@ -1,5 +1,9 @@
 ;;; Code:
 
+;; Disable common keybindings in emacs
+(require 'guru-mode)
+(guru-global-mode +1)
+
 ;; don't use tabs to indent
 (setq-default indent-tabs-mode nil)
 
@@ -56,6 +60,14 @@
 ;; allow alt-up/alt-down to move text
 (require 'move-text)
 (move-text-default-bindings)
+
+;; projectile is a project management mode
+(require 'projectile)
+(setq projectile-cache-file
+      (expand-file-name  "projectile.cache" sontek-savefile-dir))
+(setq projectile-completion-system 'grizzl)
+(projectile-global-mode t)
+(setq *grizzl-read-max-results* 5)
 
 (provide 'sontek-editor)
 ;;; sontek-editor.el ends here
