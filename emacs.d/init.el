@@ -27,6 +27,7 @@
 
   ; packages we need
   (package-install 'flycheck)
+  (package-install 'multi-term)
 )
 
 (defun setup-random-emacs ()
@@ -70,14 +71,20 @@
 
   ;; This closes Emacs without prompting if we want to close all processes,
   ;; for example, if python shell is running
-  (add-hook 'comint-exec-hook
-    (lambda ()
-      (set-process-query-on-exit-flag
-        (get-buffer-process (current-buffer)) nil)))
+  (defun my-kill-emacs ()
+    "save some buffers, then exit unconditionally"
+    (interactive)
+    (save-some-buffers nil t)
+    (kill-emacs))
+
+  (global-set-key (kbd "C-x C-c") 'my-kill-emacs)
+)
+(defun setup-shell ()
 
 )
 
 (setup-random-emacs)
+(setup-shell)
 (provide 'init)
 
 ;;; init.el ends here
