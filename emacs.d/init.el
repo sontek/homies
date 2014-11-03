@@ -41,6 +41,7 @@
 
   ;; display line numbers in margin
   (global-linum-mode 1)
+  (setq linum-format "%d ")
 
   ;; display the column and line our cursor is on
   (column-number-mode 1)
@@ -80,4 +81,3 @@
 (provide 'init)
 
 ;;; init.el ends here
-
