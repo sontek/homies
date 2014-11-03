@@ -32,5 +32,7 @@
 (if (fboundp 'fringe-mode)
     (fringe-mode 4))
 
+(load-theme 'solarized-light t)
+
 (provide 'sontek-ui)
 ;;; sontek-ui.el ends here
