@@ -26,3 +26,9 @@ open emacs and run:
     (setup-packaging-system)
 
 Then you can close/re-open emacs
+
+
+Gnome Terminal
+--------------------------
+To get gnome-terminal with a solarized color scheme go into the
+gnome-terminal-solarized folder and right ./set_light.sh
