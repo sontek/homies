@@ -13,6 +13,7 @@
   '(diminish
     flycheck
     multi-term
+    smartparens
     solarized-theme
     undo-tree
     volatile-highlights)
