@@ -69,5 +69,8 @@
 (projectile-global-mode t)
 (setq *grizzl-read-max-results* 5)
 
+;; Save backup files away from original sources
+(setq backup-directory-alist `(("." . "~/.saves")))
+
 (provide 'sontek-editor)
 ;;; sontek-editor.el ends here
