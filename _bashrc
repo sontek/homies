@@ -184,3 +184,6 @@ export WORKON_HOME='~/virtualenvs'
 source /usr/local/bin/virtualenvwrapper.sh
 export PATH=$PATH:~/.aws_bin/eb/linux/python2.7
 alias opsgateway='ssh -i ~/.ssh/encored.pem ubuntu@54.238.185.53'
+
+### Added by the Heroku Toolbelt
+export PATH="/usr/local/heroku/bin:$PATH"
