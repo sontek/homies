@@ -3,3 +3,5 @@
 *~
 _vim/ropevim/src*
 _vim/ropevim/pylibs*
+*.swp
+*.pyc

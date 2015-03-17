@@ -14,8 +14,12 @@ try:
 except ImportError:
     print("You need readline, rlcompleter, and atexit")
 
-readline.parse_and_bind("tab: complete")
-readline.parse_and_bind ("bind ^I rl_complete")
+
+# Make this work properly in Darwin and Linux
+if 'libedit' in readline.__doc__:                                          
+    readline.parse_and_bind("bind ^I rl_complete")                         
+else:                                                                      
+    readline.parse_and_bind("tab: complete")
 
 class Completer(object):
     def __init__(self):

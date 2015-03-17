@@ -133,26 +133,19 @@ fi
   }
 } >/dev/null 2>/dev/null
 
-venwrap=`type -P virtualenvwrapper_bashrc`
+venwrap=`type -P virtualenvwrapper.sh`
 if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
 
-# osx vim
-if [ -x "/Applications/MacVim.app/Contents/MacOS/Vim" ]; then
-    PATH=/Applications/MacVim.app/Contents/MacOS/:$PATH
-fi
-
-export PATH
-
-
+alias vim="emacs"
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
 
 parse_git_branch ()
 {
-  git name-rev HEAD 2> /dev/null | sed 's#HEAD\ \(.*\)#(git::\1)#'
+  git branch 2> /dev/null | grep '*' | sed 's#*\ \(.*\)#(git::\1)#'
 }
 parse_svn_branch() {
   parse_svn_url | sed -e 's#^'"$(parse_svn_repository_root)"'##g' | awk -F / '{print "(svn::"$1 "/" $2 ")"}'
@@ -163,6 +156,31 @@ parse_svn_url() {
 parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
+set -o vi
+export EDITOR="emacs"
+export GIT_EDITOR="emacs"
 
 # Add git and svn branch names
 export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "
+
+
+# /etc/profile.d/complete-hosts.sh
+# Autocomplete Hostnames for SSH etc.
+# by Jean-Sebastien Morisset (http://surniaulula.com/)
+_complete_hosts () {
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    host_list=`{ 
+        for c in /etc/ssh_config /etc/ssh/ssh_config ~/.ssh/config
+        do [ -r $c ] && sed -n -e 's/^Host[[:space:]]//p' -e 's/^[[:space:]]*HostName[[:space:]]//p' $c
+        done
+        for k in /etc/ssh_known_hosts /etc/ssh/ssh_known_hosts ~/.ssh/known_hosts
+        do [ -r $k ] && egrep -v '^[#\[]' $k|cut -f 1 -d ' '|sed -e 's/[,:].*//g'
+        done
+        sed -n -e 's/^[0-9][0-9\.]*//p' /etc/hosts; }|tr ' ' '\n'|grep -v '*'`
+    COMPREPLY=( $(compgen -W "${host_list}" -- $cur))
+    return 0
+}
+
+complete -F _complete_hosts ssh
+complete -F _complete_hosts host

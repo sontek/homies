@@ -1,25 +1,42 @@
 #!/usr/bin/env bash
-for i in _*
-do 
-    source="${PWD}/$i"
-    target="${HOME}/${i/_/.}"
-#    if [ -e "${target}" ]; then
-#        echo "${target} already exists"       
-#    else
-        ln -sf ${source} ${target}
-#    fi
-done
+function link_file {
+    source="${PWD}/$1"
+    target="${HOME}/${1/_/.}"
 
-git submodule sync
-git submodule init
-git submodule update
-git submodule foreach git pull origin master
-git submodule foreach git submodule init
-git submodule foreach git submodule update
+    if [ -e "${target}" ] && [ ! -L "${target}" ]; then
+        mv $target $target.df.bak
+    fi
 
-# setup command-t
-cd _vim/bundle/command-t
-rake make
+    ln -sf ${source} ${target}
+}
 
-#cd _vim/ropevim/
-#./install.sh
+function unlink_file {
+    source="${PWD}/$1"
+    target="${HOME}/${1/_/.}"
+
+    if [ -e "${target}.df.bak" ] && [ -L "${target}" ]; then
+        unlink ${target}
+        mv $target.df.bak $target
+    fi
+}
+
+if [ "$1" = "vim" ]; then
+    for i in _vim*
+    do
+       link_file $i
+    done
+elif [ "$1" = "restore" ]; then
+    for i in _*
+    do
+        unlink_file $i
+    done
+    exit
+else
+    for i in _*
+    do
+        link_file $i
+    done
+fi
+
+git submodule update --init --recursive
+git submodule foreach --recursive git pull origin master
