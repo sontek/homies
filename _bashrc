@@ -193,7 +193,10 @@ export USE_CCACHE=1
 export ANDROID_HOME=~/Android/Sdk
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export PYTHONPATH="$PYTHONPATH:$HOME/google_appengine"
+
 
 if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash
 fi
+
