@@ -20,7 +20,9 @@
     smartparens
     solarized-theme
     undo-tree
-    volatile-highlights)
+    volatile-highlights
+    js2-mode
+    coffee-mode)
   "A list of packages to ensure are installed at launch.")
 
 (defun sontek-check-all-packages-installed ()

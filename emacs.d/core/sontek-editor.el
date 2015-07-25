@@ -56,6 +56,10 @@
 
 ;; setup flycheck globally for all languages
 (add-hook 'after-init-hook #'global-flycheck-mode)
+(add-to-list 'auto-mode-alist (cons (rx ".js" eos) 'js2-mode))
+(add-to-list 'auto-mode-alist (cons (rx ".jsx" eos) 'js2-mode))
+
+;; (add-hook 'js2-mode-hook 'ac-js2-mode)
 
 ;; allow alt-up/alt-down to move text
 (require 'move-text)
