@@ -36,7 +36,7 @@ copy_dicolors() {
   echo
   echo "The new dircolors is copied as $DIRCOLORS_DIR/dircolors."
   echo
-  echo "Add \"eval \`dircolors /path/to/dircolorsdb\`\" in your in your shell "
+  echo "Add \"eval \`dircolors /path/to/dircolorsdb\`\" in your shell "
   echo "configuration file (.bashrc, .zshrc, etc...) to use the new dircolors."
   echo
   echo -en "Do not forget to remove the old dircolors in your shell "
@@ -51,15 +51,15 @@ interactive_dircolors() {
   do
     echo
     echo -en "A dircolors already exists, but can be incompatible with the "
-    echo -en "solarized color scheme causing some colors problems when doing "
-    echo -en "a \"ls\".\n"
+    echo -en "solarized color scheme causing some colors problems when issuing "
+    echo -en "\"ls\".\n"
     echo -e "\n"
     echo -en "1) Replace the actual dircolors by the seebi' "
     echo -en "dircolors-solarized :\n"
     echo -en "   https://github.com/seebi/dircolors-solarized (the actual "
     echo -en "dircolors will be \nkeeped as backup).\n"
     echo
-    echo -en "2) [DEFAULT] I am awared about this potentiall problem and will"
+    echo -en "2) [DEFAULT] I am aware about this potential problem and will"
     echo -en "check my \n   dircolors (default path: ~/.dir_colors/dircolors) "
     echo -en "in case of conflict.\n"
     echo -e "\n"
@@ -89,7 +89,7 @@ check_dircolors() {
 }
 
 warning_message_dircolors() {
-  echo -en "If there is any problem with the colors when doing a \"ls\", "
+  echo -en "If there is any problem with the colors when issusing \"ls\", "
   echo -en "please check your dircolors.\n"
 }
 
