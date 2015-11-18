@@ -57,7 +57,7 @@ interactive_dircolors() {
     echo -en "1) Replace the actual dircolors by the seebi' "
     echo -en "dircolors-solarized :\n"
     echo -en "   https://github.com/seebi/dircolors-solarized (the actual "
-    echo -en "dircolors will be \nkeeped as backup).\n"
+    echo -en "dircolors will be \nkept as backup).\n"
     echo
     echo -en "2) [DEFAULT] I am aware about this potential problem and will"
     echo -en "check my \n   dircolors (default path: ~/.dir_colors/dircolors) "
@@ -89,7 +89,7 @@ check_dircolors() {
 }
 
 warning_message_dircolors() {
-  echo -en "If there is any problem with the colors when issusing \"ls\", "
+  echo -en "If there is any problem with the colors when issuing \"ls\", "
   echo -en "please check your dircolors.\n"
 }
 
