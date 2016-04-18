@@ -28,3 +28,9 @@
     lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
     ls = ls-files
 
+[merge]
+    tool = mymeld
+    conflictstyle = diff3
+[mergetool "mymeld"]
+    cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+
