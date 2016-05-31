@@ -2,11 +2,20 @@ Getting Started
 --------------------------
 Get rcm:
 
+Ubuntu:
+
 .. code-block:: bash
 
      sudo apt-add-repository ppa:martin-frost/thoughtbot-rcm
      sudo apt-get update
      sudo apt-get install rcm
+
+OSX:
+
+.. code-block:: bash
+
+    brew tap thoughtbot/formulae
+    brew install rcm
 
 Then run:
 
