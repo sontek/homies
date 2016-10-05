@@ -200,3 +200,14 @@ if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash
 fi
 
+export LANG=ko_KR.utf8 
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f /home/gsong/google-cloud-sdk/path.bash.inc ]; then
+  source '/home/gsong/google-cloud-sdk/path.bash.inc'
+fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f /home/gsong/google-cloud-sdk/completion.bash.inc ]; then
+  source '/home/gsong/google-cloud-sdk/completion.bash.inc'
+fi
