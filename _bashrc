@@ -181,6 +181,7 @@ set -o vi
 export EDITOR='vim'
 export GIT_EDITOR='vim'
 export WORKON_HOME='~/virtualenvs'
+export PROJECT_HOME=$HOME
 source /usr/local/bin/virtualenvwrapper.sh
 export PATH=$PATH:~/.aws_bin/eb/linux/python2.7:~/bin
 alias androidstudio='XMODIFIERS= ~/android-studio/bin/studio.sh'
@@ -200,6 +201,7 @@ if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash
 fi
 
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 export LANG=ko_KR.utf8 
 
 # The next line updates PATH for the Google Cloud SDK.
