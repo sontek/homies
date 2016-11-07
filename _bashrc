@@ -194,6 +194,7 @@ export USE_CCACHE=1
 export ANDROID_HOME=~/Android/Sdk
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export PATH="$PATH:$HOME/appengine-java-sdk"
 export PYTHONPATH="$PYTHONPATH:$HOME/google_appengine"
 
 
@@ -201,8 +202,9 @@ if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash
 fi
 
-export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+export JAVA_HOME=/usr/lib/jvm/default-java
 export LANG=ko_KR.utf8 
+export GOOGLE_CLOUD_SDK=/home/gsong/google-cloud-sdk
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f /home/gsong/google-cloud-sdk/path.bash.inc ]; then
