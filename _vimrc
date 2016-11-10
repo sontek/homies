@@ -29,9 +29,18 @@ Plugin 'VundleVim/Vundle.vim'
 
 " All of your Plugins must be added before the following line
 
-"""""""""""""""""""""""""""""""""""""
 Plugin 'Yggdroot/indentLine'
-"""""""""""""""""""""""""""""""""""""
+Plugin 'tmhedberg/SimpylFold'
+Plugin 'vim-scripts/indentpython.vim'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/syntastic'
+Plugin 'nvie/vim-flake8'
+Plugin 'jnurmine/Zenburn'
+Plugin 'scrooloose/nerdtree'
+Plugin 'jistr/vim-nerdtree-tabs'
+Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
+Plugin 'jmcantrell/vim-virtualenv'
+
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -48,3 +57,21 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 set ts=4 sw=4 et
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
+set foldmethod=indent
+set foldlevel=99
+nnoremap <space> za
+
+set encoding=utf-8
+let g:ycm_autoclose_preview_window_after_completion=1
+map <C-G>  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+let python_highlight_all=1
+syntax on
+
+let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+map <C-n> :NERDTreeToggle<CR>
