@@ -204,14 +204,17 @@ fi
 
 export JAVA_HOME=/usr/lib/jvm/default-java
 export LANG=ko_KR.utf8 
-export GOOGLE_CLOUD_SDK=/home/gsong/google-cloud-sdk
+export GOOGLE_CLOUD_SDK=$HOME/google-cloud-sdk
+
+export NVM_DIR=$HOME/.nvm
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f /home/gsong/google-cloud-sdk/path.bash.inc ]; then
-  source '/home/gsong/google-cloud-sdk/path.bash.inc'
+if [ -f $GOOGLE_CLOUD_SDK/path.bash.inc ]; then
+  source $GOOGLE_CLOUD_SDK'/path.bash.inc'
 fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f /home/gsong/google-cloud-sdk/completion.bash.inc ]; then
-  source '/home/gsong/google-cloud-sdk/completion.bash.inc'
+if [ -f $GOOGLE_CLOUD_SDK/completion.bash.inc ]; then
+  source $GOOGLE_CLOUD_SDK'/completion.bash.inc'
 fi
