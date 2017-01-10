@@ -40,6 +40,7 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
 Plugin 'jmcantrell/vim-virtualenv'
+Plugin 'leafgarland/typescript-vim'
 
 
 call vundle#end()            " required
