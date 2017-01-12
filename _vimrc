@@ -77,3 +77,5 @@ syntax on
 
 let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 map <C-n> :NERDTreeToggle<CR>
+
+set ic
