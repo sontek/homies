@@ -41,6 +41,7 @@ Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'leafgarland/typescript-vim'
+Plugin 'maksimr/vim-jsbeautify'
 Plugin 'Chiel92/vim-autoformat'
 
 
@@ -70,7 +71,7 @@ nnoremap <space> za
 
 set encoding=utf-8
 let g:ycm_autoclose_preview_window_after_completion=1
-map <C-G>  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+map <C-]>  :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 let python_highlight_all=1
 syntax on
