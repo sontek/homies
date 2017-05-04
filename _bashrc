@@ -210,11 +210,8 @@ export NVM_DIR=$HOME/.nvm
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f $GOOGLE_CLOUD_SDK/path.bash.inc ]; then
-  source $GOOGLE_CLOUD_SDK'/path.bash.inc'
-fi
+export GOOGLE_CLOUD_SDK_PATH=/home/ksbae/google-cloud-sdk
+if [ -f '$GOOGLE_CLOUD_SDK_PATH/path.bash.inc' ]; then source '$GOOGLE_CLOUD_SDK_PATH/path.bash.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f $GOOGLE_CLOUD_SDK/completion.bash.inc ]; then
-  source $GOOGLE_CLOUD_SDK'/completion.bash.inc'
-fi
+if [ -f '$GOOGLE_CLOUD_SDK_PATH/completion.bash.inc' ]; then source '$GOOGLE_CLOUD_SDK_PATH/completion.bash.inc'; fi
