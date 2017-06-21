@@ -71,7 +71,7 @@ nnoremap <space> za
 
 set encoding=utf-8
 let g:ycm_autoclose_preview_window_after_completion=1
-map <C-]>  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+map <C-]>  :YcmCompleter GoToDefinition<CR>
 
 let python_highlight_all=1
 syntax on
