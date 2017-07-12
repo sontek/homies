@@ -29,10 +29,10 @@ Plugin 'VundleVim/Vundle.vim'
 
 " All of your Plugins must be added before the following line
 
+Plugin 'Valloric/YouCompleteMe'
 Plugin 'Yggdroot/indentLine'
 Plugin 'tmhedberg/SimpylFold'
 Plugin 'vim-scripts/indentpython.vim'
-Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/syntastic'
 Plugin 'nvie/vim-flake8'
 Plugin 'jnurmine/Zenburn'
