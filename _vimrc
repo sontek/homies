@@ -77,6 +77,7 @@ let python_highlight_all=1
 syntax on
 
 let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+let NERDTreeWinSize=20
 map <C-n> :NERDTreeToggle<CR>
 
 set ic
