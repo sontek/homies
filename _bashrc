@@ -183,18 +183,13 @@ export GIT_EDITOR='vim'
 export WORKON_HOME='~/virtualenvs'
 export PROJECT_HOME=$HOME
 source /usr/local/bin/virtualenvwrapper.sh
-export PATH=$PATH:~/.aws_bin/eb/linux/python2.7:~/bin
 alias androidstudio='XMODIFIERS= ~/android-studio/bin/studio.sh'
-
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
 
 # for Android dev
 export USE_CCACHE=1
 export ANDROID_HOME=~/Android/Sdk
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-export PATH="$PATH:$HOME/appengine-java-sdk"
 export PYTHONPATH="$PYTHONPATH:$HOME/google_appengine"
 
 
