@@ -189,9 +189,11 @@ alias androidstudio='XMODIFIERS= ~/android-studio/bin/studio.sh'
 export USE_CCACHE=1
 export ANDROID_HOME=~/Android/Sdk
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export PATH="$PATH:$HOME/.rvm/bin:$HOME/phabricatorbin/arcanist/bin" # Add RVM to PATH for scripting
 export PYTHONPATH="$PYTHONPATH:$HOME/google_appengine"
 
+# RVM
+source ~/.rvm/scripts/rvm
 
 if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash

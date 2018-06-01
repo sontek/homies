@@ -32,5 +32,5 @@
     tool = mymeld
     conflictstyle = diff3
 [mergetool "mymeld"]
-    cmd = meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+    cmd = meld --diff $LOCAL $BASE --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
 
