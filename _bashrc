@@ -182,7 +182,7 @@ export EDITOR='vim'
 export GIT_EDITOR='vim'
 export WORKON_HOME='~/virtualenvs'
 export PROJECT_HOME=$HOME
-source ~/.local/bin/virtualenvwrapper.sh
+source /home/gsong/.local/bin/virtualenvwrapper.sh
 alias androidstudio='XMODIFIERS= ~/android-studio/bin/studio.sh'
 
 # for Android dev
@@ -192,21 +192,18 @@ export ANDROID_HOME=~/Android/Sdk
 export PATH="$PATH:$HOME/.rvm/bin:$HOME/phabricatorbin/arcanist/bin" # Add RVM to PATH for scripting
 export PYTHONPATH="$PYTHONPATH:$HOME/google_appengine"
 
-# RVM
-source ~/.rvm/scripts/rvm
-
 if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash
 fi
 
 export JAVA_HOME=/usr/lib/jvm/default-java
 export LANG=ko_KR.utf8 
-export GOOGLE_CLOUD_SDK=$HOME/google-cloud-sdk
+export GOOGLE_CLOUD_SDK=/usr/lib/google-cloud-sdk
 
 export NVM_DIR=$HOME/.nvm
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-export GOOGLE_CLOUD_SDK_PATH=/usr/lib/google-cloud-sdk
+export GOOGLE_CLOUD_SDK_PATH=~/google-cloud-sdk
 export ENDPOINTS_GAE_SDK=$GOOGLE_CLOUD_SDK_PATH/platform/google_appengine
 if [ -f $GOOGLE_CLOUD_SDK_PATH/path.bash.inc ]; then source $GOOGLE_CLOUD_SDK_PATH/path.bash.inc; fi
 if [ -f $GOOGLE_CLOUD_SDK_PATH/completion.bash.inc ]; then source $GOOGLE_CLOUD_SDK_PATH/completion.bash.inc; fi
