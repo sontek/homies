@@ -1,0 +1,1 @@
+localvimrc.vmb: call delete('/home/gsong/.vim/doc/localvimrc.txt')|call delete('/home/gsong/.vim/plugin/localvimrc.vim')

@@ -81,4 +81,6 @@ let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 let NERDTreeWinSize=20
 map <C-n> :NERDTreeToggle<CR>
 
+let g:localvimrc_ask=0
+
 set ic
