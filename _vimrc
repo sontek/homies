@@ -37,7 +37,6 @@ Plugin 'nvie/vim-flake8'
 Plugin 'jnurmine/Zenburn'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
-Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'maksimr/vim-jsbeautify'
