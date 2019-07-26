@@ -9,6 +9,7 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'vimwiki/vimwiki'
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
@@ -82,3 +83,4 @@ map <C-n> :NERDTreeToggle<CR>
 let g:localvimrc_ask=0
 
 set ic
+

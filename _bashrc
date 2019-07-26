@@ -180,7 +180,7 @@ complete -F _complete_hosts host
 set -o vi
 export EDITOR='vim'
 export GIT_EDITOR='vim'
-export WORKON_HOME='~/virtualenvs'
+export WORKON_HOME='~/.virtualenvs'
 export PROJECT_HOME=$HOME
 source ~/.local/bin/virtualenvwrapper.sh
 alias androidstudio='XMODIFIERS= ~/android-studio/bin/studio.sh'
