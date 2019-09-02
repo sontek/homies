@@ -42,6 +42,7 @@ Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'maksimr/vim-jsbeautify'
 Plugin 'Chiel92/vim-autoformat'
+Plugin 'https://github.com/twitvim/twitvim.git'
 
 
 call vundle#end()            " required
