@@ -42,6 +42,7 @@ Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'maksimr/vim-jsbeautify'
 Plugin 'Chiel92/vim-autoformat'
+Plugin 'tarekbecker/vim-yaml-formatter'
 
 
 call vundle#end()            " required
@@ -81,6 +82,7 @@ let NERDTreeWinSize=20
 map <C-n> :NERDTreeToggle<CR>
 
 let g:localvimrc_ask=0
+let g:yaml_formatter_indent_collection=1
 
 set ic
 
