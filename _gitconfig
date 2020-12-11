@@ -36,3 +36,5 @@
 [mergetool "mymeld"]
     cmd = meld --diff $LOCAL $BASE --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
 
+[pull]
+	rebase = false
