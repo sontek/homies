@@ -213,3 +213,5 @@ export GOOGLE_CLOUD_SDK_PATH=$GOOGLE_CLOUD_SDK
 export ENDPOINTS_GAE_SDK=$GOOGLE_CLOUD_SDK_PATH/platform/google_appengine
 if [ -f $GOOGLE_CLOUD_SDK_PATH/path.bash.inc ]; then source $GOOGLE_CLOUD_SDK_PATH/path.bash.inc; fi
 if [ -f $GOOGLE_CLOUD_SDK_PATH/completion.bash.inc ]; then source $GOOGLE_CLOUD_SDK_PATH/completion.bash.inc; fi
+
+alias restart_network='sudo systemctl restart NetworkManager.service'
