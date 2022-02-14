@@ -40,11 +40,11 @@ install: install-system-apps install-sre-apps install-fun-apps
 
 # Installs all the dotfiles
 install-homies:
-  cd dotfiles && stow --verbose=1 --target=$HOME *
+  cd dotfiles && stow --verbose=1 --target=$HOME */
 
 # Removes all the dotfiles
 remove-homies:
-  cd dotfiles && stow --verbose=1 --delete --target=$HOME *
+  cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
 nix-gc:
   nix profile wipe-history
