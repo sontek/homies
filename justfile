@@ -1,4 +1,4 @@
-default:
+help:
   just --list
 
 # Install fun apps
