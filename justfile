@@ -30,12 +30,21 @@ install-sre-apps:
   nix profile install nixpkgs#sops
   nix profile install nixpkgs#terraform
   nix profile install nixpkgs#awscli2
+  nix profile install nixpkgs#aws-vault
   nix profile install nixpkgs#argocd
 
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
   echo "Done installing all packages"
+
+# Installs all the dotfiles
+install-homies:
+  cd dotfiles && stow --verbose=1 --target=$HOME *
+
+# Removes all the dotfiles
+remove-homies:
+  cd dotfiles && stow --verbose=1 --delete --target=$HOME *
 
 nix-gc:
   nix profile wipe-history

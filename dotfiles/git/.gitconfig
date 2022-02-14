@@ -1,0 +1,6 @@
+[user]
+	name = John Anderson
+	email = sontek@gmail.com
+
+[includeIf "gitdir:~/code/zapier/"]
+  path = .gitconfig-zapier
