@@ -15,6 +15,7 @@ install-system-apps:
   nix profile install nixpkgs#bat
   nix profile install nixpkgs#cheat
   nix profile install nixpkgs#exa
+  nix profile install nixpkgs#fzf
   nix profile install nixpkgs#jq
   nix profile install nixpkgs#neovim
   nix profile install nixpkgs#ripgrep
