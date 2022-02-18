@@ -52,6 +52,7 @@ remove-dotfiles:
 setup-asdf:
   asdf list|grep nodejs > /dev/null || asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
   asdf list|grep python > /dev/null || asdf plugin add python https://github.com/danhper/asdf-python.git
+  asdf list|grep golang > /dev/null || asdf plugin add golang https://github.com/kennyp/asdf-golang.git
 
 
 # Setup development language environments
