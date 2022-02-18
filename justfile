@@ -41,19 +41,23 @@ install: install-system-apps install-sre-apps install-fun-apps
   echo "Done installing all packages"
 
 # Installs all the dotfiles
-install-homies:
+install-dotfiles:
   cd dotfiles && stow --verbose=1 --target=$HOME */
 
 # Removes all the dotfiles
-remove-homies:
+remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
+# Configure ASDF with all desired plugins
 setup-asdf:
   asdf list|grep nodejs > /dev/null || asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
   asdf list|grep python > /dev/null || asdf plugin add python https://github.com/danhper/asdf-python.git
 
+
+# Setup development language environments
 setup-dev: setup-asdf
 
+# Remove packages that aren't referenced
 nix-gc:
   nix profile wipe-history
   nix-collect-garbage --delete-old
