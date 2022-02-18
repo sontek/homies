@@ -1,0 +1,7 @@
+if command -v asdf &> /dev/null
+then
+    ASDF_PATH=$(asdf info|grep ASDF_DIR|awk -F'=' '{ print $2}')
+    . $ASDF_PATH/asdf.sh
+fi
+
+

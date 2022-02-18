@@ -11,11 +11,12 @@ install-fun-apps:
 
 # Install apps for every day use
 install-system-apps:
-  nix profile install nixpkgs#asdf
+  nix profile install nixpkgs#asdf-vm
   nix profile install nixpkgs#bat
   nix profile install nixpkgs#cheat
   nix profile install nixpkgs#exa
   nix profile install nixpkgs#fzf
+  nix profile install nixpkgs#git
   nix profile install nixpkgs#jq
   nix profile install nixpkgs#neovim
   nix profile install nixpkgs#ripgrep
@@ -46,6 +47,12 @@ install-homies:
 # Removes all the dotfiles
 remove-homies:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
+
+setup-asdf:
+  asdf list|grep nodejs > /dev/null || asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  asdf list|grep python > /dev/null || asdf plugin add python https://github.com/danhper/asdf-python.git
+
+setup-dev: setup-asdf
 
 nix-gc:
   nix profile wipe-history
