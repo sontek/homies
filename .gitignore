@@ -7,3 +7,4 @@ emacs.d/elpa
 emacs.d/projectile*
 weechat/sec.conf
 .zsh_history
+.zcompdump
