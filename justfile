@@ -6,6 +6,7 @@ install-fun-apps:
   nix profile install nixpkgs#boxes
   nix profile install nixpkgs#cowsay
   nix profile install nixpkgs#figlet
+  nix profile install nixpkgs#fortune
   nix profile install nixpkgs#lolcat
   nix profile install nixpkgs#toilet
 
@@ -41,6 +42,10 @@ install-sre-apps:
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
   echo "Done installing all packages"
+
+# Upgrade all installed applications
+upgrade:
+  nix profile upgrade '.*'
 
 # Installs all the dotfiles
 install-dotfiles:
