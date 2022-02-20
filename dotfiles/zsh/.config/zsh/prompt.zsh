@@ -18,5 +18,5 @@ setopt PROMPT_SUBST
 
 # The %{ %} around this is important.  Otherwise big gaps
 # will appear when doing things like reverse search
-PROMPT='%{$fg[green]%}$(git_prompt)%(?.%{$fg[blue]%}.{$fg[red]%}) %B❯%b '
+PROMPT='%{$fg[green]%}$(git_prompt)%(?.%{$fg[blue]%}.%{$fg[red]%}) %B❯%b '
 
