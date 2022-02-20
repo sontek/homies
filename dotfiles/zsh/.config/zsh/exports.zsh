@@ -12,6 +12,7 @@ fi
 if command -v kubectl &> /dev/null
 then
     . <(kubectl completion zsh)
+    complete -F __start_kubectl k
 fi
 
 export DYLD_LIBRARY_PATH=$HOME/.nix-profile/lib/
