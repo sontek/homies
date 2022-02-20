@@ -16,7 +16,9 @@ install-system-apps:
   nix profile install nixpkgs#cheat
   nix profile install nixpkgs#exa
   nix profile install nixpkgs#fzf
+  nix profile install nixpkgs#gettext
   nix profile install nixpkgs#git
+  nix profile install nixpkgs#gnupg
   nix profile install nixpkgs#jq
   nix profile install nixpkgs#neovim
   nix profile install nixpkgs#ripgrep
@@ -51,9 +53,10 @@ remove-dotfiles:
 # Configure ASDF with all desired plugins
 setup-asdf:
   asdf list|grep nodejs > /dev/null || asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  asdf list|grep yarn > /dev/null || asdf plugin add yarn https://github.com/twuni/asdf-yarn.git
   asdf list|grep python > /dev/null || asdf plugin add python https://github.com/danhper/asdf-python.git
+  asdf list|grep poetry > /dev/null || asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git
   asdf list|grep golang > /dev/null || asdf plugin add golang https://github.com/kennyp/asdf-golang.git
-
 
 # Setup development language environments
 setup-dev: setup-asdf
