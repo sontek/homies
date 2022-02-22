@@ -30,6 +30,10 @@ if [ -f /etc/bashrc.backup-before-nix ]; then
     sudo mv /etc/bashrc.backup-before-nix /etc/bashrc
 fi
 
+if [ -f /etc/bash.bashrc.backup-before-nix ]; then
+    sudo mv /etc/bash.bashrc.backup-before-nix /etc/bash.bashrc
+fi
+
 if [ -f /etc/zshrc.backup-before-nix ]; then
     sudo mv /etc/zshrc.backup-before-nix /etc/zshrc
 fi
