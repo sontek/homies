@@ -38,8 +38,15 @@ install: install-system-apps install-sre-apps install-fun-apps
   @echo "Done installing all packages"
 
 # Upgrade all installed applications
-upgrade:
+nix-upgrade:
   nix profile upgrade '.*'
+
+# Remove packages that aren't referenced
+nix-gc:
+  nix profile wipe-history
+  nix-collect-garbage --delete-old
+  nix store gc
+  nix store optimise
 
 # Installs all the dotfiles
 install-dotfiles:
@@ -64,11 +71,4 @@ setup-asdf:
 
 # Setup development language environments
 setup-dev: setup-asdf
-
-# Remove packages that aren't referenced
-nix-gc:
-  nix profile wipe-history
-  nix-collect-garbage --delete-old
-  nix store gc
-  nix store optimise
 
