@@ -21,6 +21,7 @@ install-system-apps:
   @just install-nix "gettext"
   @just install-nix "git"
   @just install-nix "gnupg"
+  @just install-nix "jless"
   @just install-nix "jq"
   @just install-nix "neovim"
   @just install-nix "ripgrep"
@@ -40,6 +41,10 @@ install: install-system-apps install-sre-apps install-fun-apps
 # Upgrade all installed applications
 nix-upgrade:
   nix profile upgrade '.*'
+
+# Repair the nix store
+nix-repair:
+  nix-store --repair --verify --check-contents
 
 # Remove packages that aren't referenced
 nix-gc:
