@@ -25,6 +25,7 @@ install-system-apps:
   @just install-nix "jq"
   @just install-nix "neovim"
   @just install-nix "ripgrep"
+  @just install-nix "sd"
   @just install-nix "stow"
   @just install-nix "tmux"
   @just install-nix "xh"
