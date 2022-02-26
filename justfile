@@ -23,6 +23,7 @@ install-system-apps:
   @just install-nix "gnupg"
   @just install-nix "jless"
   @just install-nix "jq"
+  @just install-nix "loc"
   @just install-nix "neovim"
   @just install-nix "ripgrep"
   @just install-nix "sd"
