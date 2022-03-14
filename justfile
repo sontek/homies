@@ -16,6 +16,7 @@ install-system-apps:
   @just install-nix "asdf-vm"
   @just install-nix "bat"
   @just install-nix "cheat"
+  @just install-nix "coreutils"
   @just install-nix "exa"
   @just install-nix "fzf"
   @just install-nix "gettext"
@@ -23,18 +24,22 @@ install-system-apps:
   @just install-nix "gnupg"
   @just install-nix "jless"
   @just install-nix "jq"
+  @just install-nix "minikube"
   @just install-nix "loc"
   @just install-nix "neovim"
   @just install-nix "ripgrep"
   @just install-nix "sd"
   @just install-nix "stow"
   @just install-nix "tmux"
+  @just install-nix "watch"
   @just install-nix "xh"
   @just install-nix "yq"
   @just install-nix "zsh"
 
 # Install apps for doing SRE work
-install-sre-apps: (install-nix "argocd awscli2 aws-vault kubectl sops terraform")
+install-sre-apps:
+  @just install-nix "argocd awscli2 aws-vault dos2unix redis"
+  @just install-nix "sops terraform")
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
@@ -63,7 +68,7 @@ install-dotfiles:
 remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
-asdf_plugins := "nodejs python golang helm yarn poetry"
+asdf_plugins := "nodejs python golang helm yarn poetry kubectl"
 # Configure ASDF with all desired plugins
 setup-asdf:
   @for plugin in {{asdf_plugins}}; do \
