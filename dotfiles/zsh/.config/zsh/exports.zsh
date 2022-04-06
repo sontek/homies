@@ -15,6 +15,11 @@ then
     complete -F __start_kubectl k
 fi
 
+# Load Nix
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
 export DYLD_LIBRARY_PATH=$HOME/.nix-profile/lib/
 
 
