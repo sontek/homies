@@ -40,7 +40,7 @@ install-system-apps:
 # Install apps for doing SRE work
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-vault dos2unix redis"
-  @just install-nix "sops terraform")
+  @just install-nix "sops")
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
@@ -69,7 +69,7 @@ install-dotfiles:
 remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
-asdf_plugins := "nodejs python golang helm yarn poetry kubectl"
+asdf_plugins := "nodejs python golang helm yarn poetry kubectl terraform"
 # Configure ASDF with all desired plugins
 setup-asdf:
   @for plugin in {{asdf_plugins}}; do \
