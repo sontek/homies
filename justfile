@@ -4,8 +4,17 @@ help:
 # Install apps into nix profile, 'just install-nix "foo bar"
 install-nix nix_apps:
   @for app in {{nix_apps}}; do \
-      echo "Installing ${app}"; \
-      nix profile install nixpkgs#${app}; \
+      if !(nix profile list | grep -q "${app}"); then \
+          echo "Installing ${app}"; \
+          outputs=$(nix eval nixpkgs#${app}.outputs |sed 's/[]["]//g'); \
+          for out in $outputs; do \
+              echo "Building output ${out} for ${app}"; \
+              nix build nixpkgs#${app}.${out}; \
+          done; \
+          nix profile install nixpkgs#${app}; \
+      else \
+          echo "Package already installed, skipping"; \
+      fi \
   done
 
 # Install fun apps
@@ -40,7 +49,7 @@ install-system-apps:
 # Install apps for doing SRE work
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-vault dos2unix redis"
-  @just install-nix "sops")
+  @just install-nix "sops"
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
