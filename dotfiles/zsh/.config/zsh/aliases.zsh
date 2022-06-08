@@ -9,5 +9,5 @@ alias vim='nvim'
 alias npl="nix profile list|awk '{print \$2}'|sort|uniq|sed s/flake:nixpkgs#legacyPackages.x86_64-//g|sed s/darwin\.//g"
 
 # SRE aliases
-alias k="kubectl"
+alias k="kubecolor"
 alias tf="terraform"

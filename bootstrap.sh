@@ -48,6 +48,7 @@ function configure_nix() {
 function install_dependencies() {
     echo "Installing dependencies"
     nix profile install nixpkgs#just
+    nix profile install nixpkgs#ripgrep
 }
 
 function done_bootstrapping() {

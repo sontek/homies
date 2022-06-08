@@ -4,7 +4,7 @@ help:
 # Install apps into nix profile, 'just install-nix "foo bar"
 install-nix nix_apps:
   @for app in {{nix_apps}}; do \
-      if !(nix profile list | grep -q "${app}"); then \
+      if !(nix profile list | rg -q -F "\.${app}"); then \
           echo "Installing ${app}"; \
           outputs=$(nix eval nixpkgs#${app}.outputs |sed 's/[]["]//g'); \
           for out in $outputs; do \
@@ -13,7 +13,7 @@ install-nix nix_apps:
           done; \
           nix profile install nixpkgs#${app}; \
       else \
-          echo "Package already installed, skipping"; \
+          echo "Package ${app} already installed, skipping"; \
       fi \
   done
 
@@ -23,10 +23,13 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
 # Install apps for every day use
 install-system-apps:
   @just install-nix "asdf-vm"
+  @just install-nix "bash"
   @just install-nix "bat"
   @just install-nix "cheat"
   @just install-nix "coreutils"
+  @just install-nix "direnv"
   @just install-nix "exa"
+  @just install-nix "ffmpeg"
   @just install-nix "fzf"
   @just install-nix "gettext"
   @just install-nix "git"
@@ -48,8 +51,8 @@ install-system-apps:
 
 # Install apps for doing SRE work
 install-sre-apps:
-  @just install-nix "argocd awscli2 aws-vault dos2unix redis"
-  @just install-nix "sops"
+  @just install-nix "argocd awscli2 aws-vault dos2unix krew kubie"
+  @just install-nix "kubecolor redis sops stern teleport"
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
@@ -91,6 +94,25 @@ setup-asdf:
       fi \
   done
 
-# Setup development language environments
-setup-dev: setup-asdf
+install-asdf-versions:
+    asdf install kubectl 1.23.5
+    asdf install kubectl 1.21.10
+    asdf install python 3.8.13
+    asdf install python 3.9.12
+    asdf install nodejs 12.22.12
+    asdf install nodejs 16.14.2
+    asdf install golang 1.17.8
+    asdf install golang 1.18
+    asdf install terraform 1.1.8
+    asdf install yarn 1.22.18
+    asdf install poetry 1.1.13
 
+# Setup development language environments
+setup-dev: setup-asdf install-asdf-versions
+
+setup-krew:
+    krew install krew
+    kubectl krew install neat
+    kubectl krew install oidc-login
+    kubectl krew install popeye
+    kubectl krew install resource-capacity

@@ -15,6 +15,9 @@ then
     complete -F __start_kubectl k
 fi
 
+# Enable completions when using aws
+complete -C 'aws_completer' aws
+
 # Load Nix
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
@@ -22,4 +25,11 @@ fi
 
 export DYLD_LIBRARY_PATH=$HOME/.nix-profile/lib/
 
+# Add Nix to $PATH
+export PATH=$HOME/.nix-profile/bin:$PATH
+
+# Add krew to $PATH
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+eval "$(direnv hook zsh)"
 
