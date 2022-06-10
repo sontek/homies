@@ -2,7 +2,7 @@ alias ls='exa -lah'
 alias cat='bat --paging=never'
 alias less='bat --paging=always'
 alias drun='docker run --rm -it -v "${PWD}":/app -w /app'
-alias diff="diff --color -u"
+alias diff='colordiff'
 alias vim='nvim'
 
 # Nix Package list
