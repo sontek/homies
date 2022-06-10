@@ -10,4 +10,5 @@ alias npl="nix profile list|awk '{print \$2}'|sort|uniq|sed s/flake:nixpkgs#lega
 
 # SRE aliases
 alias k="kubecolor"
+alias kctx="kubectl ctx"
 alias tf="terraform"

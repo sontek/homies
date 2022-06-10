@@ -40,6 +40,7 @@ install-system-apps:
   @just install-nix "loc"
   @just install-nix "lz4"
   @just install-nix "minikube"
+  @just install-nix "ncurses"
   @just install-nix "neovim"
   @just install-nix "ripgrep"
   @just install-nix "sd"
@@ -117,3 +118,4 @@ setup-krew:
     kubectl krew install oidc-login
     kubectl krew install popeye
     kubectl krew install resource-capacity
+    kubectl krew install ctx
