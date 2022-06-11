@@ -26,6 +26,7 @@ install-system-apps:
   @just install-nix "bash"
   @just install-nix "bat"
   @just install-nix "cheat"
+  @just install-nix "cmake"
   @just install-nix "colordiff"
   @just install-nix "coreutils"
   @just install-nix "direnv"
