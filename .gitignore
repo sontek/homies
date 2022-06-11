@@ -9,3 +9,4 @@ weechat/sec.conf
 .zsh_history
 .zcompdump
 .zsh_sessions
+dotfiles/nvim/.config/nvim/plugin/*
