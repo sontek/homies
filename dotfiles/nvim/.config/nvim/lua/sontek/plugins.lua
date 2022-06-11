@@ -45,15 +45,6 @@ return require('packer').startup(function(use)
         }
     }
 
-    -- A simple starting screen with most recent edited projects
-    use {
-        'goolord/alpha-nvim',
-        requires = { 'kyazdani42/nvim-web-devicons' },
-        config = function ()
-            require'alpha'.setup(require'alpha.themes.startify'.config)
-        end
-    }
-
     -- fzf-native is a faster sorting plugin for working with large projects
     use {
         'nvim-telescope/telescope-fzf-native.nvim',
