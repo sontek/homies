@@ -54,6 +54,17 @@ return require('packer').startup(function(use)
     -- Very fast syntax highlighting.
     use 'nvim-treesitter/nvim-treesitter'
 
+    -- Some nice icons for making vim look nicer
+    use 'kyazdani42/nvim-web-devicons'
+
+    -- A tree explorer
+    use {
+    'kyazdani42/nvim-tree.lua',
+        requires = {
+          'kyazdani42/nvim-web-devicons',
+        },
+    }
+
     -- Automatically set up configuration after cloning packer.nvim
     -- Should remain at the bottom, after all plugins
     if packer_bootstrap then
@@ -62,5 +73,6 @@ return require('packer').startup(function(use)
 
 	-- load plugin specific settings here
 	require('sontek.telescope')
+	require('sontek.nvim-tree')
 end)
 

@@ -18,3 +18,8 @@ To get everything installed and provisioned you can run:
 ```
 just install
 ```
+
+# Fonts
+I currently use JetBrainsMono Nerd Font patched from here:
+
+- https://www.nerdfonts.com/font-downloads
