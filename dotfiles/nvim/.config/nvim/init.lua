@@ -16,7 +16,7 @@ vim.g.maplocalleader = ' '
 -- Load plugins very early on
 
 require('sontek.plugins')
-
+require('sontek.theme')
 -- My editor configuration / default vim settings.
 require('sontek.settings')
 require('sontek.keymaps')

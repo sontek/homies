@@ -33,6 +33,7 @@ vim.api.nvim_create_autocmd(
 -- so we are just going to return instead of failing the next lines.
 local status_ok, packer = pcall(require, "packer")
 if not status_ok then
+  vim.notify("Packer not initialized yet")
   return
 end
 

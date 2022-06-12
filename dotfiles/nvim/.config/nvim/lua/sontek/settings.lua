@@ -1,9 +1,6 @@
 -- fake it so we kind of look like vimscript.
 local set = vim.opt
 
--- set our colorscheme to gruvbox
-vim.cmd([[colorscheme gruvbox]])
-
 -- Enable 24-bity RGB colors.
 set.termguicolors = true
 
