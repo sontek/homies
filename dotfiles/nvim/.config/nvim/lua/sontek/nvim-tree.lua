@@ -1,5 +1,7 @@
 require('nvim-tree').setup {
-
+  view = {
+    width = 45,
+  }
 }
 
 -- Key mappings for nvim-tree
