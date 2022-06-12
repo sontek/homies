@@ -105,6 +105,9 @@ return require('packer').startup(function(use)
         requires = 'nvim-lua/plenary.nvim',
     }
 
+    -- Plugin for quickly searching the open buffers
+    use 'matbme/JABS.nvim'
+
     -- Automatically set up configuration after cloning packer.nvim
     -- Should remain at the bottom, after all plugins
     if packer_bootstrap then
@@ -115,6 +118,7 @@ return require('packer').startup(function(use)
     require('sontek.telescope')
     require('sontek.nvim-tree')
     require('sontek.gitlinker')
+    require('sontek.JABS')
 
 end)
 

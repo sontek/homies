@@ -1,4 +1,10 @@
 require('sontek.lsp.lsp-installer')
+local config = {
+    -- disable virtual text
+    virtual_text = false,
+}
+
+vim.diagnostic.config(config)
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -9,21 +15,25 @@ local on_attach = function(client, bufnr)
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   local bufopts = { noremap=true, silent=true, buffer=bufnr }
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wl', function()
+  keymap('n', 'gD', vim.lsp.buf.declaration, bufopts)
+  keymap('n', 'gd', vim.lsp.buf.definition, bufopts)
+  keymap('n', 'K', vim.lsp.buf.hover, bufopts)
+  keymap('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  keymap('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+  keymap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder)
+  keymap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+  keymap('n', '<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, bufopts)
-  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
+  keymap('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
+  keymap('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+  keymap('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+  keymap('n', 'gr', vim.lsp.buf.references, bufopts)
+  keymap('n', '<leader>gf', vim.lsp.buf.formatting, bufopts)
+  keymap('n', '<leader>ge', '<cmd>lua vim.diagnostic.open_float()<CR>', bufopts)
+  keymap('n', '<leader>gq', '<cmd>lua vim.diagnostic.setloclist()<CR>', bufopts)
+  keymap('n', 'n', '<cmd>lua vim.diagnostic.goto_prev()<CR>', bufopts)
+  keymap('n', 'm', '<cmd>lua vim.diagnostic.goto_next()<CR>', bufopts)
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and

@@ -9,4 +9,6 @@ keymap("n", "<C-j>", "<C-w>j", opts)
 keymap("n", "<C-k>", "<C-w>k", opts)
 keymap("n", "<C-l>", "<C-w>l", opts)
 
-
+-- Navigate buffers
+keymap("n", "<leader>l", ":bnext<CR>", opts)
+keymap("n", "<leader>h", ":bprevious<CR>", opts)
