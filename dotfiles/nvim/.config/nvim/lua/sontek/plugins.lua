@@ -24,15 +24,32 @@ local packer_group = vim.api.nvim_create_augroup(
 vim.api.nvim_create_autocmd(
     'BufWritePost',
     {
-        command = 'source <afile> | PackerCompile',
-	group = packer_group,
-	pattern = '*/plugins.lua'
+        command = 'source <afile> | PackerSync',
+        group = packer_group,
+        pattern = 'plugins.lua'
     }
 )
+-- The first time you run the configuration we won't have packer yet
+-- so we are just going to return instead of failing the next lines.
+local status_ok, packer = pcall(require, "packer")
+if not status_ok then
+  return
+end
 
+-- Usually packer runs as a split window, we want it as a pop-up since it is
+-- less disruptive.
+packer.init {
+  display = {
+    open_fn = function()
+      return require("packer.util").float { border = "rounded" }
+    end,
+  },
+}
 
 return require('packer').startup(function(use)
-    use 'wbthomason/packer.nvim' -- Package manager
+    use 'wbthomason/packer.nvim' -- Have packer manage itself
+    use "nvim-lua/plenary.nvim" -- Useful lua functions used ny lots of plugins
+
     -- A reasonably decent colorscheme
     use { "ellisonleao/gruvbox.nvim" }
 

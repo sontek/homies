@@ -40,7 +40,7 @@ require('telescope').load_extension('fzf')
 
 -- Key mappings for telescope
 -- Fuzzy search for files in the current working directory
-vim.keymap.set('n', '<leader>ff',
+keymap('n', '<leader>ff',
     function()
       require('telescope.builtin').find_files {
           previewer = false,
@@ -49,13 +49,13 @@ vim.keymap.set('n', '<leader>ff',
     end
 )
 -- Grep for text in the current working directory
-vim.keymap.set(
+keymap(
     'n', '<leader>fg',
     require('telescope.builtin').live_grep
 )
 
 -- Fuzzy search the current buffer
-vim.keymap.set(
+keymap(
   'n', '<leader>fb',
   require('telescope.builtin').current_buffer_fuzzy_find
 )

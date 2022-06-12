@@ -1,3 +1,6 @@
+-- Provide a `keymap()` function everywhere.
+keymap = vim.keymap.set
+
 -- use space as a the leader key
 -- We do this in `init` because <leader> isn't lazy processed.  If a
 -- plugin is using it as part of the keymapping they will use whatever
@@ -16,4 +19,5 @@ require('sontek.plugins')
 
 -- My editor configuration / default vim settings.
 require('sontek.settings')
+require('sontek.keymaps')
 
