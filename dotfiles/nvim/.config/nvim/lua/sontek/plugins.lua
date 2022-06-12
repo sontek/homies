@@ -52,7 +52,7 @@ return require('packer').startup(function(use)
     use "nvim-lua/plenary.nvim" -- Useful lua functions used ny lots of plugins
 
     -- A reasonably decent colorscheme
-    use { "ellisonleao/gruvbox.nvim" }
+    use "ellisonleao/gruvbox.nvim"
 
     -- UI to select things (files, grep results, open buffers...)
     -- https://github.com/nvim-telescope/telescope.nvim
@@ -111,9 +111,10 @@ return require('packer').startup(function(use)
         require('packer').sync()
     end
 
-	-- load plugin specific settings here
-	require('sontek.telescope')
-	require('sontek.nvim-tree')
-	require('sontek.gitlinker')
+    -- load plugin specific settings here
+    require('sontek.telescope')
+    require('sontek.nvim-tree')
+    require('sontek.gitlinker')
+
 end)
 
