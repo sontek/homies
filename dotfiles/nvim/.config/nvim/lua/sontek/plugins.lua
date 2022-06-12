@@ -99,6 +99,12 @@ return require('packer').startup(function(use)
     use "williamboman/nvim-lsp-installer" -- simple to use language server installer
     use "onsails/lspkind.nvim" -- Nice icons around the LSP kinds
 
+    -- Plugin for getting a remote link to GitHub/GitLab
+    use {
+        'ruifm/gitlinker.nvim',
+        requires = 'nvim-lua/plenary.nvim',
+    }
+
     -- Automatically set up configuration after cloning packer.nvim
     -- Should remain at the bottom, after all plugins
     if packer_bootstrap then
@@ -108,5 +114,6 @@ return require('packer').startup(function(use)
 	-- load plugin specific settings here
 	require('sontek.telescope')
 	require('sontek.nvim-tree')
+	require('sontek.gitlinker')
 end)
 
