@@ -83,6 +83,22 @@ return require('packer').startup(function(use)
         },
     }
 
+    -- cmp plugins
+    use "hrsh7th/nvim-cmp" -- The completion plugin
+    use "hrsh7th/cmp-buffer" -- buffer completions
+    use "hrsh7th/cmp-path" -- path completions
+    use "hrsh7th/cmp-cmdline" -- vim cmdline completions
+    use "hrsh7th/cmp-nvim-lsp"
+    use "hrsh7th/cmp-nvim-lua"
+
+    -- snippets
+    use "L3MON4D3/LuaSnip" -- snippet engine
+
+    -- LSP: Language Server Protocol
+    use "neovim/nvim-lspconfig" -- enable LSP from vim
+    use "williamboman/nvim-lsp-installer" -- simple to use language server installer
+    use "onsails/lspkind.nvim" -- Nice icons around the LSP kinds
+
     -- Automatically set up configuration after cloning packer.nvim
     -- Should remain at the bottom, after all plugins
     if packer_bootstrap then

@@ -39,3 +39,6 @@ set.smartcase = true
 -- a little long winded. i.e prevent arrow code.
 set.colorcolumn = '80'
 
+
+-- Configure completion to provide better pop-up experience
+set.completeopt = { "menu", "menuone", "noselect" }

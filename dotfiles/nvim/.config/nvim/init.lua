@@ -1,4 +1,4 @@
--- Provide a `keymap()` function everywhere.
+-- Provide a global `keymap()` function everywhere.
 keymap = vim.keymap.set
 
 -- use space as a the leader key
@@ -20,4 +20,6 @@ require('sontek.theme')
 -- My editor configuration / default vim settings.
 require('sontek.settings')
 require('sontek.keymaps')
+require('sontek.completion')
+require('sontek.lsp')
 
