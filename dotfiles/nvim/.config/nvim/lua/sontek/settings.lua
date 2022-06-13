@@ -4,6 +4,9 @@ local set = vim.opt
 -- Enable 24-bity RGB colors.
 set.termguicolors = true
 
+-- Sets us up so yanks go to the system clipboard
+set.clipboard = "unnamedplus"
+
 -- show line numbers
 set.number = true
 
