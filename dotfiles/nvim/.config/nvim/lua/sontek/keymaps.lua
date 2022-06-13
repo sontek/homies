@@ -13,6 +13,12 @@ keymap("n", "<C-l>", "<C-w>l", opts)
 keymap("n", "<leader>l", ":bnext<CR>", opts)
 keymap("n", "<leader>h", ":bprevious<CR>", opts)
 
+-- Visual --
+-- Stay in indent mode after indenting.  This lets you continue
+-- to indent if you need to
+keymap("v", "<", "<gv", opts)
+keymap("v", ">", ">gv", opts)
+
 -- Visual Block --
 -- Move full block of selected text up and down
 -- i.e if you Shift-V to select a line.

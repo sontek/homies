@@ -32,8 +32,8 @@ local on_attach = function(client, bufnr)
   keymap('n', '<leader>gf', vim.lsp.buf.formatting, bufopts)
   keymap('n', '<leader>ge', '<cmd>lua vim.diagnostic.open_float()<CR>', bufopts)
   keymap('n', '<leader>gq', '<cmd>lua vim.diagnostic.setloclist()<CR>', bufopts)
-  keymap('n', 'n', '<cmd>lua vim.diagnostic.goto_prev()<CR>', bufopts)
-  keymap('n', 'm', '<cmd>lua vim.diagnostic.goto_next()<CR>', bufopts)
+  keymap('n', 'gn', '<cmd>lua vim.diagnostic.goto_prev()<CR>', bufopts)
+  keymap('n', 'gm', '<cmd>lua vim.diagnostic.goto_next()<CR>', bufopts)
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
