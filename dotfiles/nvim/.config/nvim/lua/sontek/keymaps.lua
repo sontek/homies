@@ -2,6 +2,12 @@
 -- just the ones that don't belong to a specific plugin
 local opts = { noremap = true, silent = true }
 
+-- Resize windows with arrows
+keymap("n", "<S-Up>", ":resize -2<CR>", opts)
+keymap("n", "<S-Down>", ":resize +2<CR>", opts)
+keymap("n", "<S-Left>", ":vertical resize -2<CR>", opts)
+keymap("n", "<S-Right>", ":vertical resize +2<CR>", opts)
+
 -- Normal --
 -- Improve window navigation
 keymap("n", "<C-h>", "<C-w>h", opts)

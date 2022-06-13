@@ -108,6 +108,8 @@ return require('packer').startup(function(use)
     -- Plugin for quickly searching the open buffers
     use 'matbme/JABS.nvim'
 
+    use {"akinsho/toggleterm.nvim", tag = 'v1.*'}
+
     -- Automatically set up configuration after cloning packer.nvim
     -- Should remain at the bottom, after all plugins
     if packer_bootstrap then
@@ -119,6 +121,7 @@ return require('packer').startup(function(use)
     require('sontek.nvim-tree')
     require('sontek.gitlinker')
     require('sontek.JABS')
+    require('sontek.toggleterm')
 
 end)
 
