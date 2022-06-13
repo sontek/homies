@@ -12,3 +12,12 @@ keymap("n", "<C-l>", "<C-w>l", opts)
 -- Navigate buffers
 keymap("n", "<leader>l", ":bnext<CR>", opts)
 keymap("n", "<leader>h", ":bprevious<CR>", opts)
+
+-- Visual Block --
+-- Move full block of selected text up and down
+-- i.e if you Shift-V to select a line.
+keymap("x", "J", ":move '>+1<CR>gv-gv", opts)
+keymap("x", "K", ":move '<-2<CR>gv-gv", opts)
+keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
+keymap("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
+
