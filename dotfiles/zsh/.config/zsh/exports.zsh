@@ -31,5 +31,10 @@ export PATH=$HOME/.nix-profile/bin:$PATH
 # Add krew to $PATH
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+# Add rust to the $PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
 eval "$(direnv hook zsh)"
 
+# Use ipdb by default when debugging python
+export PYTHONBREAKPOINT=ipdb.set_trace
