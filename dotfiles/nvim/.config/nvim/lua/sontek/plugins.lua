@@ -110,6 +110,13 @@ return require('packer').startup(function(use)
 
     use {"akinsho/toggleterm.nvim", tag = 'v1.*'}
 
+
+    -- give us the ability to preview markdown files like README.md locally
+    -- before pushing to the origin.
+    use({
+        "iamcco/markdown-preview.nvim",
+        run = function() vim.fn["mkdp#util#install"]() end,
+    })
     -- Automatically set up configuration after cloning packer.nvim
     -- Should remain at the bottom, after all plugins
     if packer_bootstrap then
