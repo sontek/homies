@@ -10,3 +10,4 @@ weechat/sec.conf
 .zcompdump
 .zsh_sessions
 dotfiles/nvim/.config/nvim/plugin/*
+.DS_Store

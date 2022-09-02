@@ -32,29 +32,38 @@ install-system-apps:
   @just install-nix "direnv"
   @just install-nix "exa"
   @just install-nix "ffmpeg"
+  @just install-nix "fontconfig"
   @just install-nix "fzf"
   @just install-nix "gettext"
   @just install-nix "git"
   @just install-nix "gnupg"
+  @just install-nix "harfbuzz"
   @just install-nix "jless"
   @just install-nix "jq"
+  #@just install-nix "libgit2"
+  @just install-nix "libgit2_1_3_0"
+  @just install-nix "libffi"
   @just install-nix "loc"
   @just install-nix "lz4"
   @just install-nix "minikube"
   @just install-nix "ncurses"
+  @just install-nix "openssl"
+  @just install-nix "pango"
   @just install-nix "neovim"
   @just install-nix "ripgrep"
   @just install-nix "sd"
   @just install-nix "stow"
   @just install-nix "tmux"
+  @just install-nix "visidata"
   @just install-nix "watch"
+  @just install-nix "watchman"
   @just install-nix "xh"
   @just install-nix "yq"
   @just install-nix "zsh"
 
 # Install apps for doing SRE work
 install-sre-apps:
-  @just install-nix "argocd awscli2 aws-vault dos2unix krew kubie"
+  @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
   @just install-nix "kubecolor redis sops stern teleport"
 
 # Install all applications
@@ -84,7 +93,7 @@ install-dotfiles:
 remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
-asdf_plugins := "nodejs python golang helm yarn poetry kubectl terraform"
+asdf_plugins := "nodejs python golang helm yarn poetry kubectl terraform postgres pnpm"
 # Configure ASDF with all desired plugins
 setup-asdf:
   @for plugin in {{asdf_plugins}}; do \
@@ -102,6 +111,7 @@ install-asdf-versions:
     asdf install kubectl 1.21.10
     asdf install python 3.8.13
     asdf install python 3.9.12
+    asdf install python 3.9.13
     asdf install nodejs 12.22.12
     asdf install nodejs 16.14.2
     asdf install golang 1.17.8
@@ -109,6 +119,7 @@ install-asdf-versions:
     asdf install terraform 1.1.8
     asdf install yarn 1.22.18
     asdf install poetry 1.1.13
+    asdf install pnpm 7.9.5
 
 # Setup development language environments
 setup-dev: setup-asdf install-asdf-versions
@@ -117,6 +128,5 @@ setup-krew:
     krew install krew
     kubectl krew install neat
     kubectl krew install oidc-login
-    kubectl krew install popeye
     kubectl krew install resource-capacity
     kubectl krew install ctx
