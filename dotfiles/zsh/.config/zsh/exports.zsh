@@ -23,24 +23,6 @@ if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
-export CRYPTO_PATH=$(find /nix/store -name libcrypto.dylib|grep openssl|head -n1|sed 's/\/lib\/libcrypto.dylib//g')
-export OPENSSL_PATH="/nix/store/$(/bin/ls /nix/store|grep openssl|grep dev|head -n1)"
-export MAIN_NIX_PATH=$HOME/.nix-profile
-export GOBJECT_PATH=$(find /nix/store -name "libgobject-2.0.0.dylib" |head -n1|sed 's/\/lib\/libgobject-2.0.0.dylib//g')
-export PANGO_PATH=$(find /nix/store -name "libpango-1.0.0.dylib" |head -n1|sed 's/\/lib\/libpango-1.0.0.dylib//g')
-export HARFBUZZ_PATH=$(find /nix/store -name "libharfbuzz.dylib" |head -n1|sed 's/\/lib\/libharfbuzz.dylib//g')
-export FONTCONFIG_PATH=$(find /nix/store -name "libfontconfig.dylib" |head -n1|sed 's/\/lib\/libfontconfig.dylib//g')
-C_PATHS=("$CRYPTO_PATH" "$OPENSSL_PATH" "$MAIN_NIX_PATH" "$GOBJECT_PATH" "$PANGO_PATH" "$HARFBUZZ_PATH" "$FONTCONFIG_PATH")
-
-
-for p in ${C_PATHS[@]}; do
-  export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$p/lib/"
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$p/lib/"
-  export CFLAGS="$CFLAGS -I$p/include/"
-  export CPPFLAGS="$CPPFLAGS -I$p/include/"
-  export LDFLAGS="$LDFLAGS -L$p/lib/"
-done
-
 # Add Nix to $PATH
 export PATH=$HOME/.nix-profile/bin:$PATH
 
@@ -54,3 +36,12 @@ eval "$(direnv hook zsh)"
 
 # Use ipdb by default when debugging python
 export PYTHONBREAKPOINT=ipdb.set_trace
+
+# Load dynamic files that we generate from libs.sh that isn't committed to 
+# git.
+if ! [[ -f "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh" ]]
+then
+    ${XDG_CONFIG_HOME}/zsh/libs.sh
+fi
+
+. "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh"
