@@ -19,6 +19,13 @@ To get everything installed and provisioned you can run:
 just install
 ```
 
+# Vim
+To update the plugins used in nvim:
+
+```
+:PackerUpdate
+```
+
 # Fonts
 I currently use JetBrainsMono Nerd Font patched from here:
 

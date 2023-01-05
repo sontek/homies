@@ -108,7 +108,7 @@ return require('packer').startup(function(use)
     -- Plugin for quickly searching the open buffers
     use 'matbme/JABS.nvim'
 
-    use {"akinsho/toggleterm.nvim", tag = 'v1.*'}
+    use {"akinsho/toggleterm.nvim", tag = 'v2.*'}
 
 
     -- give us the ability to preview markdown files like README.md locally
