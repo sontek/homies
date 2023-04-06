@@ -18,6 +18,7 @@ fi
 # Enable completions when using aws
 complete -C 'aws_completer' aws
 
+export NIXPKGS_ALLOW_UNFREE=1
 # Load Nix
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
