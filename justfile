@@ -1,3 +1,5 @@
+set dotenv-load
+
 help:
   @just --list
 
@@ -30,15 +32,19 @@ install-system-apps:
   @just install-nix "cmake"
   @just install-nix "colordiff"
   @just install-nix "coreutils"
+  @just install-nix "cue"
   @just install-nix "direnv"
+  @just install-nix "earthly"
   @just install-nix "exa"
   @just install-nix "ffmpeg"
   @just install-nix "fontconfig"
   @just install-nix "fzf"
   @just install-nix "gettext"
+  @just install-nix "gh"
   @just install-nix "git"
   @just install-nix "gnupg"
   @just install-nix "harfbuzz"
+  @just install-nix "heroku"
   @just install-nix "jless"
   @just install-nix "jq"
   @just install-nix "k6"
@@ -49,6 +55,7 @@ install-system-apps:
   @just install-nix "lz4"
   @just install-nix "minikube"
   @just install-nix "ncurses"
+  @just install-nix "ngrok"
   @just install-nix "openssl"
   @just install-nix "pandoc"
   @just install-nix "pango"
@@ -76,7 +83,7 @@ install: install-system-apps install-sre-apps install-fun-apps
 
 # Upgrade all installed applications
 nix-upgrade:
-  nix profile upgrade '.*'
+  nix profile upgrade '.*' --impure
 
 # Repair the nix store
 nix-repair:
@@ -97,7 +104,7 @@ install-dotfiles:
 remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
-asdf_plugins := "nodejs python golang helm yarn poetry kubectl terraform terragrunt postgres pnpm sentinel skaffold"
+asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt"
 # Configure ASDF with all desired plugins
 setup-asdf:
   @for plugin in {{asdf_plugins}}; do \
