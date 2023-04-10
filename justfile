@@ -113,7 +113,9 @@ setup-asdf:
           echo 'Adding asdf' ${plugin}; \
           asdf plugin add ${plugin}; \
       else \
-          echo "Asdf plugin ${plugin} already installed"; \
+          echo "Asdf plugin ${plugin} already installed. Removing it"; \
+          asdf plugin remove ${plugin}; \
+          asdf plugin add ${plugin}; \
       fi \
   done
 
