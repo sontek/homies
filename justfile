@@ -67,6 +67,7 @@ install-system-apps:
   @just install-nix "visidata"
   @just install-nix "watch"
   @just install-nix "watchman"
+  @just install-nix "wget"
   @just install-nix "xh"
   @just install-nix "yq"
   @just install-nix "zsh"
@@ -74,7 +75,7 @@ install-system-apps:
 # Install apps for doing SRE work
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
-  @just install-nix "kubecolor redis sops stern teleport"
+  @just install-nix "kubecolor redis sops stern teleport terraformer"
   @just install-nix "helm-docs"
 
 # Install all applications

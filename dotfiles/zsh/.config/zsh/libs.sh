@@ -1,6 +1,6 @@
 #!/bin/bash
-CRYPTO_PATH=$(find /nix/store -name libcrypto.dylib|grep openssl-3|head -n1|sed 's/\/lib\/libcrypto.dylib//g')
-OPENSSL_PATH="/nix/store/$(/bin/ls /nix/store|grep openssl-3|grep dev|head -n1)"
+CRYPTO_PATH=$(find /nix/store -name libcrypto.dylib|grep openssl-1|head -n1|sed 's/\/lib\/libcrypto.dylib//g')
+1PENSSL_PATH="/nix/store/$(/bin/ls /nix/store|grep openssl-1|grep dev|head -n1)"
 MAIN_NIX_PATH=$HOME/.nix-profile
 GOBJECT_PATH=$(find /nix/store -name "libgobject-2.0.0.dylib" |head -n1|sed 's/\/lib\/libgobject-2.0.0.dylib//g')
 PANGO_PATH=$(find /nix/store -name "libpango-1.0.0.dylib" |head -n1|sed 's/\/lib\/libpango-1.0.0.dylib//g')
