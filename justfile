@@ -26,6 +26,7 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
 install-system-apps:
   @just install-nix "act"
   @just install-nix "asdf-vm"
+  @just install-nix "azure-cli"
   @just install-nix "bash"
   @just install-nix "bat"
   @just install-nix "cheat"
