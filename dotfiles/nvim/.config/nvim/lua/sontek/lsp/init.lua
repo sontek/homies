@@ -1,4 +1,4 @@
-require('sontek.lsp.lsp-installer')
+require('sontek.lsp.mason')
 local config = {
     -- disable virtual text
     virtual_text = false,
@@ -47,6 +47,11 @@ local servers = {
     'terraformls',
     'tsserver'
 }
+
+require("mason-lspconfig").setup {
+    ensure_installed = servers
+}
+
 for _, lsp in pairs(servers) do
     local capabilities = require('cmp_nvim_lsp').default_capabilities(
         vim.lsp.protocol.make_client_capabilities()

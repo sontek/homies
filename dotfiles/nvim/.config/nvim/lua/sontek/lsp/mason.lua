@@ -1,4 +1,4 @@
-require("nvim-lsp-installer").setup {
+require("mason").setup {
     -- automatically detect which servers to install
     -- based on which servers are set up via lspconfig
     automatic_installation = true,

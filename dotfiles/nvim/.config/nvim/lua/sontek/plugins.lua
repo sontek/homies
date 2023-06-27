@@ -96,7 +96,12 @@ return require('packer').startup(function(use)
 
     -- LSP: Language Server Protocol
     use "neovim/nvim-lspconfig" -- enable LSP from vim
-    use "williamboman/nvim-lsp-installer" -- simple to use language server installer
+
+    use {
+        "williamboman/mason.nvim",
+        run = ":MasonUpdate" -- :MasonUpdate updates registry contents
+    }
+    use "williamboman/mason-lspconfig.nvim"
     use "onsails/lspkind.nvim" -- Nice icons around the LSP kinds
 
     -- Plugin for getting a remote link to GitHub/GitLab
