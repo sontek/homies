@@ -24,13 +24,13 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
 
 # Install apps for every day use
 install-system-apps:
-  @just install-nix "act"
   @just install-nix "asdf-vm"
   @just install-nix "azure-cli"
   @just install-nix "bash"
   @just install-nix "bat"
   @just install-nix "cheat"
   @just install-nix "cmake"
+  @just install-nix "colima"
   @just install-nix "colordiff"
   @just install-nix "coreutils"
   @just install-nix "cue"
@@ -56,7 +56,8 @@ install-system-apps:
   @just install-nix "lz4"
   @just install-nix "minikube"
   @just install-nix "ncurses"
-  @just install-nix "ngrok"
+  # TODO: Figure out how to force impure
+  #@just install-nix "ngrok"
   @just install-nix "openssl"
   @just install-nix "pandoc"
   @just install-nix "pango"
@@ -77,7 +78,7 @@ install-system-apps:
 # Install apps for doing SRE work
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
-  @just install-nix "kubecolor redis sops stern teleport terraformer"
+  @just install-nix "kind kubecolor redis sops stern teleport terraformer"
   @just install-nix "helm-docs"
 
 # Install all applications

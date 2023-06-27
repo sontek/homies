@@ -4,4 +4,8 @@ source ${ZDOTDIR}/.zshrc
 
 # Use this sparingly, nix is preferred, but have it available
 # just in case.
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if command -v brew &> /dev/null
+then
+    eval "$(brew shellenv)"
+fi
+
