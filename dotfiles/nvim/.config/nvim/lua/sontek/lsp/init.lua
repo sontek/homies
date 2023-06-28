@@ -45,6 +45,7 @@ local servers = {
     'pyright',
     'rust_analyzer',
     'terraformls',
+    'tflint',
     'tsserver'
 }
 
