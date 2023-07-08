@@ -9,3 +9,4 @@ then
     eval "$(brew shellenv)"
 fi
 
+ulimit -n 4096
