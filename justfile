@@ -62,6 +62,7 @@ install-system-apps:
   @just install-nix "openssl"
   @just install-nix "pandoc"
   @just install-nix "pango"
+  @just install-nix "pkg-config"
   @just install-nix "pwgen"
   @just install-nix "neovim"
   @just install-nix "ripgrep"

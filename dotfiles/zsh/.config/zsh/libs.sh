@@ -17,6 +17,7 @@ for p in ${C_PATHS[@]}; do
   LDFLAGS="$LDFLAGS -L$p/lib/"
 done
 
+PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$(find /nix/store -name openssl.pc|head -n1| sed 's/openssl.pc//g')"
 EXPORT_FILE=${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh
 echo "Deleting $EXPORT_FILE"
 rm $EXPORT_FILE 
@@ -24,4 +25,5 @@ echo "export DYLD_LIBRARY_PATH=\"$DYLD_LIBRARY_PATH\"" >> $EXPORT_FILE
 echo "export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\"" >> $EXPORT_FILE
 echo "export CFLAGS=\"$CFLAGS\"" >> $EXPORT_FILE
 echo "export LDFLAGS=\"$LDFLAGS\"" >> $EXPORT_FILE
+echo "export PKG_CONFIG_PATH=\"$PKG_CONFIG_PATH\"" >> $EXPORT_FILE
 
