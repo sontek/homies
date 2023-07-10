@@ -80,7 +80,7 @@ install-system-apps:
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
   @just install-nix "kind kubecolor redis sops stern teleport terraformer"
-  @just install-nix "helm-docs"
+  @just install-nix "qemu helm-docs"
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
