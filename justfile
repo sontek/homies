@@ -25,6 +25,7 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
 # Install apps for every day use
 install-system-apps:
   @just install-nix "asdf-vm"
+  @just install-nix "atuin"
   @just install-nix "azure-cli"
   @just install-nix "bash"
   @just install-nix "bat"

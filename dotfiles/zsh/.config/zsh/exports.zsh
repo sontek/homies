@@ -48,4 +48,7 @@ then
     ${XDG_CONFIG_HOME}/zsh/libs.sh
 fi
 
+# Load atuin for history
+eval "$(atuin init zsh)"
+
 . "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh"
