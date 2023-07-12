@@ -51,4 +51,6 @@ fi
 # Load atuin for history
 eval "$(atuin init zsh)"
 
+# Setup the KUBECONFIG env var to use ~/kubeconfigs
+export KUBECONFIG=$(find ~/kubeconfigs -type f|xargs|tr -s '[:blank:]' ':')
 . "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh"
