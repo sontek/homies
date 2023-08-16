@@ -48,7 +48,6 @@ install-system-apps:
   @just install-nix "harfbuzz"
   @just install-nix "heroku"
   @just install-nix "jless"
-  @just install-nix "jq"
   @just install-nix "k6"
   #@just install-nix "libgit2"
   @just install-nix "libgit2_1_3_0"
@@ -74,14 +73,13 @@ install-system-apps:
   @just install-nix "watchman"
   @just install-nix "wget"
   @just install-nix "xh"
-  @just install-nix "yq"
   @just install-nix "zsh"
 
 # Install apps for doing SRE work
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
   @just install-nix "kind kubecolor redis sops stern teleport terraformer"
-  @just install-nix "qemu helm-docs"
+  @just install-nix "qemu helm-docs kafkactl"
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
@@ -110,7 +108,7 @@ install-dotfiles:
 remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
 
-asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt rust"
+asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt rust kops yq jq"
 # Configure ASDF with all desired plugins
 setup-asdf:
   @for plugin in {{asdf_plugins}}; do \
