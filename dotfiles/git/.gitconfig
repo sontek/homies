@@ -1,15 +1,33 @@
 [commit]
-  template = ~/.gitmessage
+    template = ~/.gitmessage
 
 [user]
-	name = John Anderson
-	email = sontek@gmail.com
+    name = John Anderson
+    email = sontek@gmail.com
 
 [includeIf "gitdir:~/code/ditto/"]
-  path = .gitconfig-ditto
+    path = .gitconfig-ditto
 
 [url "ssh://git@gitlab.com/"]
-  insteadOf = https://gitlab.com/
+    insteadOf = https://gitlab.com/
 
 [credential]
-	helper = store
+    helper = store
+
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true    # use n and N to move between diff sections
+    light = false
+    side-by-side = true
+    line-numbers = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default

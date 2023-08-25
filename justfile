@@ -35,6 +35,7 @@ install-system-apps:
   @just install-nix "colordiff"
   @just install-nix "coreutils"
   @just install-nix "cue"
+  @just install-nix "delta"
   @just install-nix "direnv"
   @just install-nix "earthly"
   @just install-nix "exa"
