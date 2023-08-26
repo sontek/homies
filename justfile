@@ -37,6 +37,7 @@ install-system-apps:
   @just install-nix "cue"
   @just install-nix "delta"
   @just install-nix "direnv"
+  @just install-nix "duf"
   @just install-nix "earthly"
   @just install-nix "exa"
   @just install-nix "ffmpeg"
