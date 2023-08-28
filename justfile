@@ -75,6 +75,7 @@ install-system-apps:
   @just install-nix "watchman"
   @just install-nix "wget"
   @just install-nix "xh"
+  @just install-nix "zellij"
   @just install-nix "zsh"
 
 # Install apps for doing SRE work
