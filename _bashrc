@@ -171,7 +171,7 @@ _complete_hosts () {
     return 0
 }
 
-export LESS="-X"
+export LESS="-X -R"
 alias clean_pycs='find . -name "*.pyc" -exec rm {} \;'
 
 complete -F _complete_hosts ssh
