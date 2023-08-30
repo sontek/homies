@@ -1,6 +1,6 @@
 [user]
     name = Ki Sung Bae
-    email = ksbae@36sprints.com
+    email = ksbae@pocl.io
 
 [color]
     diff = auto
@@ -13,7 +13,7 @@
 
 [core]
     editor = vim
-    pager = less -R
+pager = less -R
 
 [alias]
     diverges = !bash -c 'diff -u <(git rev-list --first-parent "${1}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
@@ -30,11 +30,18 @@
     clean-merged = !git branch --merged | grep -v \"\\*\" | grep -v master | grep -v dev | grep -v release | xargs -n 1 git branch -d
 
 
+[diff]
+    tool = vscode
 [merge]
-    tool = mymeld
+    tool = vimdiff
     conflictstyle = diff3
 [mergetool "mymeld"]
     cmd = meld --diff $LOCAL $BASE --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
+[difftool "vscode"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+[mergetool "vscode"]
+    cmd = code --wait --diff $MERGED
+
 
 [pull]
 	rebase = false

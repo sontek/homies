@@ -183,7 +183,6 @@ export GIT_EDITOR='vim'
 export WORKON_HOME='~/.virtualenvs'
 export PROJECT_HOME=$HOME
 export PATH="$PATH:$HOME/.local/bin"
-source ~/.local/bin/virtualenvwrapper.sh
 alias androidstudio='XMODIFIERS= ~/android-studio/bin/studio.sh'
 
 # for Android dev
