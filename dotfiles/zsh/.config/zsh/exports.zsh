@@ -36,6 +36,14 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Add hombrew
 export PATH="$PATH:/opt/homebrew/bin"
 
+# Enable RTX activations
+if command -v rtx &> /dev/null
+then
+    eval "$(rtx activate zsh)"
+    eval "$(rtx completion zsh)"
+fi
+
+
 eval "$(direnv hook zsh)"
 
 # Use ipdb by default when debugging python
