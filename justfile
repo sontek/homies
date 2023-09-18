@@ -4,16 +4,16 @@ help:
   @just --list
 
 # Install apps into nix profile, 'just install-nix "foo bar"
-install-nix nix_apps:
+install-nix nix_apps args="":
   @for app in {{nix_apps}}; do \
       if !(nix profile list | rg -q -F "\.${app}"); then \
           echo "Installing ${app}"; \
           outputs=$(nix eval nixpkgs#${app}.outputs |sed 's/[]["]//g'); \
           for out in $outputs; do \
               echo "Building output ${out} for ${app}"; \
-              nix build nixpkgs#${app}.${out}; \
+              nix build {{ args }} nixpkgs#${app}.${out}; \
           done; \
-          nix profile install nixpkgs#${app}; \
+          nix profile install {{ args }} nixpkgs#${app}; \
       else \
           echo "Package ${app} already installed, skipping"; \
       fi \
@@ -38,6 +38,7 @@ install-system-apps:
   @just install-nix "cue"
   @just install-nix "delta"
   @just install-nix "direnv"
+  @just install-nix "docker-ls"
   @just install-nix "duf"
   @just install-nix "earthly"
   @just install-nix "eza"
@@ -60,8 +61,7 @@ install-system-apps:
   @just install-nix "lz4"
   @just install-nix "minikube"
   @just install-nix "ncurses"
-  # TODO: Figure out how to force impure
-  #@just install-nix "ngrok"
+  @just install-nix "ngrok" "--impure"
   @just install-nix "openssl"
   @just install-nix "pandoc"
   @just install-nix "pango"
