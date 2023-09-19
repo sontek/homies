@@ -1,11 +1,12 @@
 # Setup the environment to have ASDF controlled
 # binaries be that the fron of the path
-if command -v asdf &> /dev/null
-then
-    ASDF_PATH=$(asdf info|grep ASDF_DIR|awk -F'=' '{ print $2}')
-    . $ASDF_PATH/asdf.sh
-    . $ASDF_PATH/completions/asdf.bash
-fi
+# Use rtx now
+#if command -v asdf &> /dev/null
+#then
+#    ASDF_PATH=$(asdf info|grep ASDF_DIR|awk -F'=' '{ print $2}')
+#    . $ASDF_PATH/asdf.sh
+#    . $ASDF_PATH/completions/asdf.bash
+#fi
 
 
 # Enable completions when using kubectl
@@ -53,6 +54,7 @@ export PYTHONBREAKPOINT=ipdb.set_trace
 # git.
 if ! [[ -f "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh" ]]
 then
+    echo "Regenerating dynamic exports"
     ${XDG_CONFIG_HOME}/zsh/libs.sh
 fi
 

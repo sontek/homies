@@ -1,3 +1,4 @@
+export TERM="xterm"
 export PS1="> "
 
 # Enable bash compatible completions for

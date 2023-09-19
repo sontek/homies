@@ -38,5 +38,5 @@ setopt PROMPT_SUBST
 # %B / %b = start/stop bold
 # %~ = path releative to $HOME
 NL=$'\n'
-PROMPT='%{$fg[yellow]%}%~%{$fg[green]%}$(git_prompt)$(kube_prompt)%(?.%{$fg[blue]%}.%{$fg[red]%})$NL%B❯%b '
+PROMPT='[%m]%{$fg[yellow]%}%~%{$fg[green]%}$(git_prompt)$(kube_prompt)%(?.%{$fg[blue]%}.%{$fg[red]%})$NL%B❯%b '
 
