@@ -44,6 +44,12 @@ then
     eval "$(rtx completion zsh)"
 fi
 
+# Setup starship for a nice prompt
+if command -v starship &> /dev/null
+then
+    eval "$(starship init zsh)"
+fi
+
 
 eval "$(direnv hook zsh)"
 

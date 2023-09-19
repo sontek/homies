@@ -73,6 +73,7 @@ install-system-apps:
   @just install-nix "ripgrep"
   @just install-nix "rtx"
   @just install-nix "sd"
+  @just install-nix "starship"
   @just install-nix "stow"
   @just install-nix "tmux"
   @just install-nix "unzip"

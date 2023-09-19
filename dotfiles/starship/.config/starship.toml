@@ -1,0 +1,64 @@
+add_newline = true
+format = '''[$cmd_duration](bold purple)
+[$hostname](bold red)[$git_branch](bold blue) [$kubernetes](bold cyan) [$aws](bold orange)
+[$directory](bold green)
+[$character](bold yellow)
+'''
+
+[directory]
+disabled = false
+format = '[$path]($style)[$read_only]($read_only_style)'
+truncate_to_repo = false
+truncation_length = 7
+
+[cmd_duration]
+disabled = false
+
+[character]
+# success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red) "
+
+[git_branch]
+symbol = 'git:'
+format = '[\[$symbol$branch(:$remote_branch)\]]($style)'
+truncation_symbol = ""
+
+[aws]
+disabled = false
+symbol = 'aws:'
+format = '[\[$symbol($profile)(\($region\))(\[$duration\])\]]($style)'
+
+[kubernetes]
+symbol = 'k8s:'
+format = '[\[$symbol$context( \($namespace\))\]]($style)'
+disabled = false
+
+[terraform]
+disabled = false
+symbol = "tf(bold)"
+format = "[$symbol $version $workspace]($style)"
+  
+[hostname]
+ssh_only = false
+disabled = false
+format =  "[$hostname](bold red) "
+
+[package]
+disabled = true
+
+
+[ruby]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[python]
+disabled = true
+
+[golang]
+disabled = true
+
+[rust]
+disabled = true
+
