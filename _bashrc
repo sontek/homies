@@ -200,7 +200,6 @@ if [ -f ~/.git-completion.bash ]; then
 source ~/.git-completion.bash
 fi
 
-export JAVA_HOME=/usr/lib/jvm/default-java
 export LANG=ko_KR.utf8 
 export GOOGLE_CLOUD_SDK=/usr/lib/google-cloud-sdk
 
