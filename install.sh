@@ -34,6 +34,4 @@ else
     do
         link_file $i
     done
-
-    sudo pip install flake8
 fi

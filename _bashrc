@@ -214,3 +214,13 @@ if [ -f $GOOGLE_CLOUD_SDK_PATH/path.bash.inc ]; then source $GOOGLE_CLOUD_SDK_PA
 if [ -f $GOOGLE_CLOUD_SDK_PATH/completion.bash.inc ]; then source $GOOGLE_CLOUD_SDK_PATH/completion.bash.inc; fi
 
 alias restart_network='sudo systemctl restart NetworkManager.service'
+
+if [ -z "${JAVA_HOME}" ]
+then
+    JAVA_HOME=$(readlink -nf $(which java) | xargs dirname | xargs dirname)
+    if [ ! -e "$JAVA_HOME" ]
+    then
+        JAVA_HOME=""
+    fi
+    export JAVA_HOME=$JAVA_HOME
+fi

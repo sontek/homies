@@ -33,7 +33,7 @@ pager = less -R
 [diff]
     tool = vscode
 [merge]
-    tool = vimdiff
+    tool = vscode
     conflictstyle = diff3
 [mergetool "mymeld"]
     cmd = meld --diff $LOCAL $BASE --diff $BASE $REMOTE --diff $LOCAL $MERGED $REMOTE
