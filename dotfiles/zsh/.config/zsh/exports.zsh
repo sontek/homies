@@ -37,6 +37,9 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Add hombrew
 export PATH="$PATH:/opt/homebrew/bin"
 
+# Use newer llvm from homebrew
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
 # Enable RTX activations
 if command -v rtx &> /dev/null
 then

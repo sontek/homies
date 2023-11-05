@@ -48,11 +48,13 @@ install-system-apps:
   @just install-nix "gettext"
   @just install-nix "gh"
   @just install-nix "git"
+  @just install-nix "git-crypt"
   @just install-nix "gnumake"
   @just install-nix "gnupg"
   @just install-nix "graphviz"
   @just install-nix "harfbuzz"
   @just install-nix "heroku"
+  @just install-nix "icu72"
   @just install-nix "jless"
   @just install-nix "k6"
   #@just install-nix "libgit2"
@@ -89,7 +91,7 @@ install-system-apps:
 install-sre-apps:
   @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
   @just install-nix "kind kubecolor redis sops stern teleport terraformer"
-  @just install-nix "qemu helm-docs kafkactl"
+  @just install-nix "qemu helm-docs kafkactl cilium-cli"
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
