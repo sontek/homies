@@ -24,6 +24,7 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
 
 # Install apps for every day use
 install-system-apps:
+  @just install-nix "asciinema"
   @just install-nix "asdf-vm"
   @just install-nix "atuin"
   @just install-nix "azure-cli"
@@ -57,6 +58,7 @@ install-system-apps:
   @just install-nix "icu72"
   @just install-nix "jless"
   @just install-nix "k6"
+  @just install-nix "k9s"
   #@just install-nix "libgit2"
   @just install-nix "libgit2_1_3_0"
   @just install-nix "libffi"
@@ -76,6 +78,7 @@ install-system-apps:
   @just install-nix "ripgrep"
   @just install-nix "rtx"
   @just install-nix "sd"
+  @just install-nix "shellcheck"
   @just install-nix "starship"
   @just install-nix "stow"
   @just install-nix "tmux"
