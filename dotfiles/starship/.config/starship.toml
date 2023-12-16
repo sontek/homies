@@ -40,7 +40,7 @@ format = "[$symbol $version $workspace]($style)"
   
 [hostname]
 ssh_only = false
-disabled = false
+disabled = true
 format =  "[$hostname](bold red) "
 
 [package]
