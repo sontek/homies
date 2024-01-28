@@ -81,6 +81,7 @@ install-system-apps:
   @just install-nix "shellcheck"
   @just install-nix "starship"
   @just install-nix "stow"
+  @just install-nix "terraform-docs"
   @just install-nix "tmux"
   @just install-nix "unzip"
   @just install-nix "visidata"

@@ -4,27 +4,7 @@ echo "Bootstrapping the homies!"
 
 # We need Nix to download all the applications we need
 function install_nix() {
-    echo "Downloading the nix installer..."
-    curl -s -L --output /tmp/nix_installer.sh https://nixos.org/nix/install
-    echo "Installing nix..."
-    chmod +x /tmp/nix_installer.sh
-    # We use single user mode for debian since it is supported
-    if [ "$(grep -Ei 'debian|buntu|mint' /etc/*release)" ]; then
-       yes | /tmp/nix_installer.sh --no-daemon
-    else
-       yes | /tmp/nix_installer.sh --daemon
-    fi
-    echo "Activating the Nix environment"
-
-    nix_env_path1=/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-    if [ -f "$nix_env_path1" ]; then
-        source $nix_env_path1
-    fi
-
-    nix_env_path2=~/.nix-profile/etc/profile.d/nix.sh
-    if [ -f "$nix_env_path2" ]; then
-        source $nix_env_path2
-    fi
+    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 }
 
 # Configure Nix so we can use experimental features
@@ -49,6 +29,7 @@ function install_dependencies() {
     echo "Installing dependencies"
     nix profile install nixpkgs#just
     nix profile install nixpkgs#ripgrep
+
 }
 
 function done_bootstrapping() {
