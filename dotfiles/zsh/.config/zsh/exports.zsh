@@ -41,10 +41,10 @@ export PATH="$PATH:/opt/homebrew/bin"
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
 # Enable RTX activations
-if command -v rtx &> /dev/null
+if command -v mise &> /dev/null
 then
-    eval "$(rtx activate zsh)"
-    eval "$(rtx completion zsh)"
+    eval "$(mise activate zsh)"
+    eval "$(mise completion zsh)"
 fi
 
 # Setup starship for a nice prompt

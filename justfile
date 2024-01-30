@@ -25,7 +25,6 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
 # Install apps for every day use
 install-system-apps:
   @just install-nix "asciinema"
-  @just install-nix "asdf-vm"
   @just install-nix "atuin"
   @just install-nix "azure-cli"
   @just install-nix "bash"
@@ -33,7 +32,6 @@ install-system-apps:
   @just install-nix "bottom"
   @just install-nix "cheat"
   @just install-nix "cmake"
-  @just install-nix "colima"
   @just install-nix "colordiff"
   @just install-nix "coreutils"
   @just install-nix "cue"
