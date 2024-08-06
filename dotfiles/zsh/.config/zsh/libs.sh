@@ -6,7 +6,9 @@ GOBJECT_PATH=$(find /nix/store -name "libgobject-2.0.0.dylib" |head -n1|sed 's/\
 PANGO_PATH=$(find /nix/store -name "libpango-1.0.0.dylib" |head -n1|sed 's/\/lib\/libpango-1.0.0.dylib//g')
 HARFBUZZ_PATH=$(find /nix/store -name "libharfbuzz.dylib" |head -n1|sed 's/\/lib\/libharfbuzz.dylib//g')
 FONTCONFIG_PATH=$(find /nix/store -name "libfontconfig.dylib" |head -n1|sed 's/\/lib\/libfontconfig.dylib//g')
-C_PATHS=("$CRYPTO_PATH" "$OPENSSL_PATH" "$MAIN_NIX_PATH" "$GOBJECT_PATH" "$PANGO_PATH" "$HARFBUZZ_PATH" "$FONTCONFIG_PATH")
+LZMA_PATH=$(find /nix/store -name "lzma.h" | head -n1 | sed 's/\/include\/lzma.h//g')
+
+C_PATHS=("$CRYPTO_PATH" "$OPENSSL_PATH" "$MAIN_NIX_PATH" "$GOBJECT_PATH" "$PANGO_PATH" "$HARFBUZZ_PATH" "$FONTCONFIG_PATH" "$LZMA_PATH")
 
 
 for p in ${C_PATHS[@]}; do
@@ -18,6 +20,7 @@ for p in ${C_PATHS[@]}; do
 done
 
 PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$(find /nix/store -name openssl.pc|head -n1| sed 's/openssl.pc//g')"
+PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$(find /nix/store -name liblzma.pc|head -n1| sed 's/liblzma.pc//g')"
 EXPORT_FILE=${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh
 echo "Deleting $EXPORT_FILE"
 rm $EXPORT_FILE 

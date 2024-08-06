@@ -5,8 +5,8 @@
     name = John Anderson
     email = sontek@gmail.com
 
-[includeIf "gitdir:~/code/ditto/"]
-    path = .gitconfig-ditto
+[includeIf "gitdir:~/code/stacklet/"]
+    path = .gitconfig-stacklet
 
 [url "ssh://git@gitlab.com/"]
     insteadOf = https://gitlab.com/

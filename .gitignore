@@ -13,3 +13,4 @@ dotfiles/nvim/.config/nvim/plugin/*
 .DS_Store
 dynamic-exports.zsh
 result*
+.zprofile

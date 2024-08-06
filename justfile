@@ -57,8 +57,7 @@ install-system-apps:
   @just install-nix "jless"
   @just install-nix "k6"
   @just install-nix "k9s"
-  #@just install-nix "libgit2"
-  @just install-nix "libgit2_1_3_0"
+  @just install-nix "libgit2"
   @just install-nix "libffi"
   @just install-nix "loc"
   @just install-nix "lz4"
@@ -87,6 +86,7 @@ install-system-apps:
   @just install-nix "watchman"
   @just install-nix "wget"
   @just install-nix "xh"
+  @just install-nix "xz"
   @just install-nix "zellij"
   @just install-nix "zsh"
 
@@ -95,6 +95,7 @@ install-sre-apps:
   @just install-nix "argocd awscli2 aws-nuke aws-vault dos2unix krew kubie"
   @just install-nix "kind kubecolor redis sops stern teleport terraformer"
   @just install-nix "qemu helm-docs kafkactl cilium-cli"
+  @just install-nix "ssm-session-manager-plugin"
 
 # Install all applications
 install: install-system-apps install-sre-apps install-fun-apps
