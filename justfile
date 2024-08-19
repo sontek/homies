@@ -81,6 +81,7 @@ install-system-apps:
   @just install-nix "terraform-docs"
   @just install-nix "tmux"
   @just install-nix "unzip"
+  @just install-nix "util-linux"
   @just install-nix "visidata"
   @just install-nix "watch"
   @just install-nix "watchman"
