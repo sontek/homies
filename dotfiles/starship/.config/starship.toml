@@ -1,6 +1,6 @@
 add_newline = true
 format = '''[$cmd_duration](bold purple)
-[$hostname](bold red)[$git_branch](bold blue) [$kubernetes](bold cyan) [$aws](bold orange)
+[$hostname](bold red)[$git_branch](bold blue) [$kubernetes](bold cyan) [$aws](bold orange) [$python](bold blue)
 [$directory](bold green)
 [$character](bold yellow)
 '''
@@ -54,7 +54,7 @@ disabled = true
 disabled = true
 
 [python]
-disabled = true
+disabled = false
 
 [golang]
 disabled = true
