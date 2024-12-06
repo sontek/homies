@@ -20,7 +20,7 @@ install-nix nix_apps args="":
   done
 
 # Install fun apps
-install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet")
+install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet neofetch")
 
 # Install apps for every day use
 install-system-apps:
@@ -32,8 +32,10 @@ install-system-apps:
   @just install-nix "bottom"
   @just install-nix "cheat"
   @just install-nix "cmake"
+  @just install-nix "cairo"
   @just install-nix "colordiff"
   @just install-nix "coreutils"
+  @just install-nix "crane"
   @just install-nix "cue"
   @just install-nix "delta"
   @just install-nix "direnv"
@@ -43,6 +45,7 @@ install-system-apps:
   @just install-nix "eza"
   @just install-nix "ffmpeg"
   @just install-nix "fontconfig"
+  @just install-nix "freetype"
   @just install-nix "fzf"
   @just install-nix "gettext"
   @just install-nix "gh"
@@ -59,6 +62,7 @@ install-system-apps:
   @just install-nix "k9s"
   @just install-nix "libgit2"
   @just install-nix "libffi"
+  @just install-nix "libpng"
   @just install-nix "loc"
   @just install-nix "lz4"
   @just install-nix "minikube"
@@ -67,6 +71,7 @@ install-system-apps:
   @just install-nix "openssl"
   @just install-nix "pandoc"
   @just install-nix "pango"
+  @just install-nix "pixman"
   @just install-nix "pkg-config"
   @just install-nix "protobuf"
   @just install-nix "pwgen"
