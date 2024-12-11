@@ -29,7 +29,7 @@ local on_attach = function(client, bufnr)
   keymap('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
   keymap('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
   keymap('n', 'gr', vim.lsp.buf.references, bufopts)
-  keymap('n', '<leader>gf', vim.lsp.buf.formatting, bufopts)
+  keymap('n', '<leader>gf', vim.lsp.buf.format, bufopts)
   keymap('n', '<leader>ge', '<cmd>lua vim.diagnostic.open_float()<CR>', bufopts)
   keymap('n', '<leader>gq', '<cmd>lua vim.diagnostic.setloclist()<CR>', bufopts)
   keymap('n', 'gn', '<cmd>lua vim.diagnostic.goto_prev()<CR>', bufopts)
@@ -46,7 +46,7 @@ local servers = {
     'rust_analyzer',
     'terraformls',
     'tflint',
-    'tsserver'
+    'ts_ls'
 }
 
 require("mason-lspconfig").setup {
