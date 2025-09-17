@@ -12,3 +12,6 @@ alias npl="nix profile list|awk '{print \$2}'|sort|uniq|sed s/flake:nixpkgs#lega
 alias k="kubecolor"
 alias kctx="kubectl ctx"
 alias tf="terraform"
+alias assume="source ~/.nix-profile/bin/assume"
+
+
