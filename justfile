@@ -24,6 +24,7 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet neofet
 
 # Install apps for every day use
 install-system-apps:
+  @just install-nix "act"
   @just install-nix "asciinema"
   @just install-nix "asciinema-agg"
   @just install-nix "ast-grep"
@@ -61,7 +62,7 @@ install-system-apps:
   @just install-nix "harfbuzz"
   @just install-nix "heroku"
   @just install-nix "htop"
-  @just install-nix "icu72"
+  @just install-nix "icu"
   @just install-nix "imagemagick"
   @just install-nix "jless"
   @just install-nix "k6"
@@ -82,6 +83,7 @@ install-system-apps:
   @just install-nix "pixman"
   @just install-nix "pkg-config"
   @just install-nix "poppler-utils"
+  @just install-nix "postgresql.dev"
   @just install-nix "protobuf"
   @just install-nix "pwgen"
   @just install-nix "neovim"

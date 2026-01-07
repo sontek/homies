@@ -1,0 +1,2 @@
+
+alias assume=". assume"
