@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+# claude-jail - Run Claude Code in Docker sandbox
+set -euo pipefail
+
+# Parse arguments
+FRESH_CONTAINER=false
+CLAUDE_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --fresh)
+            FRESH_CONTAINER=true
+            shift
+            ;;
+        *)
+            CLAUDE_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Check Docker Desktop is running
+if ! docker info >/dev/null 2>&1; then
+    echo "Error: Docker Desktop is not running" >&2
+    exit 1
+fi
+
+# Get paths
+PROJECT_DIR="$(pwd)"
+SKILLS_PATH="${AGENT_SKILLS_PATH:-$HOME/code/sontek/agent-skills}"
+
+# Get git credentials
+GIT_NAME="${GIT_AUTHOR_NAME:-$(git config user.name 2>/dev/null || echo '')}"
+GIT_EMAIL="${GIT_AUTHOR_EMAIL:-$(git config user.email 2>/dev/null || echo '')}"
+
+# Determine which sandbox template to use
+SANDBOX_TEMPLATE="docker/sandbox-templates:claude-code"
+
+# Check for custom Dockerfile
+if [ -f ".claude/Dockerfile" ]; then
+    echo "[Docker] Found custom .claude/Dockerfile" >&2
+
+    # Generate hash of dependency files for cache invalidation
+    # Only hash files that actually exist to avoid pipefail issues
+    DEPS_HASH=$(
+        for file in pyproject.toml uv.lock requirements.txt package.json package-lock.json Cargo.toml Cargo.lock go.mod go.sum .claude/Dockerfile; do
+            [ -f "$file" ] && cat "$file"
+        done | sha256sum | cut -d' ' -f1
+    )
+
+    # Use project directory name + hash for image tag
+    PROJECT_NAME=$(basename "$PROJECT_DIR" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]-')
+    CUSTOM_IMAGE="claude-sandbox-${PROJECT_NAME}:${DEPS_HASH}"
+
+    echo "[Docker] Image: $CUSTOM_IMAGE" >&2
+
+    # Check if image exists
+    if ! docker image inspect "$CUSTOM_IMAGE" >/dev/null 2>&1; then
+        echo "[Docker] Building custom image (first run or dependencies changed)..." >&2
+
+        if docker build -t "$CUSTOM_IMAGE" -f .claude/Dockerfile . 2>&1; then
+            echo "[Docker] Build succeeded" >&2
+            SANDBOX_TEMPLATE="$CUSTOM_IMAGE"
+        else
+            local build_exit=$?
+            echo "[Docker] ERROR: Build failed (exit code: $build_exit)" >&2
+            echo "[Docker] Falling back to base template" >&2
+            SANDBOX_TEMPLATE="docker/sandbox-templates:claude-code"
+        fi
+    else
+        echo "[Docker] Using cached image" >&2
+        SANDBOX_TEMPLATE="$CUSTOM_IMAGE"
+    fi
+else
+    echo "[Docker] Using base template: docker/sandbox-templates:claude-code" >&2
+fi
+
+# Build docker sandbox run command
+DOCKER_ARGS=(
+    --template "$SANDBOX_TEMPLATE"
+    --credentials=host
+    --mount-docker-socket
+    -w "$PROJECT_DIR"
+    -v "$SKILLS_PATH:/skills:ro"
+    -e CLAUDE_PLUGIN_PATH=/skills
+    -e GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+    -e GH_TOKEN="${GITHUB_TOKEN:-}"
+)
+
+# Add git credentials if available
+if [ -n "$GIT_NAME" ]; then
+    DOCKER_ARGS+=(-e GIT_AUTHOR_NAME="$GIT_NAME")
+fi
+if [ -n "$GIT_EMAIL" ]; then
+    DOCKER_ARGS+=(-e GIT_AUTHOR_EMAIL="$GIT_EMAIL")
+fi
+
+# Mount SSH keys (workaround for --credentials=host bug)
+if [ -d "$HOME/.ssh" ]; then
+    DOCKER_ARGS+=(-v "$HOME/.ssh:/home/agent/.ssh:ro")
+fi
+
+# Mount AWS credentials for SSO and CodeArtifact access
+if [ -d "$HOME/.aws" ]; then
+    # Mount as read-write so SSO tokens can be refreshed
+    DOCKER_ARGS+=(-v "$HOME/.aws:/home/agent/.aws")
+
+    # Pass AWS environment variables if set
+    [ -n "${AWS_PROFILE:-}" ] && DOCKER_ARGS+=(-e AWS_PROFILE="$AWS_PROFILE")
+    [ -n "${AWS_REGION:-}" ] && DOCKER_ARGS+=(-e AWS_REGION="$AWS_REGION")
+    [ -n "${AWS_DEFAULT_REGION:-}" ] && DOCKER_ARGS+=(-e AWS_DEFAULT_REGION="$AWS_DEFAULT_REGION")
+    [ -n "${AWS_ACCESS_KEY_ID:-}" ] && DOCKER_ARGS+=(-e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID")
+    [ -n "${AWS_SECRET_ACCESS_KEY:-}" ] && DOCKER_ARGS+=(-e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY")
+    [ -n "${AWS_SESSION_TOKEN:-}" ] && DOCKER_ARGS+=(-e AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN")
+
+    # Enable AWS SDK to load config file (required for SSO profiles)
+    DOCKER_ARGS+=(-e AWS_SDK_LOAD_CONFIG=1)
+fi
+
+# Note: Claude credentials are stored in docker-claude-sandbox-data volume
+# and persist across container restarts. Authenticate once on first run.
+
+# Clean up existing containers if --fresh flag is set
+if [ "$FRESH_CONTAINER" = true ]; then
+    EXISTING_CONTAINERS=$(docker sandbox ls 2>&1 | awk -v dir="$PROJECT_DIR" 'NR>1 && $4==dir {print $1}' || true)
+    if [ -n "$EXISTING_CONTAINERS" ]; then
+        echo "[Docker] Cleaning up existing sandbox containers (--fresh)..." >&2
+        echo "$EXISTING_CONTAINERS" | while read -r container_id; do
+            docker sandbox rm "$container_id" >/dev/null 2>&1 || true
+        done
+    fi
+fi
+
+# Auto-cleanup: Remove existing container if AWS credentials have changed
+# This prevents stale AWS_PROFILE from causing authentication issues
+EXISTING_CONTAINERS=$(docker sandbox ls 2>&1 | awk -v dir="$PROJECT_DIR" 'NR>1 && $4==dir {print $1}' || true)
+if [ -n "$EXISTING_CONTAINERS" ]; then
+    for container_id in $EXISTING_CONTAINERS; do
+        # Get AWS_PROFILE from existing container
+        CONTAINER_AWS_PROFILE=$(docker inspect "$container_id" 2>/dev/null | jq -r '.[0].Config.Env[]? | select(startswith("AWS_PROFILE=")) | sub("AWS_PROFILE="; "")' || echo "")
+        CURRENT_AWS_PROFILE="${AWS_PROFILE:-}"
+
+        # If AWS_PROFILE has changed, recreate container
+        if [ "$CONTAINER_AWS_PROFILE" != "$CURRENT_AWS_PROFILE" ]; then
+            echo "[Docker] AWS_PROFILE changed (was: '$CONTAINER_AWS_PROFILE', now: '$CURRENT_AWS_PROFILE')" >&2
+            echo "[Docker] Recreating container to use updated credentials..." >&2
+            docker sandbox rm "$container_id" >/dev/null 2>&1 || true
+        fi
+    done
+fi
+
+# Run Claude in Docker sandbox
+echo "[Docker] Running sandbox: $SANDBOX_TEMPLATE" >&2
+if ! docker sandbox run "${DOCKER_ARGS[@]}" claude "${CLAUDE_ARGS[@]}" 2>&1; then
+    exit_code=$?
+    echo "[Docker] ERROR: Sandbox run failed with exit code: $exit_code" >&2
+    exit $exit_code
+fi
