@@ -5,7 +5,6 @@ set -euo pipefail
 
 # Detect script directory to find claude-jail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE_JAIL="${SCRIPT_DIR}/claude-jail"
 
 # Configuration (can be overridden by environment variables)
 RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-20}"
@@ -14,6 +13,17 @@ RALPH_AUTO_APPROVE_PUSH="${RALPH_AUTO_APPROVE_PUSH:-false}"
 RALPH_DIR="${RALPH_DIR:-.ralph}"
 RALPH_AUDIT_DIR="${RALPH_AUDIT_DIR:-.ralph/audit}"
 RALPH_RUNS_DIR="${RALPH_RUNS_DIR:-.ralph/runs}"
+RALPH_CLAUDE_COMMAND="${RALPH_CLAUDE_COMMAND:-claude-jail}"
+
+# Determine Claude command path
+if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+    CLAUDE_CMD="${SCRIPT_DIR}/claude-jail"
+elif [ "$RALPH_CLAUDE_COMMAND" = "claude" ]; then
+    CLAUDE_CMD="claude"
+else
+    # Assume it's a custom path/command
+    CLAUDE_CMD="$RALPH_CLAUDE_COMMAND"
+fi
 
 # Generate unique run ID (timestamp-based)
 RALPH_RUN_ID="ralph-$(date +%Y%m%d-%H%M%S)"
@@ -75,11 +85,14 @@ Environment variables:
   RALPH_MAX_ITERATIONS      Max total iterations (default: 20)
   RALPH_COST_LIMIT          Max cost in USD (default: 10.00)
   RALPH_AUTO_APPROVE_PUSH   Skip push approval (default: false)
+  RALPH_CLAUDE_COMMAND      Claude command to use (default: claude-jail)
+                            Options: "claude", "claude-jail", or custom path
 
 Examples:
   ralph "Add user authentication"
   ralph docs/implementation.md
   RALPH_MAX_ITERATIONS=30 ralph "complex task"
+  RALPH_CLAUDE_COMMAND=claude ralph "use native claude"
 EOF
     exit 1
 }
@@ -518,23 +531,34 @@ EOF
     esac
 }
 
-# Run Claude in jail with a message and iteration number
+# Run Claude with a message and iteration number
 run_claude() {
     local message="$1"
     local iteration="$2"
 
-    log_info "Running Claude in Docker sandbox..."
+    # Conditional logging and checks based on command
+    if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+        log_info "Running Claude in Docker sandbox..."
 
-    # Check if Docker Desktop is running
-    if ! docker info >/dev/null 2>&1; then
-        log_error "Docker Desktop is not running"
-        exit 1
-    fi
+        # Check if Docker Desktop is running
+        if ! docker info >/dev/null 2>&1; then
+            log_error "Docker Desktop is not running"
+            exit 1
+        fi
 
-    # Check if claude-jail is available
-    if [ ! -x "$CLAUDE_JAIL" ]; then
-        log_error "claude-jail not found at: $CLAUDE_JAIL"
-        exit 1
+        # Check if claude-jail is available
+        if [ ! -x "$CLAUDE_CMD" ]; then
+            log_error "claude-jail not found at: $CLAUDE_CMD"
+            exit 1
+        fi
+    else
+        log_info "Running Claude..."
+
+        # Check if claude command is available
+        if ! command -v "$CLAUDE_CMD" >/dev/null 2>&1; then
+            log_error "Claude command not found: $CLAUDE_CMD"
+            exit 1
+        fi
     fi
 
     # Get current phase from state
@@ -562,27 +586,35 @@ run_claude() {
 
     log_info "Phase $current_phase: $phase_name (iteration $phase_iterations in this phase)"
 
-    # Show Docker environment info
-    if [ -f ".claude/Dockerfile" ]; then
-        log_info "Docker: Using custom .claude/Dockerfile"
-    else
-        log_info "Docker: Using base template (docker/sandbox-templates:claude-code)"
+    # Show environment info for claude-jail
+    if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+        if [ -f ".claude/Dockerfile" ]; then
+            log_info "Docker: Using custom .claude/Dockerfile"
+        else
+            log_info "Docker: Using base template (docker/sandbox-templates:claude-code)"
+        fi
     fi
-    log_info "Executing: claude-jail -p --system-prompt \"...\" --permission-mode acceptEdits"
 
-    # Run claude-jail and capture output and exit code
-    # Use script command to create pseudo-TTY for docker sandbox
+    log_info "Executing: $CLAUDE_CMD -p --system-prompt \"...\" --permission-mode acceptEdits"
+
+    # Run Claude and capture output and exit code
     local output_file=$(mktemp)
 
-    # script -q runs quietly, -c runs command, output goes to file
-    script -q "$output_file" "$CLAUDE_JAIL" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$message" > /dev/null 2>&1
-    local exit_code=$?
+    if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+        # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
+        script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$message" > /dev/null 2>&1
+        local exit_code=$?
+    else
+        # Native claude handles TTY properly
+        "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$message" > "$output_file" 2>&1
+        local exit_code=$?
+    fi
 
-    # Display the output (strip script control characters)
+    # Display the output
     cat "$output_file"
 
     if [ $exit_code -ne 0 ]; then
-        log_error "claude-jail exited with code $exit_code"
+        log_error "$CLAUDE_CMD exited with code $exit_code"
         log_error "Last 20 lines of output:"
         tail -20 "$output_file" | while IFS= read -r line; do
             echo "  $line" >&2

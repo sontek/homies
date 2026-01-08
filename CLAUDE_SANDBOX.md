@@ -277,6 +277,24 @@ Ralph tracks state in `.ralph/`:
 RALPH_MAX_ITERATIONS=30      # Default: 20
 RALPH_COST_LIMIT=15.00       # Default: 10.00 USD (not yet implemented)
 RALPH_AUTO_APPROVE_PUSH=true # Skip push approval (default: false)
+RALPH_CLAUDE_COMMAND=claude  # Use native claude instead of claude-jail (default: claude-jail)
+```
+
+**Choosing between `claude` and `claude-jail`:**
+
+- **`claude-jail` (default)**: Runs in Docker sandbox with custom images, AWS SSO, isolated environment
+- **`claude`**: Uses native Claude Code, faster startup, no Docker required
+
+```bash
+# Use Docker sandbox (default)
+ralph "implement feature"
+
+# Use native Claude
+RALPH_CLAUDE_COMMAND=claude ralph "implement feature"
+
+# Or set persistently
+export RALPH_CLAUDE_COMMAND=claude
+ralph "implement feature"
 ```
 
 ### .gitignore
