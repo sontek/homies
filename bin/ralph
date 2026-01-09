@@ -1543,6 +1543,56 @@ run_workflow() {
         # Unstage any .claude/ or .ralph/ files (should never be committed)
         unstage_ralph_files
 
+        # Check for phase dependencies - route to fix phases if they have work
+        # This prevents getting stuck when review phases have tasks that depend on fix phases
+        case $current_phase in
+            3)
+                # Phase 3 (REVIEW) - check if Phase 4 (FIX) has unchecked tasks
+                if phase_has_unchecked 4; then
+                    log_info "Phase 3 has dependency on Phase 4 - routing to Phase 4 first"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "**From**: Phase 3 (REVIEW)" >> "$DECISIONS_FILE"
+                    echo "**To**: Phase 4 (FIX)" >> "$DECISIONS_FILE"
+                    echo "**Reason**: Phase 4 has unchecked fix tasks that must be completed before Phase 3 review can finish" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    update_state "{\"current_phase\": 4, \"phase_iterations\": 0}"
+                    continue
+                fi
+                ;;
+            5)
+                # Phase 5 (TEST) - check if Phase 6 (FIX) has unchecked tasks
+                if phase_has_unchecked 6; then
+                    log_info "Phase 5 has dependency on Phase 6 - routing to Phase 6 first"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "**From**: Phase 5 (TEST)" >> "$DECISIONS_FILE"
+                    echo "**To**: Phase 6 (FIX)" >> "$DECISIONS_FILE"
+                    echo "**Reason**: Phase 6 has unchecked fix tasks that must be completed before Phase 5 testing can finish" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    update_state "{\"current_phase\": 6, \"phase_iterations\": 0}"
+                    continue
+                fi
+                ;;
+            7)
+                # Phase 7 (FINAL-REVIEW) - check if Phase 8 (FIX) has unchecked tasks
+                if phase_has_unchecked 8; then
+                    log_info "Phase 7 has dependency on Phase 8 - routing to Phase 8 first"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "**From**: Phase 7 (FINAL-REVIEW)" >> "$DECISIONS_FILE"
+                    echo "**To**: Phase 8 (FIX)" >> "$DECISIONS_FILE"
+                    echo "**Reason**: Phase 8 has unchecked fix tasks that must be completed before Phase 7 final review can finish" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    update_state "{\"current_phase\": 8, \"phase_iterations\": 0}"
+                    continue
+                fi
+                ;;
+        esac
+
         # Check for phase completion and transition
         if detect_phase_completion "$current_phase"; then
             local next_phase=$(determine_next_phase "$current_phase")
