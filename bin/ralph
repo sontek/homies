@@ -319,7 +319,7 @@ detect_phase_completion() {
             phase_tasks_complete 7 && return 0
             ;;
         8)
-            # Phase 8 complete when all fix tasks done (returns to Phase 7)
+            # Phase 8 complete when all fix tasks done (returns to Phase 5 to re-test)
             phase_tasks_complete 8 && return 0
             ;;
         9)
@@ -351,7 +351,7 @@ determine_next_phase() {
             # Final-Review → Fix (if issues) or Commit (if clean)
             phase_has_unchecked 8 && echo 8 || echo 9
             ;;
-        8) echo 7 ;;  # Fix → Re-review
+        8) echo 5 ;;  # Fix → Re-test (ensures fixes didn't break anything, then re-review)
         9) echo "done" ;;  # Commit → Done
         *) echo "error" ;;
     esac
@@ -366,12 +366,17 @@ Ralph orchestrates a 9-phase development workflow:
 1. PLAN - Create implementation plan
 2. IMPLEMENT - Write code
 3. REVIEW - Code review
-4. FIX - Fix review issues
+4. FIX - Fix review issues (returns to Phase 3)
 5. TEST - Run tests/linter/type checker
-6. FIX - Fix test failures
-7. FINAL-REVIEW - Final verification
-8. FIX - Final fixes
+6. FIX - Fix test failures (returns to Phase 5)
+7. FINAL-REVIEW - Final verification before commit
+8. FIX - Final fixes (returns to Phase 5 to re-test and re-review)
 9. COMMIT - Create git commit
+
+Phase flow ensures quality:
+- Phase 4 fixes → re-review (Phase 3)
+- Phase 6 fixes → re-test (Phase 5)
+- Phase 8 fixes → re-test (Phase 5) → re-review (Phase 7) → commit (Phase 9)
 
 STATELESS OPERATION (CRITICAL):
 You are called iteratively. Each invocation should complete ONE task from the plan, then STOP.
@@ -658,6 +663,32 @@ RECOMMENDATION: Re-review passed, no new issues found, ready for Phase 5
 ---END_RALPH_STATUS---
 
 RALPH ACTION: Detects Phase 3 complete with no Phase 4 tasks, advances to Phase 5
+
+---
+
+Scenario 7: Phase 8 Fixes Trigger Full Re-Test Cycle
+GIVEN:
+- Phase 7 (FINAL-REVIEW) identified issues and added tasks to Phase 8
+- You completed Phase 8 fix tasks
+- Fixes could have introduced new bugs or broken tests
+
+WHEN: You complete the last Phase 8 fix task
+
+THEN: Mark task [x], note completion in decisions
+Example:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 2
+TESTS_STATUS: NOT_RUN
+WORK_TYPE: REFACTORING
+EXIT_SIGNAL: false
+RECOMMENDATION: Phase 8 fixes complete, returning to Phase 5 for re-testing
+---END_RALPH_STATUS---
+
+RALPH ACTION: Detects Phase 8 complete, returns to Phase 5 (TEST) to ensure fixes didn't break anything, then proceeds through Phase 6 (FIX if needed), Phase 7 (FINAL-REVIEW), and Phase 9 (COMMIT if clean)
+
+This ensures quality: any fix in Phase 8 triggers a full re-test and re-review cycle before commit.
 
 LOGGING FORMAT for DECISIONS_FILE_PATH:
 
@@ -1061,7 +1092,7 @@ STEPS:
 2) Find the FIRST unchecked Phase 8 task (line starting with '- [ ]' under ## Phase 8)
 3) If all Phase 8 tasks are [x]:
    - Log to DECISIONS_FILE_PATH: "Phase 8 complete - all final fixes applied"
-   - STOP immediately (Ralph will return to Phase 7 for re-review)
+   - STOP immediately (Ralph will return to Phase 5 to re-test, then re-review)
 4) If unchecked task found:
    - Read the task description carefully (it should specify what needs fixing)
    - Complete ONLY that ONE fix
@@ -1070,11 +1101,13 @@ STEPS:
    - STOP IMMEDIATELY
 
 IMPORTANT:
-- Do NOT re-run final review yourself - Ralph will return to Phase 7 after fixes
+- Do NOT re-run tests or review yourself - Ralph will handle the full cycle
+- After Phase 8 fixes, Ralph returns to Phase 5 (TEST) to ensure fixes didn't break anything
+- Then proceeds through Phase 6 (FIX if needed), Phase 7 (FINAL-REVIEW), and Phase 9 (COMMIT)
 - Focus on fixing the specific issue described in the task
 - One fix per iteration
 
-After completing ONE fix and marking it [x], STOP. Ralph will call you again for the next fix or return to Phase 7.
+After completing ONE fix and marking it [x], STOP. Ralph will call you again for the next fix or return to Phase 5.
 EOF
             ;;
         9)
