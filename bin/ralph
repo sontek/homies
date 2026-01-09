@@ -1360,11 +1360,13 @@ parse_status_block() {
 
     # Extract status block if it exists
     # More lenient pattern to handle potential whitespace or control chars
-    if grep -q "---RALPH_STATUS---" "$output_file"; then
+    # Use -F for fixed string matching and -- to prevent --- being interpreted as options
+    if grep -qF -- "---RALPH_STATUS---" "$output_file"; then
         # Use awk to extract everything between the markers
         # Strip leading/trailing whitespace from each line
+        # Use -- in grep to prevent pattern from being interpreted as option
         awk '/---RALPH_STATUS---/,/---END_RALPH_STATUS---/' "$output_file" | \
-            grep -v "---.*RALPH_STATUS.*---" | \
+            grep -v -- "---.*RALPH_STATUS.*---" | \
             sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
     fi
 }
