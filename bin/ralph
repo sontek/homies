@@ -44,6 +44,14 @@ DECISIONS_FILE="$RUN_DIR/decisions.md"
 # Ralph uses .ralph/ for its own files (state, audit, runs)
 CLAUDE_DIR=".claude"
 
+# Circuit breaker tracking (for stagnation detection)
+LAST_ERROR_MSG=""
+ERROR_REPEAT_COUNT=0
+TEST_ONLY_LOOP_COUNT=0
+NO_PROGRESS_COUNT=0
+LAST_COMPLETED_TASKS=0
+LAST_FILES_MODIFIED=0
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -400,6 +408,13 @@ CRITICAL AUTONOMOUS WORKFLOW RULES:
 - ONLY stage actual implementation files (source code, tests, config files)
 - Log all decisions and test results to DECISIONS_FILE_PATH
 
+EFFICIENT CODEBASE EXPLORATION:
+When you need to understand the codebase or find files/code:
+- Use the Task tool with Explore subagent (subagent_type="Explore") for open-ended searches
+- Examples: "Where is authentication handled?", "Find all API endpoints", "How does error handling work?"
+- Do NOT use Glob/Grep directly for exploratory questions - subagents are more efficient
+- Only use Glob/Grep for specific, targeted searches when you know what you're looking for
+
 SCOPE BOUNDARIES (resist the urge to be "helpful"):
 - Do NOT fix unrelated bugs you notice
 - Do NOT refactor code not mentioned in your specific task
@@ -419,6 +434,25 @@ Examples of errors to log and stop:
 - File not found that should exist
 - Git operation fails (conflicts, merge issues)
 - Cannot parse or find required data
+
+STATUS REPORTING (REQUIRED):
+At the end of your response, you MUST include a status block for Ralph to parse:
+
+---RALPH_STATUS---
+STATUS: IN_PROGRESS | COMPLETE | BLOCKED
+TASKS_COMPLETED_THIS_LOOP: <number>
+FILES_MODIFIED: <number>
+TESTS_STATUS: PASSING | FAILING | NOT_RUN
+WORK_TYPE: IMPLEMENTATION | TESTING | DOCUMENTATION | REFACTORING
+EXIT_SIGNAL: false | true
+RECOMMENDATION: <one line summary of what to do next>
+---END_RALPH_STATUS---
+
+Set EXIT_SIGNAL to true ONLY when ALL of these conditions are met:
+1. All items in the plan are marked [x] or [~]
+2. All tests are passing (or no tests exist for valid reasons)
+3. No errors or warnings in the last execution
+4. You have nothing meaningful left to implement for this task
 
 LOGGING FORMAT for DECISIONS_FILE_PATH:
 
@@ -524,6 +558,14 @@ CRITICAL - ONE TASK ONLY:
 You MUST complete ONLY ONE task per iteration, even if you see multiple related tasks.
 Ralph requires per-task granularity for progress tracking and phase management.
 Do NOT batch multiple tasks together "for efficiency" - this breaks the autonomous workflow.
+
+TESTING GUIDELINES (20% RULE):
+- LIMIT testing to ~20% of your total effort per loop
+- PRIORITIZE: Implementation > Documentation > Tests
+- Only write tests for NEW functionality you implement
+- Do NOT refactor existing tests unless broken
+- Do NOT add "additional test coverage" as busy work
+- Focus on CORE functionality first, comprehensive testing comes in Phase 5
 
 STEPS:
 1) Read PLAN_FILE_PATH
@@ -938,25 +980,7 @@ run_claude() {
     # Get phase-specific instructions with actual file paths injected
     local PHASE_INSTRUCTIONS=$(get_phase_prompt "$current_phase" | sed "s|PLAN_FILE_PATH|$PLAN_FILE|g; s|DECISIONS_FILE_PATH|$DECISIONS_FILE|g")
 
-    # Build dynamic regular prompt
-    local FULL_PROMPT
-    if [ "$current_phase" = "1" ]; then
-        # Phase 1: Just the original task + phase instructions
-        FULL_PROMPT="Original task: $original_prompt
-
-Phase 1 (PLAN) instructions:
-$PHASE_INSTRUCTIONS"
-    else
-        # Phases 2-9: Reference the plan document
-        FULL_PROMPT="Original task: $original_prompt
-Plan document: $PLAN_FILE
-
-Current phase: Phase $current_phase
-Phase instructions:
-$PHASE_INSTRUCTIONS"
-    fi
-
-    # Phase names for logging
+    # Phase name for logging and context
     local phase_name
     case $current_phase in
         1) phase_name="PLAN" ;;
@@ -970,6 +994,53 @@ $PHASE_INSTRUCTIONS"
         9) phase_name="COMMIT" ;;
         *) phase_name="UNKNOWN" ;;
     esac
+
+    # Build loop context for iteration awareness
+    local LOOP_CONTEXT=""
+    if [ "$iteration" -gt 1 ]; then
+        # Count tasks completed so far
+        local completed_tasks=0
+        if [ -f "$PLAN_FILE" ]; then
+            completed_tasks=$(grep -c '^- \[x\]' "$PLAN_FILE" 2>/dev/null || echo "0")
+        fi
+
+        # Get recent activity from decisions file (last 3 entries)
+        local recent_activity=""
+        if [ -f "$DECISIONS_FILE" ]; then
+            recent_activity=$(tail -50 "$DECISIONS_FILE" | grep -A 3 "^## \[Iteration" | tail -20)
+        fi
+
+        LOOP_CONTEXT="
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LOOP CONTEXT (Iteration $iteration):
+- Total iterations so far: $iteration
+- Phase iterations: $phase_iterations
+- Tasks completed: $completed_tasks
+- Current phase: $current_phase ($phase_name)
+
+Recent activity (last few decisions):
+$recent_activity
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"
+    fi
+
+    # Build dynamic regular prompt
+    local FULL_PROMPT
+    if [ "$current_phase" = "1" ]; then
+        # Phase 1: Just the original task + phase instructions
+        FULL_PROMPT="Original task: $original_prompt
+$LOOP_CONTEXT
+Phase 1 (PLAN) instructions:
+$PHASE_INSTRUCTIONS"
+    else
+        # Phases 2-9: Reference the plan document
+        FULL_PROMPT="Original task: $original_prompt
+Plan document: $PLAN_FILE
+$LOOP_CONTEXT
+Current phase: Phase $current_phase
+Phase instructions:
+$PHASE_INSTRUCTIONS"
+    fi
 
     log_info "Phase $current_phase: $phase_name (iteration $phase_iterations in this phase)"
 
@@ -996,6 +1067,9 @@ $PHASE_INSTRUCTIONS"
     # Run Claude and capture output and exit code
     local output_file=$(mktemp)
 
+    # Also save to a persistent location for circuit breaker analysis
+    local persistent_output="$RUN_DIR/last_output.txt"
+
     if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
         # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
         script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$FULL_PROMPT" > /dev/null 2>&1
@@ -1005,6 +1079,9 @@ $PHASE_INSTRUCTIONS"
         "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$FULL_PROMPT" > "$output_file" 2>&1
         local exit_code=$?
     fi
+
+    # Copy output to persistent location for circuit breaker
+    cp "$output_file" "$persistent_output"
 
     # Display the output
     cat "$output_file"
@@ -1030,6 +1107,103 @@ unstage_ralph_files() {
         log_warning "Unstaging .claude/ and .ralph/ files (should not be committed)"
         git reset HEAD .claude/ .ralph/ 2>/dev/null || true
     fi
+}
+
+# Parse status block from Claude's output
+parse_status_block() {
+    local output_file="$1"
+
+    # Extract status block if it exists
+    if grep -q "^---RALPH_STATUS---" "$output_file"; then
+        awk '/^---RALPH_STATUS---$/,/^---END_RALPH_STATUS---$/' "$output_file" | \
+            grep -v "^---.*RALPH_STATUS.*---$"
+    fi
+}
+
+# Check if exit signal was set in status block
+check_exit_signal() {
+    local status_block="$1"
+
+    if echo "$status_block" | grep -q "^EXIT_SIGNAL: true"; then
+        return 0  # Exit signal detected
+    else
+        return 1  # No exit signal
+    fi
+}
+
+# Detect and handle circuit breaker conditions
+check_circuit_breaker() {
+    local output_file="$1"
+    local iteration="$2"
+
+    # Parse status block from output
+    local status_block=$(parse_status_block "$output_file")
+
+    # Check for EXIT_SIGNAL
+    if [ -n "$status_block" ] && check_exit_signal "$status_block"; then
+        log_success "EXIT_SIGNAL detected in status block - workflow complete!"
+        echo ""
+        echo "Status Block:"
+        echo "$status_block"
+        echo ""
+        return 2  # Special code for clean exit
+    fi
+
+    # Extract metrics from status block
+    local tasks_completed=0
+    local files_modified=0
+    local work_type=""
+
+    if [ -n "$status_block" ]; then
+        tasks_completed=$(echo "$status_block" | grep "^TASKS_COMPLETED_THIS_LOOP:" | awk '{print $2}' || echo "0")
+        files_modified=$(echo "$status_block" | grep "^FILES_MODIFIED:" | awk '{print $2}' || echo "0")
+        work_type=$(echo "$status_block" | grep "^WORK_TYPE:" | awk '{print $2}' || echo "")
+    fi
+
+    # Detect test-only loops (3+ consecutive loops with TESTING work type and no file modifications)
+    if [ "$work_type" = "TESTING" ] && [ "$files_modified" = "0" ]; then
+        TEST_ONLY_LOOP_COUNT=$((TEST_ONLY_LOOP_COUNT + 1))
+
+        if [ $TEST_ONLY_LOOP_COUNT -ge 3 ]; then
+            log_warning "Circuit breaker: Detected $TEST_ONLY_LOOP_COUNT consecutive test-only loops"
+            log_warning "No files being modified, only running tests - likely stagnating"
+            return 1
+        fi
+    else
+        TEST_ONLY_LOOP_COUNT=0  # Reset counter
+    fi
+
+    # Detect no-progress loops (3+ loops with no tasks completed and no files modified)
+    if [ "$tasks_completed" = "0" ] && [ "$files_modified" = "0" ]; then
+        NO_PROGRESS_COUNT=$((NO_PROGRESS_COUNT + 1))
+
+        if [ $NO_PROGRESS_COUNT -ge 3 ]; then
+            log_warning "Circuit breaker: Detected $NO_PROGRESS_COUNT consecutive loops with no progress"
+            log_warning "No tasks completed and no files modified - likely stuck"
+            return 1
+        fi
+    else
+        NO_PROGRESS_COUNT=0  # Reset counter
+    fi
+
+    # Detect repeated errors (check last 50 lines of output for error patterns)
+    local current_errors=$(tail -50 "$output_file" | grep -i "error\|failed\|exception" | head -5 | sort -u)
+
+    if [ -n "$current_errors" ] && [ "$current_errors" = "$LAST_ERROR_MSG" ]; then
+        ERROR_REPEAT_COUNT=$((ERROR_REPEAT_COUNT + 1))
+
+        if [ $ERROR_REPEAT_COUNT -ge 3 ]; then
+            log_warning "Circuit breaker: Same error repeated $ERROR_REPEAT_COUNT times"
+            log_warning "Error pattern:"
+            echo "$current_errors" | head -3
+            return 1
+        fi
+    else
+        LAST_ERROR_MSG="$current_errors"
+        ERROR_REPEAT_COUNT=0  # Reset if errors changed
+    fi
+
+    return 0  # No circuit breaker conditions met
 }
 
 # Main workflow - Simple loop like the original Ralph
@@ -1089,6 +1263,24 @@ run_workflow() {
         if ! run_claude "$prompt" "$total"; then
             log_error "Claude execution failed, stopping workflow"
             exit 1
+        fi
+
+        # Check circuit breaker conditions (stagnation, repeated errors, exit signal)
+        local circuit_breaker_output="$RUN_DIR/last_output.txt"
+        if [ -f "$circuit_breaker_output" ]; then
+            check_circuit_breaker "$circuit_breaker_output" "$total"
+            local breaker_result=$?
+
+            if [ $breaker_result -eq 2 ]; then
+                # EXIT_SIGNAL detected - clean exit
+                log_success "Workflow completed via EXIT_SIGNAL"
+                break
+            elif [ $breaker_result -eq 1 ]; then
+                # Circuit breaker tripped - stagnation detected
+                log_error "Circuit breaker triggered - halting workflow to prevent runaway loop"
+                log_error "Review $RUN_DIR/last_output.txt and $DECISIONS_FILE for details"
+                exit 1
+            fi
         fi
 
         # Unstage any .claude/ or .ralph/ files (should never be committed)
