@@ -448,11 +448,216 @@ EXIT_SIGNAL: false | true
 RECOMMENDATION: <one line summary of what to do next>
 ---END_RALPH_STATUS---
 
+WHEN TO SET EXIT_SIGNAL:
 Set EXIT_SIGNAL to true ONLY when ALL of these conditions are met:
 1. All items in the plan are marked [x] or [~]
 2. All tests are passing (or no tests exist for valid reasons)
 3. No errors or warnings in the last execution
 4. You have nothing meaningful left to implement for this task
+
+CONCRETE EXAMPLES OF STATUS BLOCKS:
+
+Example 1 - Making Progress (typical iteration):
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 3
+TESTS_STATUS: PASSING
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: false
+RECOMMENDATION: Continue with next Phase 2 task from plan
+---END_RALPH_STATUS---
+
+Example 2 - Task Complete (all plan items done, tests passing):
+---RALPH_STATUS---
+STATUS: COMPLETE
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 1
+TESTS_STATUS: PASSING
+WORK_TYPE: DOCUMENTATION
+EXIT_SIGNAL: true
+RECOMMENDATION: All plan tasks complete, tests passing, ready for completion
+---END_RALPH_STATUS---
+
+Example 3 - Blocked/Stuck (same error repeatedly):
+---RALPH_STATUS---
+STATUS: BLOCKED
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 2
+TESTS_STATUS: FAILING
+WORK_TYPE: DEBUGGING
+EXIT_SIGNAL: false
+RECOMMENDATION: Stuck on import error - same failure 3 times, need investigation
+---END_RALPH_STATUS---
+
+Example 4 - Test-Only Loop (running tests without changes):
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 0
+TESTS_STATUS: PASSING
+WORK_TYPE: TESTING
+EXIT_SIGNAL: false
+RECOMMENDATION: All tests passing, no implementation changes needed
+---END_RALPH_STATUS---
+
+CRITICAL ANTI-PATTERNS TO AVOID:
+- Do NOT continue with busy work when EXIT_SIGNAL should be true
+- Do NOT run tests repeatedly without implementing new features (test-only loops)
+- Do NOT refactor code that is already working fine unless explicitly tasked
+- Do NOT add features beyond what's in the plan (scope creep)
+- Do NOT forget to include the status block (Ralph circuit breaker depends on it)
+- Do NOT mark tasks complete that still have failing tests or errors
+
+EXIT SCENARIOS (Specification by Example):
+
+Scenario 1: Successful Phase Completion
+GIVEN:
+- All tasks in current phase are marked [x] in plan
+- Tests are passing (or not yet run if before Phase 5)
+- No errors in recent execution
+- Files are properly staged/committed (if in Phase 9)
+
+WHEN: You complete the last task in the phase
+
+THEN: Output status with EXIT_SIGNAL: false (Ralph will detect phase completion and advance)
+Example:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 2
+TESTS_STATUS: PASSING
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: false
+RECOMMENDATION: Phase 2 complete, all implementation tasks done
+---END_RALPH_STATUS---
+
+RALPH ACTION: Detects all Phase 2 tasks are [x], advances to Phase 3
+
+---
+
+Scenario 2: Complete Workflow (All Phases Done)
+GIVEN:
+- All Phase 9 (COMMIT) tasks are marked [x]
+- Git commit was successfully created
+- All tests passing from Phase 5
+- All review tasks from Phase 3 and 7 are complete
+
+WHEN: You complete the final commit task
+
+THEN: Output status with EXIT_SIGNAL: true
+Example:
+---RALPH_STATUS---
+STATUS: COMPLETE
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 0
+TESTS_STATUS: PASSING
+WORK_TYPE: DOCUMENTATION
+EXIT_SIGNAL: true
+RECOMMENDATION: All phases complete, commit created, workflow done
+---END_RALPH_STATUS---
+
+RALPH ACTION: Detects EXIT_SIGNAL: true, exits workflow successfully
+
+---
+
+Scenario 3: Test-Only Loop Detected (Stagnation)
+GIVEN:
+- Last 3 iterations only ran tests (npm test, pytest, etc.)
+- No files were modified in those iterations
+- No tasks were marked complete
+- Tests are passing
+
+WHEN: You run tests again without making changes
+
+THEN: Output status indicating no progress
+Example:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 0
+TESTS_STATUS: PASSING
+WORK_TYPE: TESTING
+EXIT_SIGNAL: false
+RECOMMENDATION: Tests passing, no changes needed, task may be complete
+---END_RALPH_STATUS---
+
+RALPH ACTION: Circuit breaker increments test-only counter, exits after 3 consecutive test-only loops
+
+---
+
+Scenario 4: Recurring Error (Stuck)
+GIVEN:
+- Same error appears in last 3 consecutive iterations
+- Error message is identical or very similar
+- Attempted fixes have not resolved the issue
+- Making no forward progress
+
+WHEN: You encounter the same error again
+
+THEN: Output status indicating BLOCKED
+Example:
+---RALPH_STATUS---
+STATUS: BLOCKED
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 3
+TESTS_STATUS: FAILING
+WORK_TYPE: DEBUGGING
+EXIT_SIGNAL: false
+RECOMMENDATION: Stuck on ModuleNotFoundError for 'foo.bar' - attempted 3 fixes
+---END_RALPH_STATUS---
+
+RALPH ACTION: Circuit breaker detects repeated errors, opens circuit and halts workflow
+
+---
+
+Scenario 5: No Progress Made (Multiple Iterations)
+GIVEN:
+- Last 3 iterations completed 0 tasks
+- No files were modified
+- Phase has unchecked tasks remaining
+- No clear blocker identified
+
+WHEN: Another iteration completes with no progress
+
+THEN: Output status showing lack of progress
+Example:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 0
+TESTS_STATUS: NOT_RUN
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: false
+RECOMMENDATION: Unable to make progress on current task, may need clarification
+---END_RALPH_STATUS---
+
+RALPH ACTION: Circuit breaker detects no-progress pattern, halts after 3 iterations
+
+---
+
+Scenario 6: Successfully Fixed Issue After Review
+GIVEN:
+- Phase 3 (REVIEW) identified issues and added tasks to Phase 4
+- You completed Phase 4 fix tasks
+- Ralph returned to Phase 3 for re-review
+- Re-review found no new issues
+
+WHEN: You complete re-review with no issues found
+
+THEN: Mark review task [x], note clean review in decisions
+Example:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 0
+TESTS_STATUS: NOT_RUN
+WORK_TYPE: REFACTORING
+EXIT_SIGNAL: false
+RECOMMENDATION: Re-review passed, no new issues found, ready for Phase 5
+---END_RALPH_STATUS---
+
+RALPH ACTION: Detects Phase 3 complete with no Phase 4 tasks, advances to Phase 5
 
 LOGGING FORMAT for DECISIONS_FILE_PATH:
 
@@ -473,7 +678,12 @@ LOGGING FORMAT for DECISIONS_FILE_PATH:
 
 Use this format for all decision logging to maintain consistency across iterations.
 
-Your responses should be concise. Execute tasks, verify results, update the plan, log decisions, and STOP.
+REMEMBER:
+- Quality over speed - build it right the first time
+- One task per iteration - resist the urge to batch work
+- Know when you're done - don't invent work when the task is complete
+- Execute and verify - don't just plan or document what should happen
+- Your responses should be concise - complete the task, update the plan, log decisions, and STOP
 EOF
 }
 
@@ -1080,8 +1290,10 @@ $PHASE_INSTRUCTIONS"
         local exit_code=$?
     fi
 
-    # Copy output to persistent location for circuit breaker
-    cp "$output_file" "$persistent_output"
+    # Strip ANSI escape codes and save to persistent location for circuit breaker
+    # The script command adds TTY control codes that break status block parsing
+    # Use sed to remove ANSI escape sequences: ESC [ ... m
+    sed 's/\x1b\[[0-9;]*m//g' "$output_file" > "$persistent_output"
 
     # Display the output
     cat "$output_file"
@@ -1114,9 +1326,13 @@ parse_status_block() {
     local output_file="$1"
 
     # Extract status block if it exists
-    if grep -q "^---RALPH_STATUS---" "$output_file"; then
-        awk '/^---RALPH_STATUS---$/,/^---END_RALPH_STATUS---$/' "$output_file" | \
-            grep -v "^---.*RALPH_STATUS.*---$"
+    # More lenient pattern to handle potential whitespace or control chars
+    if grep -q "---RALPH_STATUS---" "$output_file"; then
+        # Use awk to extract everything between the markers
+        # Strip leading/trailing whitespace from each line
+        awk '/---RALPH_STATUS---/,/---END_RALPH_STATUS---/' "$output_file" | \
+            grep -v "---.*RALPH_STATUS.*---" | \
+            sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
     fi
 }
 
@@ -1124,7 +1340,8 @@ parse_status_block() {
 check_exit_signal() {
     local status_block="$1"
 
-    if echo "$status_block" | grep -q "^EXIT_SIGNAL: true"; then
+    # More lenient pattern - match EXIT_SIGNAL: true anywhere in line
+    if echo "$status_block" | grep -qi "EXIT_SIGNAL:[[:space:]]*true"; then
         return 0  # Exit signal detected
     else
         return 1  # No exit signal
@@ -1139,8 +1356,14 @@ check_circuit_breaker() {
     # Parse status block from output
     local status_block=$(parse_status_block "$output_file")
 
+    # Debug: log if status block was found
+    if [ -z "$status_block" ]; then
+        log_warning "Circuit breaker: No status block found in output"
+        return 0  # Don't trigger circuit breaker if we can't parse status
+    fi
+
     # Check for EXIT_SIGNAL
-    if [ -n "$status_block" ] && check_exit_signal "$status_block"; then
+    if check_exit_signal "$status_block"; then
         log_success "EXIT_SIGNAL detected in status block - workflow complete!"
         echo ""
         echo "Status Block:"
@@ -1149,16 +1372,15 @@ check_circuit_breaker() {
         return 2  # Special code for clean exit
     fi
 
-    # Extract metrics from status block
-    local tasks_completed=0
-    local files_modified=0
-    local work_type=""
+    # Extract metrics from status block with more robust parsing
+    # Use grep with lenient whitespace matching and awk to extract value
+    local tasks_completed=$(echo "$status_block" | grep -i "TASKS_COMPLETED_THIS_LOOP:" | sed 's/.*:[[:space:]]*//' || echo "0")
+    local files_modified=$(echo "$status_block" | grep -i "FILES_MODIFIED:" | sed 's/.*:[[:space:]]*//' || echo "0")
+    local work_type=$(echo "$status_block" | grep -i "WORK_TYPE:" | sed 's/.*:[[:space:]]*//' || echo "")
 
-    if [ -n "$status_block" ]; then
-        tasks_completed=$(echo "$status_block" | grep "^TASKS_COMPLETED_THIS_LOOP:" | awk '{print $2}' || echo "0")
-        files_modified=$(echo "$status_block" | grep "^FILES_MODIFIED:" | awk '{print $2}' || echo "0")
-        work_type=$(echo "$status_block" | grep "^WORK_TYPE:" | awk '{print $2}' || echo "")
-    fi
+    # Default to 0 if empty
+    [ -z "$tasks_completed" ] && tasks_completed=0
+    [ -z "$files_modified" ] && files_modified=0
 
     # Detect test-only loops (3+ consecutive loops with TESTING work type and no file modifications)
     if [ "$work_type" = "TESTING" ] && [ "$files_modified" = "0" ]; then
