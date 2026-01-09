@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Configuration (can be overridden by environment variables)
-RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-20}"
+RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-50}"
 RALPH_COST_LIMIT="${RALPH_COST_LIMIT:-10.00}"
 RALPH_AUTO_APPROVE_PUSH="${RALPH_AUTO_APPROVE_PUSH:-false}"
 RALPH_DIR="${RALPH_DIR:-.ralph}"
@@ -563,16 +563,24 @@ STEPS:
 3) If all Phase 3 tasks are [x]:
    - Log to DECISIONS_FILE_PATH: "Phase 3 complete - all review tasks checked"
    - STOP immediately (Ralph will advance based on Phase 4 status)
-4) Check what files were created (git status, git diff --name-only, git diff --cached --name-only)
+4) Check what files were created/modified THIS RUN:
+   - Run 'git diff --name-only' to see modified files
+   - Run 'git status --porcelain' to see new untracked files created during implementation
+
 5) Perform thorough code review:
    - Bugs, security issues, code quality, edge cases
    - Logic errors, null checks, error handling
-   - CHECK: Were any documentation files created (SUMMARY.md, GUIDE.md, etc.)?
-   - CHECK: Were any test running guides created?
-   - If documentation files found, these are bugs that need fixing
+   - CHECK: Did implementation create unwanted documentation files?
+     * Look for SUMMARY.md, GUIDE.md, HOWTO.md, etc. in git status/diff
+     * Test running guides (RUNNING_TESTS.md, TEST_COVERAGE.md)
+     * Only flag files that were CREATED during this run, not pre-existing files
+   - CHECK: Will any sensitive files be committed?
+     * Look at what files are staged or modified
+     * Files like .env, .envrc, credentials.json should NOT be staged
+     * But DO NOT delete pre-existing sensitive files - just ensure they're not staged
 
 6) Log findings in DECISIONS_FILE_PATH using standard format
-7) IF issues found (including unwanted docs):
+7) IF issues found:
    - ADD fix tasks to Phase 4 using the template below
    - ADD re-review task to Phase 3 if needed
 8) IF clean: note "Review passed - no issues found" in DECISIONS_FILE_PATH
@@ -584,12 +592,16 @@ Use the Edit tool to add tasks after "## Phase 4: FIX" header, before "## Phase 
 Format each task as:
 - [ ] Fix: <specific description of what needs fixing>
 
+IMPORTANT - Only delete files that were CREATED during this implementation run:
+- Files YOU created (SUMMARY.md, GUIDE.md, etc.) → Delete them
+- Pre-existing project files (.envrc, .env, *.bak, local config files) → Just ensure not staged, DO NOT delete
+
 Example - if you find 3 issues:
 
 ## Phase 4: FIX
-- [ ] Fix: Delete tests/SUMMARY.md (unwanted documentation file)
+- [ ] Fix: Delete tests/SUMMARY.md (documentation file created during implementation)
 - [ ] Fix: Add input validation to login() function in auth.py (security issue)
-- [ ] Fix: Handle None return value in get_user() at user.py:45 (potential bug)
+- [ ] Fix: Ensure .envrc is not staged (pre-existing file with secrets, just unstage it)
 
 ## Phase 5: TEST
 
@@ -735,22 +747,28 @@ STEPS:
    - VERIFY Phase 5 actually executed tests/linter (look for command output, not just "I will run tests")
    - Verify commands were run and results logged
 4) Run 'git status' and 'git diff --cached --name-only' to check staged files
-5) Perform final review:
+5) Identify what files were CREATED during this run vs pre-existing:
+   - Compare git status output against DECISIONS_FILE_PATH to see what was implemented
+   - Files mentioned in Phase 2 implementation tasks = created during this run
+   - Other files in git status = likely pre-existing
+
+6) Perform final review:
    - VERIFY tests/linter/type-checker actually ran with real output
    - Verify all changes complete and correct
    - Check code quality, error handling, edge cases
-   - CHECK git status for documentation files that should NOT be staged:
-     * Any SUMMARY.md, GUIDE.md, HOWTO.md, README.md files you created
-     * Any test running guides (RUNNING_TESTS.md, TEST_COVERAGE.md, etc.)
-     * Any markdown files in tests/ directory explaining implementation
+   - CHECK git status for files that should NOT be committed:
+     * Documentation files CREATED during implementation (SUMMARY.md, GUIDE.md, etc.)
+     * Test running guides created during implementation
+     * Markdown files in tests/ directory created during implementation
+     * Pre-existing sensitive files (.envrc, .env, credentials.json) - should not be staged
    - Check NO .claude/ or .ralph/ files staged
 
-6) Log findings in DECISIONS_FILE_PATH using standard format
-7) IF issues found (docs staged, tests not actually run, etc.):
+7) Log findings in DECISIONS_FILE_PATH using standard format
+8) IF issues found (unwanted files staged, tests not actually run, etc.):
    - ADD fix tasks to Phase 8 using template below
    - ADD re-review task to Phase 7
-8) IF clean AND tests verified with actual output: note "Final review passed" in DECISIONS_FILE_PATH
-9) Mark current task as '- [x]' and STOP
+9) IF clean AND tests verified with actual output: note "Final review passed" in DECISIONS_FILE_PATH
+10) Mark current task as '- [x]' and STOP
 
 HOW TO ADD FIX TASKS TO PHASE 8:
 Use the Edit tool to add tasks after "## Phase 8: FIX" header, before "## Phase 9:" header.
@@ -758,10 +776,15 @@ Use the Edit tool to add tasks after "## Phase 8: FIX" header, before "## Phase 
 Format each task as:
 - [ ] Fix: <specific issue requiring correction>
 
+IMPORTANT - Only delete files that were CREATED during this implementation run:
+- Files created during implementation (SUMMARY.md, GUIDE.md, etc.) → Delete them
+- Pre-existing project files (.envrc, backup files, etc.) → Just unstage, DO NOT delete
+
 Example:
 
 ## Phase 8: FIX
-- [ ] Fix: Unstage tests/SUMMARY.md (unwanted documentation)
+- [ ] Fix: Delete tests/SUMMARY.md (documentation file created during implementation)
+- [ ] Fix: Unstage .envrc (pre-existing file with secrets, just remove from staging)
 - [ ] Fix: Tests were not actually executed in Phase 5 - decisions.md shows only intent, not output
 
 ## Phase 9: COMMIT
@@ -827,36 +850,40 @@ STEPS:
    - Run 'git diff --cached' to see already staged changes
    - Run 'git status' to see all files
 
-6) Before staging, CHECK for problematic files that should NOT be committed:
-   - Any SUMMARY.md, GUIDE.md, HOWTO.md, README.md files you created? → DO NOT stage
-   - Any test running guides (RUNNING_TESTS.md, TEST_COVERAGE.md)? → DO NOT stage
-   - Any documentation in tests/ directory explaining your work? → DO NOT stage
-   - Any .claude/ or .ralph/ files? → DO NOT stage
-   - Any temporary helper scripts not part of implementation? → DO NOT stage
+6) Identify files created during implementation by reviewing DECISIONS_FILE_PATH and Phase 2 tasks
 
-7) Stage ONLY implementation files:
+7) Before staging, CHECK for problematic files that should NOT be committed:
+   - Documentation files YOU created during implementation (SUMMARY.md, GUIDE.md, etc.) → DO NOT stage
+   - Test running guides you created (RUNNING_TESTS.md, TEST_COVERAGE.md) → DO NOT stage
+   - Markdown files in tests/ directory you created → DO NOT stage
+   - .claude/ or .ralph/ files → DO NOT stage
+   - Pre-existing sensitive files (.envrc, .env, credentials.json) → DO NOT stage
+   - Temporary backup files (*.bak) → DO NOT stage
+
+8) Stage ONLY implementation files:
    - Source code (*.py, *.js, *.go, etc.)
    - Test files (test_*.py, *.test.js, etc.)
    - Configuration files (*.yaml, *.json, *.toml, etc.)
    - Use 'git add' for specific files, or 'git add -p' for interactive staging
+   - Stage ONLY files that are part of the implementation
 
-8) Check staged files:
+9) Check staged files:
    - Run 'git diff --cached --name-only' to verify only correct files staged
    - If any problematic files staged, unstage them with 'git reset HEAD <file>'
 
-9) If nothing to commit (all files were filtered out):
-   - Log to DECISIONS_FILE_PATH: "No files to commit - only documentation was created"
-   - Mark Phase 9 task as '- [x]'
-   - STOP
+10) If nothing to commit (all files were filtered out):
+    - Log to DECISIONS_FILE_PATH: "No files to commit - only documentation was created"
+    - Mark Phase 9 task as '- [x]'
+    - STOP
 
-10) Create commit following project conventions you discovered:
+11) Create commit following project conventions you discovered:
     - Write a descriptive commit message explaining the what and why
     - Follow the format/style from 'git log' output
     - Use 'git commit' with appropriate message
 
-11) Mark Phase 9 task as '- [x]'
-12) Log commit details to DECISIONS_FILE_PATH
-13) STOP
+12) Mark Phase 9 task as '- [x]'
+13) Log commit details to DECISIONS_FILE_PATH
+14) STOP
 
 IMPORTANT:
 - Do NOT push unless explicitly requested in the original task
