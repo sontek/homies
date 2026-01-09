@@ -266,38 +266,35 @@ detect_phase_completion() {
             phase_tasks_complete 2 && return 0
             ;;
         3)
-            # Phase 3 complete (advances to next phase)
-            # If Phase 4 has tasks, we'll move to Phase 4
-            # If Phase 4 is empty, we'll move to Phase 5
-            return 0
+            # Phase 3 complete when all Phase 3 review tasks are checked
+            # After completion, will advance to Phase 4 (if tasks added) or Phase 5
+            phase_tasks_complete 3 && return 0
             ;;
         4)
             # Phase 4 complete when all fix tasks done (returns to Phase 3)
             phase_tasks_complete 4 && return 0
             ;;
         5)
-            # Phase 5 complete (advances to next phase)
-            # If Phase 6 has tasks, we'll move to Phase 6
-            # If Phase 6 is empty, we'll move to Phase 7
-            return 0
+            # Phase 5 complete when all Phase 5 test tasks are checked
+            # After completion, will advance to Phase 6 (if tasks added) or Phase 7
+            phase_tasks_complete 5 && return 0
             ;;
         6)
             # Phase 6 complete when all fix tasks done (returns to Phase 5)
             phase_tasks_complete 6 && return 0
             ;;
         7)
-            # Phase 7 complete (advances to next phase)
-            # If Phase 8 has tasks, we'll move to Phase 8
-            # If Phase 8 is empty, we'll move to Phase 9
-            return 0
+            # Phase 7 complete when all Phase 7 final review tasks are checked
+            # After completion, will advance to Phase 8 (if tasks added) or Phase 9
+            phase_tasks_complete 7 && return 0
             ;;
         8)
             # Phase 8 complete when all fix tasks done (returns to Phase 7)
             phase_tasks_complete 8 && return 0
             ;;
         9)
-            # Phase 9 complete immediately after commit
-            return 0
+            # Phase 9 complete when commit task is checked
+            phase_tasks_complete 9 && return 0
             ;;
     esac
     return 1
@@ -330,24 +327,63 @@ determine_next_phase() {
     esac
 }
 
-# Get phase-specific system prompt
+# Get generic system prompt (same for all phases)
+get_system_prompt() {
+    cat <<'EOF'
+You are running in an autonomous workflow system called Ralph.
+
+Ralph orchestrates a 9-phase development workflow:
+1. PLAN - Create implementation plan
+2. IMPLEMENT - Write code
+3. REVIEW - Code review
+4. FIX - Fix review issues
+5. TEST - Run tests/linter/type checker
+6. FIX - Fix test failures
+7. FINAL-REVIEW - Final verification
+8. FIX - Final fixes
+9. COMMIT - Create git commit
+
+CRITICAL AUTONOMOUS WORKFLOW RULES:
+- Work on ONE task at a time from the plan
+- ACTUALLY EXECUTE commands (tests, linter, etc.) - don't just document how to run them
+- Wait for commands to complete and verify results
+- Be MINIMAL - only create files necessary for implementation
+- Follow existing project conventions (check justfile, package.json, Makefile, etc.)
+- DO NOT create user-facing documentation (README.md, SUMMARY.md, HOWTO.md) unless explicitly requested
+- DO NOT create bash scripts if project uses other tools (justfile, npm scripts)
+- DO NOT stage/commit:
+  - .claude/ or .ralph/ directories
+  - Documentation summaries, implementation guides, planning documents you create
+  - Temporary helper scripts (unless they're part of the actual implementation)
+- ONLY stage actual implementation files (source code, tests, config files)
+- Log all decisions and test results to .ralph/decisions.md
+
+Your responses should be concise. Execute tasks, verify results, update the plan, and move forward.
+EOF
+}
+
+# Get phase-specific instructions (sent as regular prompt, not system prompt)
 get_phase_prompt() {
     local phase=$1
 
     case $phase in
         1)
             cat <<'EOF'
-Your task: Create an implementation plan in a markdown file at PLAN_FILE_PLACEHOLDER
-
-IMPORTANT: This plan is a LIVING DOCUMENT. Review and test phases will UPDATE the plan with new fix tasks.
+Create an implementation plan in a markdown file at PLAN_FILE_PATH
 
 The plan must be organized into these 9 phases:
 
 ## Phase 1: PLAN
-List 2-3 analysis tasks (understand requirements, review existing code, identify gaps)
+List analysis tasks needed to understand the work (typically 2-4 tasks):
+- Understand requirements and scope
+- Review existing code and patterns
+- Identify gaps and approach
 
 ## Phase 2: IMPLEMENT
-List 2-4 implementation tasks (write code, add tests, etc.)
+List ALL implementation tasks needed to complete the work. Break down into specific, actionable items:
+- Each task should be concrete (e.g., "Create test_queue_models.py" not "Add tests")
+- Include code files, test files, and configuration changes
+- Be thorough - list everything that needs to be created or modified
 
 ## Phase 3: REVIEW
 List 1 review task:
@@ -376,156 +412,157 @@ List 1 task:
 
 Each task should be a single line starting with '- [ ]' (markdown checkbox).
 
-CRITICAL:
-- Write to PLAN_FILE_PLACEHOLDER (use Write tool)
-- DO NOT implement anything
-- DO NOT write code
-- DO NOT make commits
-- DO NOT stage/commit .claude/ or .ralph/ files
+Write to PLAN_FILE_PATH (use Write tool). DO NOT implement anything yet.
 EOF
             ;;
         2)
             cat <<'EOF'
-Your task: Complete the next Phase 2 (IMPLEMENT) task from the plan.
+Complete the next Phase 2 (IMPLEMENT) task from the plan.
 
-1) Read PLAN_FILE_PLACEHOLDER
+1) Read PLAN_FILE_PATH
 2) Find the FIRST unchecked Phase 2 task (line starting with '- [ ]' under ## Phase 2)
-3) Complete ONLY that one task
+3) Complete ONLY that one task (write code, tests, configs ONLY)
 4) Mark it as done by changing '- [ ]' to '- [x]'
-5) Stop and exit
+5) Log what you did in .ralph/decisions.md
+6) Stop and exit
 
-DO NOT work on tasks from other phases. DO NOT work on multiple tasks at once.
+CRITICAL - DO NOT CREATE:
+- Documentation files (SUMMARY.md, GUIDE.md, HOWTO.md, README.md, etc.)
+- Test running guides (RUNNING_TESTS.md, TEST_GUIDE.md, etc.)
+- Coverage reports or summaries as files
+- Any markdown files explaining what you did
 
-Important notes:
-- Log implementation decisions in .ralph/decisions.md
-- Use 'sudo docker' for docker commands in sandbox
-- DO NOT stage/commit .claude/ or .ralph/ files
+ONLY create: source code, test files, and configuration files.
 EOF
             ;;
         3)
             cat <<'EOF'
-Your task: Review the implementation (Phase 3).
+Review the implementation (Phase 3).
 
-1) Read PLAN_FILE_PLACEHOLDER
+1) Read PLAN_FILE_PATH
 2) Find the FIRST unchecked Phase 3 task
-3) Perform a thorough code review looking for:
-   - Bugs and logic errors
-   - Security issues
-   - Code quality and best practices
-   - Edge cases and error handling
-4) Log detailed findings in .ralph/decisions.md
-5) IF issues found:
-   - ADD specific fix tasks to Phase 4 (e.g. '- [ ] Fix: Add null check in login()')
-   - ADD a re-review task to Phase 3 (e.g. '- [ ] Re-review implementation after Phase 4 fixes')
-6) IF no issues found:
-   - Do NOT add re-review task
-   - Note in .ralph/decisions.md that review is clean
-7) Mark current Phase 3 task as '- [x]'
-8) Stop and exit
+3) Check what files were created (git status, git diff --name-only)
+4) Perform thorough code review:
+   - Bugs, security issues, code quality, edge cases
+   - CHECK: Were any documentation files created (SUMMARY.md, GUIDE.md, etc.)?
+   - CHECK: Were any test running guides created?
+   - If documentation files found, these are bugs that need fixing
 
-CRITICAL: When adding tasks, preserve the plan structure and phase headers.
+5) Log findings in .ralph/decisions.md
+6) IF issues found (including unwanted docs):
+   - ADD fix tasks to Phase 4 (e.g., '- [ ] Fix: Delete tests/SUMMARY.md')
+   - ADD re-review task to Phase 3 (e.g., '- [ ] Re-review after Phase 4 fixes')
+7) IF clean: note in .ralph/decisions.md
+8) Mark current task as '- [x]' and exit
+
+When adding tasks, preserve the plan structure and phase headers.
 EOF
             ;;
         4)
             cat <<'EOF'
-Your task: Fix issues identified in Phase 3 review.
+Fix issues from Phase 3 review.
 
-1) Read PLAN_FILE_PLACEHOLDER
-2) Find the FIRST unchecked Phase 4 task
-3) Complete the fix described in the task
-4) Mark it as '- [x]'
-5) Log what was fixed in .ralph/decisions.md
-6) Stop and exit
-
-DO NOT work on multiple tasks at once.
+1) Read PLAN_FILE_PATH
+2) Find FIRST unchecked Phase 4 task
+3) Complete the fix
+4) Mark as '- [x]' and log in .ralph/decisions.md
+5) Exit
 EOF
             ;;
         5)
             cat <<'EOF'
-Your task: Run tests and linter (Phase 5).
+Run tests, linter, and type checker (Phase 5).
 
-1) Read PLAN_FILE_PLACEHOLDER
-2) Find the FIRST unchecked Phase 5 task
-3) Run the project's test suite and linter:
-   - Discover what tools the project uses (check justfile, package.json, pyproject.toml, etc.)
-   - Run tests (e.g. 'just test', 'uv run pytest', 'npm test')
-   - Run linter (e.g. 'just lint', 'just format', 'npm run lint')
-4) Log results in .ralph/decisions.md
-5) IF tests fail or linter reports issues:
-   - ADD specific fix tasks to Phase 6 (e.g. '- [ ] Fix: test_login failing - update validation')
-   - ADD a re-test task to Phase 5 (e.g. '- [ ] Re-run tests after Phase 6 fixes')
-6) IF all tests pass and linter is clean:
-   - Do NOT add re-test task
-   - Note in .ralph/decisions.md that tests are passing
-7) Mark current Phase 5 task as '- [x]'
-8) Stop and exit
+CRITICAL: You must ACTUALLY EXECUTE these commands, not just document how to run them.
 
-CRITICAL: When adding tasks, preserve the plan structure and phase headers.
+1) Read PLAN_FILE_PATH and find FIRST unchecked Phase 5 task
+2) Discover project tools (check justfile, package.json, pyproject.toml, Makefile, .github/workflows)
+3) EXECUTE all quality checks:
+   - Tests (e.g., 'just test', 'uv run pytest', 'npm test')
+   - Linter (e.g., 'just lint', 'uv run ruff check', 'npm run lint')
+   - Type checker (e.g., 'uv run mypy', 'npm run typecheck')
+   - Pre-commit hooks if configured
+
+4) Wait for commands to complete, capture full output
+5) Log to .ralph/decisions.md: commands run, output, pass/fail status
+6) IF failures:
+   - ADD fix tasks to Phase 6 (e.g., '- [ ] Fix: test_login failing')
+   - ADD re-test task to Phase 5
+7) IF all pass: note in .ralph/decisions.md
+8) Mark as '- [x]' and exit
 EOF
             ;;
         6)
             cat <<'EOF'
-Your task: Fix test failures or linter issues (Phase 6).
+Fix test failures or linter issues (Phase 6).
 
-1) Read PLAN_FILE_PLACEHOLDER
-2) Find the FIRST unchecked Phase 6 task
-3) Complete the fix described in the task
-4) Mark it as '- [x]'
-5) Log what was fixed in .ralph/decisions.md
-6) Stop and exit
-
-DO NOT work on multiple tasks at once.
+1) Read PLAN_FILE_PATH
+2) Find FIRST unchecked Phase 6 task
+3) Complete the fix
+4) Mark as '- [x]' and log in .ralph/decisions.md
+5) Exit
 EOF
             ;;
         7)
             cat <<'EOF'
-Your task: Final comprehensive review (Phase 7).
+Final comprehensive review (Phase 7).
 
-1) Read PLAN_FILE_PLACEHOLDER
-2) Find the FIRST unchecked Phase 7 task
-3) Perform a final thorough review:
-   - Verify all changes are complete and correct
-   - Check code quality and best practices
-   - Verify error handling and edge cases
-   - Ensure tests are comprehensive
-4) Log detailed findings in .ralph/decisions.md
-5) IF issues found:
-   - ADD specific fix tasks to Phase 8 (e.g. '- [ ] Fix: Missing error handling in edge case')
-   - ADD a re-review task to Phase 7 (e.g. '- [ ] Re-review after Phase 8 fixes')
-6) IF no issues found:
-   - Do NOT add re-review task
-   - Note in .ralph/decisions.md that final review is clean
-7) Mark current Phase 7 task as '- [x]'
-8) Stop and exit
+1) Read PLAN_FILE_PATH and find FIRST unchecked Phase 7 task
+2) Read .ralph/decisions.md to VERIFY Phase 5 actually executed tests/linter
+3) Run `git status` and check for problematic staged files
+4) Perform final review:
+   - VERIFY tests/linter/type-checker actually ran (check .ralph/decisions.md for command output)
+   - Verify all changes complete and correct
+   - Check code quality, error handling, edge cases
+   - CHECK git status for documentation files that should NOT be staged:
+     * Any SUMMARY.md, GUIDE.md, HOWTO.md, README.md files you created
+     * Any test running guides (RUNNING_TESTS.md, TEST_COVERAGE.md, etc.)
+     * Any markdown files in tests/ directory explaining implementation
+   - Check NO .claude/ or .ralph/ files staged
 
-CRITICAL: When adding tasks, preserve the plan structure and phase headers.
+5) Log findings in .ralph/decisions.md
+6) IF issues found (docs staged, tests not run, etc.):
+   - ADD fix tasks to Phase 8 (e.g., "Unstage tests/SUMMARY.md")
+   - ADD re-review task to Phase 7
+7) IF clean AND tests verified: note in .ralph/decisions.md
+8) Mark as '- [x]' and exit
+
+This is VERIFICATION - ensure everything was actually done correctly, not just documented.
 EOF
             ;;
         8)
             cat <<'EOF'
-Your task: Fix issues identified in Phase 7 final review.
+Fix issues from Phase 7 final review.
 
-1) Read PLAN_FILE_PLACEHOLDER
-2) Find the FIRST unchecked Phase 8 task
-3) Complete the fix described in the task
-4) Mark it as '- [x]'
-5) Log what was fixed in .ralph/decisions.md
-6) Stop and exit
-
-DO NOT work on multiple tasks at once.
+1) Read PLAN_FILE_PATH
+2) Find FIRST unchecked Phase 8 task
+3) Complete the fix
+4) Mark as '- [x]' and log in .ralph/decisions.md
+5) Exit
 EOF
             ;;
         9)
             cat <<'EOF'
-Your task: Create git commit (Phase 9).
+Create git commit (Phase 9).
 
-1) Review all changes made (git diff, git status)
-2) Stage relevant files (DO NOT stage .claude/ or .ralph/ files)
-3) Create a commit
-4) Mark the Phase 9 task as '- [x]' in the plan
-5) Stop and exit
+1) Review all changes (git diff, git status)
+2) Before staging, CHECK for problematic files:
+   - Run `git status` and identify any .md files you created
+   - Any SUMMARY.md, GUIDE.md, HOWTO.md, README.md files you created? → DO NOT stage
+   - Any test running guides (RUNNING_TESTS.md, TEST_COVERAGE.md)? → DO NOT stage
+   - Any documentation in tests/ directory? → DO NOT stage
+   - Any .claude/ or .ralph/ files? → DO NOT stage
 
-CRITICAL: Do NOT push unless explicitly requested by the user.
+3) Stage ONLY implementation files:
+   - Source code (*.py, *.js, *.go, etc.)
+   - Test files (test_*.py, *.test.js, etc.)
+   - Configuration files (*.yaml, *.json, *.toml, etc.)
+
+4) Create commit following project conventions
+5) Mark Phase 9 task as '- [x]'
+6) Exit
+
+Do NOT push unless explicitly requested.
 EOF
             ;;
     esac
@@ -565,9 +602,31 @@ run_claude() {
     local state=$(load_state)
     local current_phase=$(echo "$state" | jq -r '.current_phase // 1')
     local phase_iterations=$(echo "$state" | jq -r '.phase_iterations // 0')
+    local original_prompt="$message"
 
-    # Get phase-specific system prompt
-    local SYSTEM_PROMPT=$(get_phase_prompt "$current_phase" | sed "s|PLAN_FILE_PLACEHOLDER|$PLAN_FILE|g")
+    # Get generic system prompt (same for all phases)
+    local SYSTEM_PROMPT=$(get_system_prompt)
+
+    # Get phase-specific instructions with actual plan filename injected
+    local PHASE_INSTRUCTIONS=$(get_phase_prompt "$current_phase" | sed "s|PLAN_FILE_PATH|$PLAN_FILE|g")
+
+    # Build dynamic regular prompt
+    local FULL_PROMPT
+    if [ "$current_phase" = "1" ]; then
+        # Phase 1: Just the original task + phase instructions
+        FULL_PROMPT="Original task: $original_prompt
+
+Phase 1 (PLAN) instructions:
+$PHASE_INSTRUCTIONS"
+    else
+        # Phases 2-9: Reference the plan document
+        FULL_PROMPT="Original task: $original_prompt
+Plan document: $PLAN_FILE
+
+Current phase: Phase $current_phase
+Phase instructions:
+$PHASE_INSTRUCTIONS"
+    fi
 
     # Phase names for logging
     local phase_name
@@ -595,18 +654,27 @@ run_claude() {
         fi
     fi
 
-    log_info "Executing: $CLAUDE_CMD -p --system-prompt \"...\" --permission-mode acceptEdits"
+    log_info "Executing: $CLAUDE_CMD -p --system-prompt \"<generic>\" --permission-mode acceptEdits"
+
+    # Log the phase-specific prompt being sent
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "PROMPT (Phase $current_phase - $phase_name):"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "$FULL_PROMPT"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
 
     # Run Claude and capture output and exit code
     local output_file=$(mktemp)
 
     if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
         # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
-        script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$message" > /dev/null 2>&1
+        script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$FULL_PROMPT" > /dev/null 2>&1
         local exit_code=$?
     else
         # Native claude handles TTY properly
-        "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$message" > "$output_file" 2>&1
+        "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$FULL_PROMPT" > "$output_file" 2>&1
         local exit_code=$?
     fi
 
@@ -644,6 +712,14 @@ run_workflow() {
 
     log_info "Starting Ralph autonomous workflow..."
     log_info "Prompt: $prompt"
+    echo ""
+
+    # Show system prompt once at the beginning
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "SYSTEM PROMPT (used for all phases):"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    get_system_prompt
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
     # Infinite loop - Claude will work until the task is complete
