@@ -37,8 +37,11 @@ RUN_DIR="$RALPH_RUNS_DIR/$RALPH_RUN_ID"
 # Plan file for current run
 PLAN_FILE="$RUN_DIR/plan.md"
 
+# Decisions file for current run (logs what was done each iteration)
+DECISIONS_FILE="$RUN_DIR/decisions.md"
+
 # Claude Code uses .claude/ for its own files (todos.json)
-# Ralph uses .ralph/ for its own files (state, done, decisions, audit, runs)
+# Ralph uses .ralph/ for its own files (state, audit, runs)
 CLAUDE_DIR=".claude"
 
 # Colors for output
@@ -111,7 +114,7 @@ archive_old_state() {
     # Check if there are any state files from previous run
     local has_old_files=false
 
-    if [ -f "$STATE_FILE" ] || [ -f "$CLAUDE_DIR/todos.json" ] || [ -f ".ralph/decisions.md" ]; then
+    if [ -f "$STATE_FILE" ] || [ -f "$CLAUDE_DIR/todos.json" ]; then
         has_old_files=true
     fi
 
@@ -132,7 +135,6 @@ archive_old_state() {
         # Move old state files to archive
         [ -f "$STATE_FILE" ] && mv "$STATE_FILE" "$archive_dir/" 2>/dev/null || true
         [ -f "$CLAUDE_DIR/todos.json" ] && mv "$CLAUDE_DIR/todos.json" "$archive_dir/" 2>/dev/null || true
-        [ -f ".ralph/decisions.md" ] && mv ".ralph/decisions.md" "$archive_dir/" 2>/dev/null || true
     fi
 }
 
@@ -239,7 +241,24 @@ phase_has_unchecked() {
     local phase=$1
     [ ! -f "$PLAN_FILE" ] && return 1
 
-    local count=$(awk "/^## Phase $phase:/,/^## Phase [0-9]+:/ { if (/^- \[ \]/) count++ } END { print count+0 }" "$PLAN_FILE")
+    # Use awk to count unchecked tasks in the phase section
+    # Start at phase header, process until next phase header (excluding current phase)
+    # This handles whitespace variations: - [ ], -  [ ], etc.
+    local count=$(awk -v phase="$phase" '
+        /^## Phase [0-9]+:/ {
+            # Found a phase header
+            phase_num = $3
+            gsub(/:/, "", phase_num)
+            in_target_phase = (phase_num == phase)
+            next
+        }
+        in_target_phase && /^-[ \t]+\[[ \t]\]/ {
+            # Found unchecked task in target phase
+            count++
+        }
+        END { print count+0 }
+    ' "$PLAN_FILE")
+
     [ "$count" -gt 0 ] && return 0 || return 1
 }
 
@@ -258,8 +277,11 @@ detect_phase_completion() {
 
     case $phase in
         1)
-            # Phase 1 complete when plan.md exists with proper structure
-            [ -f "$PLAN_FILE" ] && grep -q "^## Phase 9:" "$PLAN_FILE" && return 0
+            # Phase 1 complete when plan.md exists with proper structure AND all Phase 1 tasks are checked
+            if [ -f "$PLAN_FILE" ] && grep -q "^## Phase 9:" "$PLAN_FILE"; then
+                # Plan file exists with all phases, now check if Phase 1 tasks are done
+                phase_tasks_complete 1 && return 0
+            fi
             ;;
         2)
             # Phase 2 complete when all Phase 2 tasks are checked
@@ -343,8 +365,28 @@ Ralph orchestrates a 9-phase development workflow:
 8. FIX - Final fixes
 9. COMMIT - Create git commit
 
+STATELESS OPERATION (CRITICAL):
+You are called iteratively. Each invocation should complete ONE task from the plan, then STOP.
+Do not continue to additional tasks. Ralph controls phase transitions and will call you again
+for the next task. You have NO MEMORY of previous invocations - rebuild context by reading:
+1. DECISIONS_FILE_PATH (what happened in previous iterations)
+2. git status and git diff (current state)
+3. The plan file (what's done, what's remaining)
+
+Ralph may call you multiple times for the same phase if multiple tasks exist. Each call completes
+ONE task. Ralph automatically detects when all tasks in a phase are complete and transitions to
+the next phase. You do NOT control phase transitions.
+
+STOP CONDITION:
+After completing your assigned task and marking it [x] in the plan, your work for this iteration
+is COMPLETE. Do not proceed to additional tasks, create new tasks, or continue working. Do not
+explain what you'll do next or prepare for future work. STOP IMMEDIATELY after:
+1. Completing the one task assigned to you
+2. Marking that task as [x] in the plan file
+3. Logging the outcome to DECISIONS_FILE_PATH
+
 CRITICAL AUTONOMOUS WORKFLOW RULES:
-- Work on ONE task at a time from the plan
+- Work on ONE task at a time from the plan (even if multiple similar tasks exist)
 - ACTUALLY EXECUTE commands (tests, linter, etc.) - don't just document how to run them
 - Wait for commands to complete and verify results
 - Be MINIMAL - only create files necessary for implementation
@@ -356,9 +398,48 @@ CRITICAL AUTONOMOUS WORKFLOW RULES:
   - Documentation summaries, implementation guides, planning documents you create
   - Temporary helper scripts (unless they're part of the actual implementation)
 - ONLY stage actual implementation files (source code, tests, config files)
-- Log all decisions and test results to .ralph/decisions.md
+- Log all decisions and test results to DECISIONS_FILE_PATH
 
-Your responses should be concise. Execute tasks, verify results, update the plan, and move forward.
+SCOPE BOUNDARIES (resist the urge to be "helpful"):
+- Do NOT fix unrelated bugs you notice
+- Do NOT refactor code not mentioned in your specific task
+- Do NOT add features not in the plan
+- Do NOT improve code style unless it's a documented issue
+- Do NOT create helper scripts, utilities, or convenience functions unless they're part of the task
+Your job is to complete the EXACT task assigned, nothing more.
+
+ERROR HANDLING:
+If you encounter errors you cannot resolve:
+1. Log the error to DECISIONS_FILE_PATH with full details
+2. Do NOT attempt to fix unrelated issues or work around the problem
+3. Stop immediately - Ralph will handle recovery
+
+Examples of errors to log and stop:
+- Command fails with non-zero exit code
+- File not found that should exist
+- Git operation fails (conflicts, merge issues)
+- Cannot parse or find required data
+
+LOGGING FORMAT for DECISIONS_FILE_PATH:
+
+## [Iteration N] Phase X: Task Name
+
+**Task:** (copy the exact task from plan)
+
+**What I Did:**
+- Concrete actions taken (commands run, files modified, etc.)
+
+**Why:**
+- Rationale for approach chosen
+
+**Result:**
+- Success or failure
+- Key outputs, error messages, or findings
+- Any follow-up work needed
+
+Use this format for all decision logging to maintain consistency across iterations.
+
+Your responses should be concise. Execute tasks, verify results, update the plan, log decisions, and STOP.
 EOF
 }
 
@@ -369,7 +450,12 @@ get_phase_prompt() {
     case $phase in
         1)
             cat <<'EOF'
-Create an implementation plan in a markdown file at PLAN_FILE_PATH
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH (if it exists) to understand previous iterations
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Understand the requirements from the original task
+
+TASK: Create an implementation plan in a markdown file at PLAN_FILE_PATH
 
 The plan must be organized into these 9 phases:
 
@@ -379,52 +465,77 @@ List analysis tasks needed to understand the work (typically 2-4 tasks):
 - Review existing code and patterns
 - Identify gaps and approach
 
+After creating the plan, you must COMPLETE these Phase 1 tasks by marking them [x] before
+Ralph will advance to Phase 2. Do thorough research for each task.
+
 ## Phase 2: IMPLEMENT
 List ALL implementation tasks needed to complete the work. Break down into specific, actionable items:
-- Each task should be concrete (e.g., "Create test_queue_models.py" not "Add tests")
+- Each task should be concrete and specific
+- Good: "- [ ] Create test_queue_models.py with tests for QueueModel.save() edge cases"
+- Bad: "- [ ] Add tests" (too vague)
 - Include code files, test files, and configuration changes
 - Be thorough - list everything that needs to be created or modified
 
 ## Phase 3: REVIEW
 List 1 review task:
-- Review implementation for bugs, security issues, logic errors, and code quality
+- [ ] Review implementation for bugs, security issues, logic errors, and code quality
 
 ## Phase 4: FIX
-(Initially empty - will be populated by Phase 3 review findings)
+(Leave this section EMPTY - just the header. Will be populated by Phase 3 review findings if issues found)
 
 ## Phase 5: TEST
 List 1 test task:
-- Run project tests, linter, and type checker
+- [ ] Run project tests, linter, and type checker
 
 ## Phase 6: FIX
-(Initially empty - will be populated by Phase 5 test failures)
+(Leave this section EMPTY - just the header. Will be populated by Phase 5 if test failures occur)
 
 ## Phase 7: FINAL-REVIEW
 List 1 final review task:
-- Final review of all changes for quality, completeness, and correctness
+- [ ] Final review of all changes for quality, completeness, and correctness
 
 ## Phase 8: FIX
-(Initially empty - will be populated by Phase 7 review findings)
+(Leave this section EMPTY - just the header. Will be populated by Phase 7 review findings if issues found)
 
 ## Phase 9: COMMIT
 List 1 task:
-- Create git commit with descriptive message following project conventions
+- [ ] Create git commit with descriptive message following project conventions
 
-Each task should be a single line starting with '- [ ]' (markdown checkbox).
+IMPORTANT:
+- Each task is a single line starting with '- [ ]' (markdown checkbox)
+- Phases 4, 6, 8 should have ONLY the header line, no tasks (they're populated dynamically during review/test phases)
+- Phase 1 tasks will be completed before advancing to Phase 2
 
-Write to PLAN_FILE_PATH (use Write tool). DO NOT implement anything yet.
+Write the complete plan to PLAN_FILE_PATH (use Write tool). DO NOT implement anything yet.
+
+After writing the plan, STOP. Ralph will call you again to complete Phase 1 tasks.
 EOF
             ;;
         2)
             cat <<'EOF'
-Complete the next Phase 2 (IMPLEMENT) task from the plan.
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand what happened in previous iterations
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific task
 
+TASK: Complete the next Phase 2 (IMPLEMENT) task from the plan.
+
+CRITICAL - ONE TASK ONLY:
+You MUST complete ONLY ONE task per iteration, even if you see multiple related tasks.
+Ralph requires per-task granularity for progress tracking and phase management.
+Do NOT batch multiple tasks together "for efficiency" - this breaks the autonomous workflow.
+
+STEPS:
 1) Read PLAN_FILE_PATH
 2) Find the FIRST unchecked Phase 2 task (line starting with '- [ ]' under ## Phase 2)
-3) Complete ONLY that one task (write code, tests, configs ONLY)
-4) Mark it as done by changing '- [ ]' to '- [x]'
-5) Log what you did in .ralph/decisions.md
-6) Stop and exit
+3) If all Phase 2 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 2 complete - all implementation tasks checked"
+   - STOP immediately (Ralph will advance to Phase 3)
+4) If unchecked task found:
+   - Complete ONLY that ONE task (write code, tests, configs ONLY)
+   - Mark it as done by changing '- [ ]' to '- [x]'
+   - Log what you did in DECISIONS_FILE_PATH using the standard format
+   - STOP IMMEDIATELY - do not continue to the next task
 
 CRITICAL - DO NOT CREATE:
 - Documentation files (SUMMARY.md, GUIDE.md, HOWTO.md, README.md, etc.)
@@ -432,86 +543,200 @@ CRITICAL - DO NOT CREATE:
 - Coverage reports or summaries as files
 - Any markdown files explaining what you did
 
-ONLY create: source code, test files, and configuration files.
+ONLY create: source code, test files, and configuration files that are part of the task.
+
+After completing ONE task and marking it [x], STOP. Ralph will call you again for the next task.
 EOF
             ;;
         3)
             cat <<'EOF'
-Review the implementation (Phase 3).
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand what happened in previous iterations
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific task
 
+TASK: Review the implementation (Phase 3).
+
+STEPS:
 1) Read PLAN_FILE_PATH
-2) Find the FIRST unchecked Phase 3 task
-3) Check what files were created (git status, git diff --name-only)
-4) Perform thorough code review:
+2) Find the FIRST unchecked Phase 3 task (line starting with '- [ ]' under ## Phase 3)
+3) If all Phase 3 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 3 complete - all review tasks checked"
+   - STOP immediately (Ralph will advance based on Phase 4 status)
+4) Check what files were created (git status, git diff --name-only, git diff --cached --name-only)
+5) Perform thorough code review:
    - Bugs, security issues, code quality, edge cases
+   - Logic errors, null checks, error handling
    - CHECK: Were any documentation files created (SUMMARY.md, GUIDE.md, etc.)?
    - CHECK: Were any test running guides created?
    - If documentation files found, these are bugs that need fixing
 
-5) Log findings in .ralph/decisions.md
-6) IF issues found (including unwanted docs):
-   - ADD fix tasks to Phase 4 (e.g., '- [ ] Fix: Delete tests/SUMMARY.md')
-   - ADD re-review task to Phase 3 (e.g., '- [ ] Re-review after Phase 4 fixes')
-7) IF clean: note in .ralph/decisions.md
-8) Mark current task as '- [x]' and exit
+6) Log findings in DECISIONS_FILE_PATH using standard format
+7) IF issues found (including unwanted docs):
+   - ADD fix tasks to Phase 4 using the template below
+   - ADD re-review task to Phase 3 if needed
+8) IF clean: note "Review passed - no issues found" in DECISIONS_FILE_PATH
+9) Mark current task as '- [x]' and STOP
 
-When adding tasks, preserve the plan structure and phase headers.
+HOW TO ADD FIX TASKS TO PHASE 4:
+Use the Edit tool to add tasks after "## Phase 4: FIX" header, before "## Phase 5:" header.
+
+Format each task as:
+- [ ] Fix: <specific description of what needs fixing>
+
+Example - if you find 3 issues:
+
+## Phase 4: FIX
+- [ ] Fix: Delete tests/SUMMARY.md (unwanted documentation file)
+- [ ] Fix: Add input validation to login() function in auth.py (security issue)
+- [ ] Fix: Handle None return value in get_user() at user.py:45 (potential bug)
+
+## Phase 5: TEST
+
+After adding fix tasks to Phase 4, add a re-review task to Phase 3 if this was the initial review:
+- [ ] Re-review implementation after Phase 4 fixes are complete
+
+After updating the plan and marking your task [x], STOP. Ralph will route to Phase 4 for fixes.
 EOF
             ;;
         4)
             cat <<'EOF'
-Fix issues from Phase 3 review.
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand what issues were found in Phase 3
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific fix task
 
+TASK: Fix issues identified in Phase 3 review.
+
+STEPS:
 1) Read PLAN_FILE_PATH
-2) Find FIRST unchecked Phase 4 task
-3) Complete the fix
-4) Mark as '- [x]' and log in .ralph/decisions.md
-5) Exit
+2) Find the FIRST unchecked Phase 4 task (line starting with '- [ ]' under ## Phase 4)
+3) If all Phase 4 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 4 complete - all fixes applied"
+   - STOP immediately (Ralph will return to Phase 3 for re-review)
+4) If unchecked task found:
+   - Read the task description carefully (it should specify what needs fixing)
+   - Complete ONLY that ONE fix
+   - Mark as '- [x]'
+   - Log the fix in DECISIONS_FILE_PATH using standard format
+   - STOP IMMEDIATELY
+
+IMPORTANT:
+- Do NOT re-run review yourself - Ralph will return to Phase 3 after fixes
+- Do NOT attempt to verify your fix by running tests - that happens in Phase 5
+- Focus on fixing the specific issue described in the task
+- One fix per iteration
+
+After completing ONE fix and marking it [x], STOP. Ralph will call you again for the next fix or return to Phase 3.
 EOF
             ;;
         5)
             cat <<'EOF'
-Run tests, linter, and type checker (Phase 5).
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand what happened in previous iterations
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific task
 
-CRITICAL: You must ACTUALLY EXECUTE these commands, not just document how to run them.
+TASK: Run tests, linter, and type checker (Phase 5).
 
+CRITICAL - ACTUAL EXECUTION REQUIRED:
+You must ACTUALLY EXECUTE these commands, not just document how to run them.
+Test suites may take 5-10+ minutes. Wait for complete execution. Do not timeout or skip.
+
+STEPS:
 1) Read PLAN_FILE_PATH and find FIRST unchecked Phase 5 task
-2) Discover project tools (check justfile, package.json, pyproject.toml, Makefile, .github/workflows)
-3) EXECUTE all quality checks:
+2) If all Phase 5 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 5 complete - all tests checked"
+   - STOP immediately (Ralph will advance based on Phase 6 status)
+3) Discover project tools (check justfile, package.json, pyproject.toml, Makefile, .github/workflows)
+4) EXECUTE all quality checks:
    - Tests (e.g., 'just test', 'uv run pytest', 'npm test')
    - Linter (e.g., 'just lint', 'uv run ruff check', 'npm run lint')
    - Type checker (e.g., 'uv run mypy', 'npm run typecheck')
    - Pre-commit hooks if configured
 
-4) Wait for commands to complete, capture full output
-5) Log to .ralph/decisions.md: commands run, output, pass/fail status
-6) IF failures:
-   - ADD fix tasks to Phase 6 (e.g., '- [ ] Fix: test_login failing')
+5) Wait for commands to complete, capture full output (this may take several minutes)
+6) Log to DECISIONS_FILE_PATH: exact commands run, full output, pass/fail status
+7) IF failures found:
+   - ADD fix tasks to Phase 6 using template below
    - ADD re-test task to Phase 5
-7) IF all pass: note in .ralph/decisions.md
-8) Mark as '- [x]' and exit
+8) IF all pass: note "All tests passed" in DECISIONS_FILE_PATH
+9) Mark current task as '- [x]' and STOP
+
+HOW TO ADD FIX TASKS TO PHASE 6:
+Use the Edit tool to add tasks after "## Phase 6: FIX" header, before "## Phase 7:" header.
+
+Format each task as:
+- [ ] Fix: <specific test/linter/type error with location>
+
+Example - if you have test failures and linter errors:
+
+## Phase 6: FIX
+- [ ] Fix: test_login failing - TypeError at tests/test_auth.py:42
+- [ ] Fix: test_user_create failing - AssertionError at tests/test_user.py:108
+- [ ] Fix: Ruff error - unused import at src/utils.py:5
+- [ ] Fix: Mypy error - incompatible type at src/models.py:67
+
+## Phase 7: FINAL-REVIEW
+
+After adding fix tasks to Phase 6, add a re-test task to Phase 5:
+- [ ] Re-run tests after Phase 6 fixes are complete
+
+After updating the plan and marking your task [x], STOP. Ralph will route to Phase 6 for fixes.
 EOF
             ;;
         6)
             cat <<'EOF'
-Fix test failures or linter issues (Phase 6).
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand what test/linter failures occurred in Phase 5
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific fix task
 
+TASK: Fix test failures or linter issues identified in Phase 5.
+
+STEPS:
 1) Read PLAN_FILE_PATH
-2) Find FIRST unchecked Phase 6 task
-3) Complete the fix
-4) Mark as '- [x]' and log in .ralph/decisions.md
-5) Exit
+2) Find the FIRST unchecked Phase 6 task (line starting with '- [ ]' under ## Phase 6)
+3) If all Phase 6 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 6 complete - all test/linter fixes applied"
+   - STOP immediately (Ralph will return to Phase 5 for re-testing)
+4) If unchecked task found:
+   - Read the task description carefully (it should specify the test/linter error)
+   - Complete ONLY that ONE fix
+   - Mark as '- [x]'
+   - Log the fix in DECISIONS_FILE_PATH using standard format
+   - STOP IMMEDIATELY
+
+IMPORTANT:
+- Do NOT re-run tests yourself - Ralph will return to Phase 5 for re-testing
+- Focus on fixing the specific test/linter/type error described in the task
+- One fix per iteration
+
+After completing ONE fix and marking it [x], STOP. Ralph will call you again for the next fix or return to Phase 5.
 EOF
             ;;
         7)
             cat <<'EOF'
-Final comprehensive review (Phase 7).
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand entire workflow and verify Phase 5 actually executed tests
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific task
 
+TASK: Final comprehensive review (Phase 7).
+
+This is VERIFICATION - ensure everything was actually done correctly, not just documented.
+
+STEPS:
 1) Read PLAN_FILE_PATH and find FIRST unchecked Phase 7 task
-2) Read .ralph/decisions.md to VERIFY Phase 5 actually executed tests/linter
-3) Run `git status` and check for problematic staged files
-4) Perform final review:
-   - VERIFY tests/linter/type-checker actually ran (check .ralph/decisions.md for command output)
+2) If all Phase 7 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 7 complete - final review passed"
+   - STOP immediately (Ralph will advance based on Phase 8 status)
+3) Read DECISIONS_FILE_PATH thoroughly:
+   - VERIFY Phase 5 actually executed tests/linter (look for command output, not just "I will run tests")
+   - Verify commands were run and results logged
+4) Run 'git status' and 'git diff --cached --name-only' to check staged files
+5) Perform final review:
+   - VERIFY tests/linter/type-checker actually ran with real output
    - Verify all changes complete and correct
    - Check code quality, error handling, edge cases
    - CHECK git status for documentation files that should NOT be staged:
@@ -520,49 +745,125 @@ Final comprehensive review (Phase 7).
      * Any markdown files in tests/ directory explaining implementation
    - Check NO .claude/ or .ralph/ files staged
 
-5) Log findings in .ralph/decisions.md
-6) IF issues found (docs staged, tests not run, etc.):
-   - ADD fix tasks to Phase 8 (e.g., "Unstage tests/SUMMARY.md")
+6) Log findings in DECISIONS_FILE_PATH using standard format
+7) IF issues found (docs staged, tests not actually run, etc.):
+   - ADD fix tasks to Phase 8 using template below
    - ADD re-review task to Phase 7
-7) IF clean AND tests verified: note in .ralph/decisions.md
-8) Mark as '- [x]' and exit
+8) IF clean AND tests verified with actual output: note "Final review passed" in DECISIONS_FILE_PATH
+9) Mark current task as '- [x]' and STOP
 
-This is VERIFICATION - ensure everything was actually done correctly, not just documented.
+HOW TO ADD FIX TASKS TO PHASE 8:
+Use the Edit tool to add tasks after "## Phase 8: FIX" header, before "## Phase 9:" header.
+
+Format each task as:
+- [ ] Fix: <specific issue requiring correction>
+
+Example:
+
+## Phase 8: FIX
+- [ ] Fix: Unstage tests/SUMMARY.md (unwanted documentation)
+- [ ] Fix: Tests were not actually executed in Phase 5 - decisions.md shows only intent, not output
+
+## Phase 9: COMMIT
+
+After adding fix tasks to Phase 8, add a re-review task to Phase 7:
+- [ ] Re-review after Phase 8 fixes are complete
+
+After updating the plan and marking your task [x], STOP. Ralph will route to Phase 8 for fixes.
 EOF
             ;;
         8)
             cat <<'EOF'
-Fix issues from Phase 7 final review.
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand what issues were found in Phase 7 final review
+2. Run 'git status' and 'git diff --stat' to see current state
+3. Read PLAN_FILE_PATH to see your specific fix task
 
+TASK: Fix issues identified in Phase 7 final review.
+
+STEPS:
 1) Read PLAN_FILE_PATH
-2) Find FIRST unchecked Phase 8 task
-3) Complete the fix
-4) Mark as '- [x]' and log in .ralph/decisions.md
-5) Exit
+2) Find the FIRST unchecked Phase 8 task (line starting with '- [ ]' under ## Phase 8)
+3) If all Phase 8 tasks are [x]:
+   - Log to DECISIONS_FILE_PATH: "Phase 8 complete - all final fixes applied"
+   - STOP immediately (Ralph will return to Phase 7 for re-review)
+4) If unchecked task found:
+   - Read the task description carefully (it should specify what needs fixing)
+   - Complete ONLY that ONE fix
+   - Mark as '- [x]'
+   - Log the fix in DECISIONS_FILE_PATH using standard format
+   - STOP IMMEDIATELY
+
+IMPORTANT:
+- Do NOT re-run final review yourself - Ralph will return to Phase 7 after fixes
+- Focus on fixing the specific issue described in the task
+- One fix per iteration
+
+After completing ONE fix and marking it [x], STOP. Ralph will call you again for the next fix or return to Phase 7.
 EOF
             ;;
         9)
             cat <<'EOF'
-Create git commit (Phase 9).
+CONTEXT GATHERING (do this first):
+1. Read DECISIONS_FILE_PATH to understand the complete work done
+2. Run 'git status' and 'git diff --stat' to see all changes
+3. Run 'git log -10 --oneline' to understand project commit message style and conventions
+4. Read PLAN_FILE_PATH to see your specific task
 
-1) Review all changes (git diff, git status)
-2) Before staging, CHECK for problematic files:
-   - Run `git status` and identify any .md files you created
+TASK: Create git commit (Phase 9).
+
+STEPS:
+1) Read PLAN_FILE_PATH
+2) Find the FIRST unchecked Phase 9 task
+3) If all Phase 9 tasks are [x]:
+   - STOP immediately (workflow complete)
+4) Review recent commits to learn message format:
+   - Run 'git log -10 --oneline' for style
+   - Run 'git log -3' for detailed format
+   - Note patterns: conventional commits? Sentence case? Past/present tense?
+
+5) Review all changes:
+   - Run 'git diff' to see unstaged changes
+   - Run 'git diff --cached' to see already staged changes
+   - Run 'git status' to see all files
+
+6) Before staging, CHECK for problematic files that should NOT be committed:
    - Any SUMMARY.md, GUIDE.md, HOWTO.md, README.md files you created? → DO NOT stage
    - Any test running guides (RUNNING_TESTS.md, TEST_COVERAGE.md)? → DO NOT stage
-   - Any documentation in tests/ directory? → DO NOT stage
+   - Any documentation in tests/ directory explaining your work? → DO NOT stage
    - Any .claude/ or .ralph/ files? → DO NOT stage
+   - Any temporary helper scripts not part of implementation? → DO NOT stage
 
-3) Stage ONLY implementation files:
+7) Stage ONLY implementation files:
    - Source code (*.py, *.js, *.go, etc.)
    - Test files (test_*.py, *.test.js, etc.)
    - Configuration files (*.yaml, *.json, *.toml, etc.)
+   - Use 'git add' for specific files, or 'git add -p' for interactive staging
 
-4) Create commit following project conventions
-5) Mark Phase 9 task as '- [x]'
-6) Exit
+8) Check staged files:
+   - Run 'git diff --cached --name-only' to verify only correct files staged
+   - If any problematic files staged, unstage them with 'git reset HEAD <file>'
 
-Do NOT push unless explicitly requested.
+9) If nothing to commit (all files were filtered out):
+   - Log to DECISIONS_FILE_PATH: "No files to commit - only documentation was created"
+   - Mark Phase 9 task as '- [x]'
+   - STOP
+
+10) Create commit following project conventions you discovered:
+    - Write a descriptive commit message explaining the what and why
+    - Follow the format/style from 'git log' output
+    - Use 'git commit' with appropriate message
+
+11) Mark Phase 9 task as '- [x]'
+12) Log commit details to DECISIONS_FILE_PATH
+13) STOP
+
+IMPORTANT:
+- Do NOT push unless explicitly requested in the original task
+- If unsure about commit message format, favor clear descriptive messages over clever ones
+- The commit message should explain WHAT changed and WHY, not HOW (code shows that)
+
+After creating commit and marking task [x], STOP. Workflow complete.
 EOF
             ;;
     esac
@@ -607,8 +908,8 @@ run_claude() {
     # Get generic system prompt (same for all phases)
     local SYSTEM_PROMPT=$(get_system_prompt)
 
-    # Get phase-specific instructions with actual plan filename injected
-    local PHASE_INSTRUCTIONS=$(get_phase_prompt "$current_phase" | sed "s|PLAN_FILE_PATH|$PLAN_FILE|g")
+    # Get phase-specific instructions with actual file paths injected
+    local PHASE_INSTRUCTIONS=$(get_phase_prompt "$current_phase" | sed "s|PLAN_FILE_PATH|$PLAN_FILE|g; s|DECISIONS_FILE_PATH|$DECISIONS_FILE|g")
 
     # Build dynamic regular prompt
     local FULL_PROMPT
@@ -781,12 +1082,12 @@ run_workflow() {
                 log_info "Phase $current_phase ($phase_name) complete → advancing to Phase $next_phase"
 
                 # Log phase transition
-                echo "" >> .ralph/decisions.md
-                echo "## Phase Transition (Iteration $total)" >> .ralph/decisions.md
-                echo "" >> .ralph/decisions.md
-                echo "**From**: Phase $current_phase ($phase_name)" >> .ralph/decisions.md
-                echo "**To**: Phase $next_phase" >> .ralph/decisions.md
-                echo "" >> .ralph/decisions.md
+                echo "" >> "$DECISIONS_FILE"
+                echo "## Phase Transition (Iteration $total)" >> "$DECISIONS_FILE"
+                echo "" >> "$DECISIONS_FILE"
+                echo "**From**: Phase $current_phase ($phase_name)" >> "$DECISIONS_FILE"
+                echo "**To**: Phase $next_phase" >> "$DECISIONS_FILE"
+                echo "" >> "$DECISIONS_FILE"
 
                 # Update state with new phase
                 update_state "{\"current_phase\": $next_phase, \"phase_iterations\": 0}"
@@ -821,13 +1122,11 @@ run_workflow() {
         sleep 2
     done
 
-    # Copy state files to run directory (plan.md already there)
+    # Copy state files to run directory (plan.md and decisions.md already there)
     log_info "Archiving run artifacts to: $RUN_DIR"
 
-    # Copy state files
     [ -f "$STATE_FILE" ] && cp "$STATE_FILE" "$RUN_DIR/" || true
     [ -f "$CLAUDE_DIR/todos.json" ] && cp "$CLAUDE_DIR/todos.json" "$RUN_DIR/" || true
-    [ -f ".ralph/decisions.md" ] && cp ".ralph/decisions.md" "$RUN_DIR/" || true
 
     echo ""
     local state=$(load_state)
@@ -853,12 +1152,12 @@ run_workflow() {
     echo ""
 
     # Check if decisions were logged
-    if [ -f ".ralph/decisions.md" ]; then
+    if [ -f "$DECISIONS_FILE" ]; then
         log_warning "Ralph made decisions during autonomous operation"
         echo ""
-        echo "Review decisions made: .ralph/decisions.md"
+        echo "Review decisions made: $DECISIONS_FILE"
         echo ""
-        cat ".ralph/decisions.md"
+        cat "$DECISIONS_FILE"
         echo ""
     fi
 }
