@@ -110,7 +110,7 @@ Environment variables:
   RALPH_MODEL               Model to use for all phases (default: sonnet)
                             Options: "opus", "sonnet", "haiku", or full model name
   RALPH_PLAN_MODEL          Model for Phase 1 planning (default: RALPH_MODEL)
-  RALPH_REVIEW_MODEL        Model for Phase 3 & 7 reviews (default: RALPH_MODEL)
+  RALPH_REVIEW_MODEL        Model for Phase 3 & 5 reviews (default: RALPH_MODEL)
 
 Examples:
   ralph "Add user authentication"
@@ -305,7 +305,7 @@ detect_phase_completion() {
     case $phase in
         1)
             # Phase 1 complete when plan.md exists with proper structure AND all Phase 1 tasks are checked
-            if [ -f "$PLAN_FILE" ] && grep -q "^## Phase 9:" "$PLAN_FILE"; then
+            if [ -f "$PLAN_FILE" ] && grep -q "^## Phase 6:" "$PLAN_FILE"; then
                 # Plan file exists with all phases, now check if Phase 1 tasks are done
                 phase_tasks_complete 1 && return 0
             fi
@@ -316,34 +316,22 @@ detect_phase_completion() {
             ;;
         3)
             # Phase 3 complete when all Phase 3 review tasks are checked
-            # After completion, will advance to Phase 4 (if tasks added) or Phase 5
+            # May loop back to Phase 3 if review adds more fix tasks
             phase_tasks_complete 3 && return 0
             ;;
         4)
-            # Phase 4 complete when all fix tasks done (returns to Phase 3)
+            # Phase 4 complete when all Phase 4 test tasks are checked
+            # May loop back to Phase 4 if tests add more fix tasks
             phase_tasks_complete 4 && return 0
             ;;
         5)
-            # Phase 5 complete when all Phase 5 test tasks are checked
-            # After completion, will advance to Phase 6 (if tasks added) or Phase 7
+            # Phase 5 complete when all Phase 5 final review tasks are checked
+            # Returns to Phase 4 (re-test) if fixes needed, otherwise advances to Phase 6
             phase_tasks_complete 5 && return 0
             ;;
         6)
-            # Phase 6 complete when all fix tasks done (returns to Phase 5)
+            # Phase 6 complete when commit task is checked
             phase_tasks_complete 6 && return 0
-            ;;
-        7)
-            # Phase 7 complete when all Phase 7 final review tasks are checked
-            # After completion, will advance to Phase 8 (if tasks added) or Phase 9
-            phase_tasks_complete 7 && return 0
-            ;;
-        8)
-            # Phase 8 complete when all fix tasks done (returns to Phase 5 to re-test)
-            phase_tasks_complete 8 && return 0
-            ;;
-        9)
-            # Phase 9 complete when commit task is checked
-            phase_tasks_complete 9 && return 0
             ;;
     esac
     return 1
@@ -357,21 +345,20 @@ determine_next_phase() {
         1) echo 2 ;;  # Plan → Implement
         2) echo 3 ;;  # Implement → Review
         3)
-            # Review → Fix (if issues) or Test (if clean)
+            # Review → Re-review (if added fix tasks) or Test (if clean)
+            # Check if phase 3 still has unchecked tasks (review added fixes)
+            phase_has_unchecked 3 && echo 3 || echo 4
+            ;;
+        4)
+            # Test → Re-test (if added fix tasks) or Final-Review (if passing)
             phase_has_unchecked 4 && echo 4 || echo 5
             ;;
-        4) echo 3 ;;  # Fix → Re-review
         5)
-            # Test → Fix (if failures) or Final-Review (if passing)
-            phase_has_unchecked 6 && echo 6 || echo 7
+            # Final-Review → Re-test (if added fix tasks) or Commit (if clean)
+            # If fixes needed, go back to Phase 4 to re-test, then re-review
+            phase_has_unchecked 5 && echo 4 || echo 6
             ;;
-        6) echo 5 ;;  # Fix → Re-test
-        7)
-            # Final-Review → Fix (if issues) or Commit (if clean)
-            phase_has_unchecked 8 && echo 8 || echo 9
-            ;;
-        8) echo 5 ;;  # Fix → Re-test (ensures fixes didn't break anything, then re-review)
-        9) echo "done" ;;  # Commit → Done
+        6) echo "done" ;;  # Commit → Done
         *) echo "error" ;;
     esac
 }
@@ -379,7 +366,7 @@ determine_next_phase() {
 # Get generic system prompt (same for all phases)
 get_system_prompt() {
     cat <<'EOF'
-Ralph: 9-phase autonomous workflow - PLAN, IMPLEMENT, REVIEW, FIX(→3), TEST, FIX(→5), FINAL-REVIEW, FIX(→5), COMMIT
+Ralph: 6-phase autonomous workflow - PLAN, IMPLEMENT, REVIEW(loops), TEST(loops), FINAL-REVIEW(→4 if fixes), COMMIT
 
 STATELESS OPERATION:
 Complete ONE task per call. Rebuild context from DECISIONS_FILE_PATH, git status, and plan.md.
@@ -407,13 +394,46 @@ EXIT_SIGNAL: true|false
 RECOMMENDATION: one-line next step
 ---END_RALPH_STATUS---
 
-EXIT_SIGNAL=true ONLY when: all plan tasks [x]/[~], tests passing, no errors.
+EXIT_SIGNAL=true ONLY when ALL conditions met:
+1. All plan tasks marked [x] or [~]
+2. Tests passing (or NOT_RUN if before Phase 5)
+3. No errors in last execution
+4. No meaningful work remaining
 
 EXAMPLES:
-Progress: STATUS=IN_PROGRESS, TASKS=1, FILES=3, TESTS=PASSING, EXIT=false
-Complete: STATUS=COMPLETE, TASKS=1, FILES=1, TESTS=PASSING, EXIT=true (Phase 9 done)
-Blocked: STATUS=BLOCKED, TASKS=0, FILES=2, TESTS=FAILING, EXIT=false (same error 3x)
-Testing: STATUS=IN_PROGRESS, TASKS=0, FILES=0, TESTS=PASSING, EXIT=false (no changes)
+
+Example 1 - Making Progress:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 3
+TESTS_STATUS: PASSING
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: false
+RECOMMENDATION: Continue with next Phase 2 task from plan
+---END_RALPH_STATUS---
+
+Example 2 - All Done (Phase 9 complete):
+---RALPH_STATUS---
+STATUS: COMPLETE
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 1
+TESTS_STATUS: PASSING
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: true
+RECOMMENDATION: All tasks complete, tests passing, workflow finished
+---END_RALPH_STATUS---
+
+Example 3 - Blocked:
+---RALPH_STATUS---
+STATUS: BLOCKED
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 2
+TESTS_STATUS: FAILING
+WORK_TYPE: DEBUGGING
+EXIT_SIGNAL: false
+RECOMMENDATION: Same import error 3x, needs investigation
+---END_RALPH_STATUS---
 
 AVOID:
 - Busy work when done
@@ -437,17 +457,14 @@ get_phase_prompt() {
     case $phase in
         1)
             cat <<'EOF'
-Read DECISIONS_FILE_PATH, git status. Create plan at PLAN_FILE_PATH with 9 phases:
+Read DECISIONS_FILE_PATH, git status. Create plan at PLAN_FILE_PATH with 6 phases:
 
 ## Phase 1: PLAN (2-4 analysis tasks, then mark [x])
 ## Phase 2: IMPLEMENT (specific tasks: "Create X with Y", not vague)
-## Phase 3: REVIEW (1 task)
-## Phase 4: FIX (EMPTY - populated by Phase 3)
-## Phase 5: TEST (1 task)
-## Phase 6: FIX (EMPTY - populated by Phase 5)
-## Phase 7: FINAL-REVIEW (1 task)
-## Phase 8: FIX (EMPTY - populated by Phase 7)
-## Phase 9: COMMIT (1 task)
+## Phase 3: REVIEW (1 task: review all changes)
+## Phase 4: TEST (1 task: run tests/linter/type-checker)
+## Phase 5: FINAL-REVIEW (1 task: final verification)
+## Phase 6: COMMIT (1 task: create commit)
 
 Tasks: '- [ ] description'. Complete Phase 1 tasks before STOP.
 EOF
@@ -457,7 +474,7 @@ EOF
 Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 2 task.
 
 Complete ONE task: code/tests/config only. Mark [x], log to DECISIONS_FILE_PATH, STOP.
-NO docs (SUMMARY.md, guides). Testing: 20% effort, new features only, Phase 5 is main testing.
+NO docs (SUMMARY.md, guides). Testing: 20% effort, new features only, Phase 4 is main testing.
 EOF
             ;;
         3)
@@ -466,52 +483,34 @@ Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 3 task.
 
 Review: git diff/status. Check bugs, security, quality, unwanted docs (SUMMARY.md, guides), sensitive files.
 
-IF issues: Edit Phase 4, add '- [ ] Fix: description', add re-review to Phase 3. Mark [x], STOP.
+IF issues found: Add '- [ ] Fix: description' tasks to Phase 3, add '- [ ] Re-review after fixes' to Phase 3. Mark current [x], STOP.
+IF no issues: Mark [x], STOP. Ralph advances to Phase 4.
 EOF
             ;;
         4)
             cat <<'EOF'
 Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 4 task.
 
-Fix ONE issue from Phase 3. Mark [x], log, STOP. Ralph returns to Phase 3 for re-review.
+IF task is "run tests": EXECUTE tests/linter/type-checker (justfile/package.json). Wait for completion (5-10min). Log full output.
+IF task is "Fix: X": Fix ONE issue from test output.
+
+IF failures found: Add '- [ ] Fix: error at location' tasks to Phase 4, add '- [ ] Re-run tests' to Phase 4. Mark [x], STOP.
+IF all passing: Mark [x], STOP. Ralph advances to Phase 5.
 EOF
             ;;
         5)
             cat <<'EOF'
 Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 5 task.
 
-EXECUTE tests/linter/type-checker (justfile/package.json). Wait for completion (5-10min).
-Log full output to DECISIONS_FILE_PATH.
+VERIFY Phase 4 tests passed (check decisions log). Check git status for unwanted files (docs, .claude/, .ralph/, sensitive files).
 
-IF failures: Edit Phase 6, add '- [ ] Fix: error at location', add re-test to Phase 5. Mark [x], STOP.
+IF issues found: Add '- [ ] Fix: description' tasks to Phase 5. Mark [x], STOP. Ralph returns to Phase 4 to re-test.
+IF no issues: Mark [x], STOP. Ralph advances to Phase 6.
 EOF
             ;;
         6)
             cat <<'EOF'
-Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 6 task.
-
-Fix ONE test/linter error from Phase 5. Mark [x], log, STOP. Ralph returns to Phase 5 for re-test.
-EOF
-            ;;
-        7)
-            cat <<'EOF'
-Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 7 task.
-
-VERIFY Phase 5 executed (look for command output). Check git status for unwanted files (docs, .claude/, .ralph/, sensitive files).
-
-IF issues: Edit Phase 8, add '- [ ] Fix: description', add re-review to Phase 7. Mark [x], STOP.
-EOF
-            ;;
-        8)
-            cat <<'EOF'
-Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 8 task.
-
-Fix ONE issue from Phase 7. Mark [x], log, STOP. Ralph returns to Phase 5→6→7→9.
-EOF
-            ;;
-        9)
-            cat <<'EOF'
-Read DECISIONS_FILE_PATH, PLAN_FILE_PATH, git log (for style). Find FIRST unchecked Phase 9 task.
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH, git log (for style). Find FIRST unchecked Phase 6 task.
 
 Stage ONLY code/tests/config (NO docs, .claude/, .ralph/, sensitive files). Verify with git diff --cached.
 Create commit following project style. Mark [x], log, STOP.
@@ -568,12 +567,9 @@ run_claude() {
         1) phase_name="PLAN" ;;
         2) phase_name="IMPLEMENT" ;;
         3) phase_name="REVIEW" ;;
-        4) phase_name="FIX (post-review)" ;;
-        5) phase_name="TEST" ;;
-        6) phase_name="FIX (post-test)" ;;
-        7) phase_name="FINAL-REVIEW" ;;
-        8) phase_name="FIX (post-final-review)" ;;
-        9) phase_name="COMMIT" ;;
+        4) phase_name="TEST" ;;
+        5) phase_name="FINAL-REVIEW" ;;
+        6) phase_name="COMMIT" ;;
         *) phase_name="UNKNOWN" ;;
     esac
 
@@ -581,7 +577,7 @@ run_claude() {
     local model="$RALPH_MODEL"
     case $current_phase in
         1) model="${RALPH_PLAN_MODEL}" ;;
-        3|7) model="${RALPH_REVIEW_MODEL}" ;;
+        3|5) model="${RALPH_REVIEW_MODEL}" ;;
     esac
 
     # Build loop context for iteration awareness
