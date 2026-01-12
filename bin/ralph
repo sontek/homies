@@ -1327,48 +1327,95 @@ $PHASE_INSTRUCTIONS"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
-    # Run Claude and capture output and exit code
-    local output_file=$(mktemp)
-
-    # Also save to a persistent location for circuit breaker analysis
+    # Retry logic for transient errors
+    local max_retries=3
+    local retry_count=0
+    local exit_code=1
+    local output_file=""
+    local output_text=""
     local persistent_output="$RUN_DIR/last_output.txt"
 
-    if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
-        # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
-        script -q "$output_file" "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
-        local exit_code=$?
-    else
-        # Native claude handles TTY properly
-        "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
-        local exit_code=$?
-    fi
+    while [ $retry_count -lt $max_retries ]; do
+        # Run Claude and capture output and exit code
+        output_file=$(mktemp)
 
-    # Parse JSON output and extract text content
-    # With --output-format json, Claude returns a JSON object with the response
-    local output_text="$output_file"
-    if grep -q '"type":"result"' "$output_file" 2>/dev/null; then
-        # JSON output detected - extract the text content
-        local json_output="$output_file"
-        output_text=$(mktemp)
-
-        # Check for errors in JSON
-        if jq -e '.is_error == true' "$json_output" > /dev/null 2>&1; then
-            log_error "Claude returned an error:"
-            jq -r '.errors[]' "$json_output" 2>/dev/null || cat "$json_output"
-            rm -f "$output_file"
-            rm -f "$output_text"
-            return 1
+        if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+            # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
+            script -q "$output_file" "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
+            exit_code=$?
+        else
+            # Native claude handles TTY properly
+            "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
+            exit_code=$?
         fi
 
-        # Extract the actual response text from JSON
-        jq -r '.result // ""' "$json_output" 2>/dev/null > "$output_text"
+        # Parse JSON output and extract text content
+        # With --output-format json, Claude returns a JSON object with the response
+        output_text="$output_file"
+        if grep -q '"type":"result"' "$output_file" 2>/dev/null; then
+            # JSON output detected - extract the text content
+            local json_output="$output_file"
+            output_text=$(mktemp)
 
-        # If jq extraction failed or returned empty, fall back to showing raw output
-        if [ ! -s "$output_text" ]; then
-            log_warning "Could not extract text from JSON output, using raw output"
-            cp "$json_output" "$output_text"
+            # Check for errors in JSON
+            if jq -e '.is_error == true' "$json_output" > /dev/null 2>&1; then
+                # Extract error message to check if it's retryable
+                local error_msg=$(jq -r '.errors[]' "$json_output" 2>/dev/null || echo "")
+
+                # Check for transient/retryable errors
+                if echo "$error_msg" | grep -qE "only prompt commands are supported in streaming mode|overloaded|rate limit|timeout|network|connection"; then
+                    retry_count=$((retry_count + 1))
+                    if [ $retry_count -lt $max_retries ]; then
+                        log_warning "Transient error detected (attempt $retry_count/$max_retries): $error_msg"
+                        log_info "Retrying in 3 seconds..."
+                        sleep 3
+                        rm -f "$output_file"
+                        [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+                        continue
+                    else
+                        log_error "Max retries reached. Claude returned an error:"
+                        echo "$error_msg"
+                        rm -f "$output_file"
+                        rm -f "$output_text"
+                        return 1
+                    fi
+                else
+                    # Non-retryable error
+                    log_error "Claude returned an error:"
+                    echo "$error_msg"
+                    rm -f "$output_file"
+                    rm -f "$output_text"
+                    return 1
+                fi
+            fi
+
+            # Extract the actual response text from JSON
+            jq -r '.result // ""' "$json_output" 2>/dev/null > "$output_text"
+
+            # If jq extraction failed or returned empty, fall back to showing raw output
+            if [ ! -s "$output_text" ]; then
+                log_warning "Could not extract text from JSON output, using raw output"
+                cp "$json_output" "$output_text"
+            fi
         fi
-    fi
+
+        # Check if command succeeded
+        if [ $exit_code -eq 0 ]; then
+            # Success - break out of retry loop
+            break
+        else
+            # Failed - check if we should retry
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                log_warning "Command failed with exit code $exit_code (attempt $retry_count/$max_retries)"
+                log_info "Retrying in 3 seconds..."
+                sleep 3
+                rm -f "$output_file"
+                [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+                continue
+            fi
+        fi
+    done
 
     # Strip ANSI escape codes and save to persistent location for circuit breaker
     # The script command adds TTY control codes that break status block parsing
@@ -1379,7 +1426,7 @@ $PHASE_INSTRUCTIONS"
     cat "$output_text"
 
     if [ $exit_code -ne 0 ]; then
-        log_error "$CLAUDE_CMD exited with code $exit_code"
+        log_error "$CLAUDE_CMD exited with code $exit_code after $retry_count attempts"
         log_error "Last 20 lines of output:"
         tail -20 "$output_text" | while IFS= read -r line; do
             echo "  $line" >&2
@@ -1391,7 +1438,12 @@ $PHASE_INSTRUCTIONS"
 
     rm -f "$output_file"
     [ "$output_text" != "$output_file" ] && rm -f "$output_text"
-    log_info "Claude finished successfully"
+
+    if [ $retry_count -gt 0 ]; then
+        log_info "Claude finished successfully after $((retry_count + 1)) attempts"
+    else
+        log_info "Claude finished successfully"
+    fi
 }
 
 # Unstage any .claude/ or .ralph/ files that shouldn't be committed
