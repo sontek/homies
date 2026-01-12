@@ -1296,7 +1296,7 @@ $PHASE_INSTRUCTIONS"
         fi
     fi
 
-    log_info "Executing: $CLAUDE_CMD -p --system-prompt \"<generic>\" --permission-mode acceptEdits"
+    log_info "Executing: $CLAUDE_CMD -p --system-prompt \"<generic>\" --permission-mode bypassPermissions"
 
     # Log the phase-specific prompt being sent
     echo ""
@@ -1315,11 +1315,11 @@ $PHASE_INSTRUCTIONS"
 
     if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
         # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
-        script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$FULL_PROMPT" > /dev/null 2>&1
+        script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
         local exit_code=$?
     else
         # Native claude handles TTY properly
-        "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode acceptEdits "$FULL_PROMPT" > "$output_file" 2>&1
+        "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
         local exit_code=$?
     fi
 
