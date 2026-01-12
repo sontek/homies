@@ -7,6 +7,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Configuration (can be overridden by environment variables)
+# Track if RALPH_MAX_ITERATIONS was explicitly set by user
+if [ -n "${RALPH_MAX_ITERATIONS:-}" ]; then
+    RALPH_MAX_ITERATIONS_EXPLICIT=true
+else
+    RALPH_MAX_ITERATIONS_EXPLICIT=false
+fi
 RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-50}"
 RALPH_COST_LIMIT="${RALPH_COST_LIMIT:-10.00}"
 RALPH_AUTO_APPROVE_PUSH="${RALPH_AUTO_APPROVE_PUSH:-false}"
@@ -1850,6 +1856,32 @@ main() {
                 log_error "No state file found to resume from"
                 exit 1
             fi
+        fi
+
+        # Check if we're at or past the iteration limit
+        local state=$(load_state)
+        local current_iterations=$(echo "$state" | jq -r '.total_iterations // 0')
+
+        if [ "$current_iterations" -ge "$RALPH_MAX_ITERATIONS" ]; then
+            # Check if user explicitly set RALPH_MAX_ITERATIONS (via env var)
+            if [ "$RALPH_MAX_ITERATIONS_EXPLICIT" = "false" ]; then
+                # User didn't set it - auto-extend by 50
+                local old_limit=$RALPH_MAX_ITERATIONS
+                RALPH_MAX_ITERATIONS=$((current_iterations + 50))
+                log_warning "Current run has $current_iterations iterations, at limit of $old_limit"
+                log_info "Auto-extending iteration limit to $RALPH_MAX_ITERATIONS"
+                log_info "To set a custom limit, use: RALPH_MAX_ITERATIONS=<number> ralph --resume"
+            else
+                # User explicitly set it but it's still too low
+                log_error "Current run has $current_iterations iterations, but limit is $RALPH_MAX_ITERATIONS"
+                log_error "Increase the limit to continue: RALPH_MAX_ITERATIONS=$((current_iterations + 50)) ralph --resume"
+                exit 1
+            fi
+        elif [ "$current_iterations" -gt $((RALPH_MAX_ITERATIONS - 10)) ]; then
+            # Within 10 iterations of the limit - warn them
+            local remaining=$((RALPH_MAX_ITERATIONS - current_iterations))
+            log_warning "Approaching iteration limit: $current_iterations/$RALPH_MAX_ITERATIONS ($remaining remaining)"
+            log_info "To increase limit, use: RALPH_MAX_ITERATIONS=<number> ralph --resume"
         fi
     else
         # Archive old state files before starting new run
