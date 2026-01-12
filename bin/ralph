@@ -1314,7 +1314,7 @@ $PHASE_INSTRUCTIONS"
         fi
     fi
 
-    log_info "Executing: $CLAUDE_CMD -p --model $model --system-prompt \"<generic>\" --permission-mode bypassPermissions"
+    log_info "Executing: $CLAUDE_CMD -p --model $model --output-format json --system-prompt \"<generic>\" --permission-mode bypassPermissions"
 
     # Log the phase-specific prompt being sent
     echo ""
@@ -1333,33 +1333,62 @@ $PHASE_INSTRUCTIONS"
 
     if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
         # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
-        script -q "$output_file" "$CLAUDE_CMD" -p --model "$model" --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
+        script -q "$output_file" "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
         local exit_code=$?
     else
         # Native claude handles TTY properly
-        "$CLAUDE_CMD" -p --model "$model" --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
+        "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
         local exit_code=$?
+    fi
+
+    # Parse JSON output and extract text content
+    # With --output-format json, Claude returns a JSON object with the response
+    local output_text="$output_file"
+    if grep -q '"type":"result"' "$output_file" 2>/dev/null; then
+        # JSON output detected - extract the text content
+        local json_output="$output_file"
+        output_text=$(mktemp)
+
+        # Check for errors in JSON
+        if jq -e '.is_error == true' "$json_output" > /dev/null 2>&1; then
+            log_error "Claude returned an error:"
+            jq -r '.errors[]' "$json_output" 2>/dev/null || cat "$json_output"
+            rm -f "$output_file"
+            rm -f "$output_text"
+            return 1
+        fi
+
+        # Extract the actual response text from JSON
+        jq -r '.result // ""' "$json_output" 2>/dev/null > "$output_text"
+
+        # If jq extraction failed or returned empty, fall back to showing raw output
+        if [ ! -s "$output_text" ]; then
+            log_warning "Could not extract text from JSON output, using raw output"
+            cp "$json_output" "$output_text"
+        fi
     fi
 
     # Strip ANSI escape codes and save to persistent location for circuit breaker
     # The script command adds TTY control codes that break status block parsing
     # Use sed to remove ANSI escape sequences: ESC [ ... m
-    sed 's/\x1b\[[0-9;]*m//g' "$output_file" > "$persistent_output"
+    sed 's/\x1b\[[0-9;]*m//g' "$output_text" > "$persistent_output"
 
     # Display the output
-    cat "$output_file"
+    cat "$output_text"
 
     if [ $exit_code -ne 0 ]; then
         log_error "$CLAUDE_CMD exited with code $exit_code"
         log_error "Last 20 lines of output:"
-        tail -20 "$output_file" | while IFS= read -r line; do
+        tail -20 "$output_text" | while IFS= read -r line; do
             echo "  $line" >&2
         done
         rm -f "$output_file"
+        [ "$output_text" != "$output_file" ] && rm -f "$output_text"
         return 1
     fi
 
     rm -f "$output_file"
+    [ "$output_text" != "$output_file" ] && rm -f "$output_text"
     log_info "Claude finished successfully"
 }
 
