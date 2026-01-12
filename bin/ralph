@@ -1359,29 +1359,30 @@ $PHASE_INSTRUCTIONS"
 
             # Check for errors in JSON
             if jq -e '.is_error == true' "$json_output" > /dev/null 2>&1; then
-                # Extract error message to check if it's retryable
+                # Extract error message
                 local error_msg=$(jq -r '.errors[]' "$json_output" 2>/dev/null || echo "")
 
-                # Check for transient/retryable errors
-                if echo "$error_msg" | grep -qE "only prompt commands are supported in streaming mode|overloaded|rate limit|timeout|network|connection"; then
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                        log_warning "Transient error detected (attempt $retry_count/$max_retries): $error_msg"
-                        log_info "Retrying in 3 seconds..."
-                        sleep 3
-                        rm -f "$output_file"
-                        [ "$output_text" != "$output_file" ] && rm -f "$output_text"
-                        continue
-                    else
-                        log_error "Max retries reached. Claude returned an error:"
-                        echo "$error_msg"
-                        rm -f "$output_file"
-                        rm -f "$output_text"
-                        return 1
-                    fi
+                # Check for non-retryable errors (authentication, authorization)
+                if echo "$error_msg" | grep -qiE "authentication|unauthorized|invalid api key|permission denied|forbidden"; then
+                    # Non-retryable error - fail immediately
+                    log_error "Claude returned a non-retryable error:"
+                    echo "$error_msg"
+                    rm -f "$output_file"
+                    rm -f "$output_text"
+                    return 1
+                fi
+
+                # All other errors are potentially transient - retry them
+                retry_count=$((retry_count + 1))
+                if [ $retry_count -lt $max_retries ]; then
+                    log_warning "Error detected (attempt $retry_count/$max_retries): $error_msg"
+                    log_info "Retrying in 3 seconds..."
+                    sleep 3
+                    rm -f "$output_file"
+                    [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+                    continue
                 else
-                    # Non-retryable error
-                    log_error "Claude returned an error:"
+                    log_error "Max retries reached. Claude returned an error:"
                     echo "$error_msg"
                     rm -f "$output_file"
                     rm -f "$output_text"
