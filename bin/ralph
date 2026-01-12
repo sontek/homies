@@ -14,6 +14,9 @@ RALPH_DIR="${RALPH_DIR:-.ralph}"
 RALPH_AUDIT_DIR="${RALPH_AUDIT_DIR:-.ralph/audit}"
 RALPH_RUNS_DIR="${RALPH_RUNS_DIR:-.ralph/runs}"
 RALPH_CLAUDE_COMMAND="${RALPH_CLAUDE_COMMAND:-claude-jail}"
+RALPH_MODEL="${RALPH_MODEL:-sonnet}"
+RALPH_PLAN_MODEL="${RALPH_PLAN_MODEL:-$RALPH_MODEL}"
+RALPH_REVIEW_MODEL="${RALPH_REVIEW_MODEL:-$RALPH_MODEL}"
 
 # Determine Claude command path
 if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
@@ -98,12 +101,20 @@ Environment variables:
   RALPH_AUTO_APPROVE_PUSH   Skip push approval (default: false)
   RALPH_CLAUDE_COMMAND      Claude command to use (default: claude-jail)
                             Options: "claude", "claude-jail", or custom path
+  RALPH_MODEL               Model to use for all phases (default: sonnet)
+                            Options: "opus", "sonnet", "haiku", or full model name
+  RALPH_PLAN_MODEL          Model for Phase 1 planning (default: RALPH_MODEL)
+  RALPH_REVIEW_MODEL        Model for Phase 3 & 7 reviews (default: RALPH_MODEL)
 
 Examples:
   ralph "Add user authentication"
   ralph docs/implementation.md
   RALPH_MAX_ITERATIONS=30 ralph "complex task"
   RALPH_CLAUDE_COMMAND=claude ralph "use native claude"
+  RALPH_MODEL=opus ralph "complex planning task"
+  RALPH_MODEL=haiku ralph "simple refactoring"
+  RALPH_PLAN_MODEL=opus ralph "use opus for planning phase"
+  RALPH_PLAN_MODEL=opus RALPH_MODEL=sonnet ralph "opus planning, sonnet implementation"
 EOF
     exit 1
 }
@@ -1238,6 +1249,13 @@ run_claude() {
         *) phase_name="UNKNOWN" ;;
     esac
 
+    # Select model based on phase (if phase-specific models are configured)
+    local model="$RALPH_MODEL"
+    case $current_phase in
+        1) model="${RALPH_PLAN_MODEL}" ;;
+        3|7) model="${RALPH_REVIEW_MODEL}" ;;
+    esac
+
     # Build loop context for iteration awareness
     local LOOP_CONTEXT=""
     if [ "$iteration" -gt 1 ]; then
@@ -1296,7 +1314,7 @@ $PHASE_INSTRUCTIONS"
         fi
     fi
 
-    log_info "Executing: $CLAUDE_CMD -p --system-prompt \"<generic>\" --permission-mode bypassPermissions"
+    log_info "Executing: $CLAUDE_CMD -p --model $model --system-prompt \"<generic>\" --permission-mode bypassPermissions"
 
     # Log the phase-specific prompt being sent
     echo ""
@@ -1315,11 +1333,11 @@ $PHASE_INSTRUCTIONS"
 
     if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
         # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
-        script -q "$output_file" "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
+        script -q "$output_file" "$CLAUDE_CMD" -p --model "$model" --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
         local exit_code=$?
     else
         # Native claude handles TTY properly
-        "$CLAUDE_CMD" -p --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
+        "$CLAUDE_CMD" -p --model "$model" --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
         local exit_code=$?
     fi
 
