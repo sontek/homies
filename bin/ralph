@@ -92,8 +92,8 @@ PROMPT can be:
   - Stdin: echo "task" | ralph
 
 Options:
-  --resume     Resume from last checkpoint
-  --help       Show this help
+  --resume [path]    Resume from last checkpoint or specific run directory
+  --help             Show this help
 
 Environment variables:
   RALPH_MAX_ITERATIONS      Max total iterations (default: 20)
@@ -109,6 +109,8 @@ Environment variables:
 Examples:
   ralph "Add user authentication"
   ralph docs/implementation.md
+  ralph --resume                                    # Resume from last run
+  ralph --resume .ralph/runs/ralph-20260112-120125  # Resume from specific run
   RALPH_MAX_ITERATIONS=30 ralph "complex task"
   RALPH_CLAUDE_COMMAND=claude ralph "use native claude"
   RALPH_MODEL=opus ralph "complex planning task"
@@ -1739,12 +1741,18 @@ run_workflow() {
 main() {
     # Parse arguments
     local resume=false
+    local resume_path=""
     local prompt_arg=""
 
     while [[ $# -gt 0 ]]; do
         case $1 in
             --resume)
                 resume=true
+                # Check if next argument is a path
+                if [[ $# -gt 1 ]] && [[ ! "$2" =~ ^-- ]]; then
+                    resume_path="$2"
+                    shift
+                fi
                 shift
                 ;;
             --help|-h)
@@ -1760,17 +1768,39 @@ main() {
     # Initialize directories
     init_dirs
 
-    # Archive old state files before starting new run
-    archive_old_state
-
     # Get prompt
     if [ "$resume" = true ]; then
         log_info "Resuming from checkpoint..."
-        if [ ! -f "$STATE_FILE" ]; then
-            log_error "No state file found to resume from"
-            exit 1
+
+        # If resume path provided, restore from that run directory
+        if [ -n "$resume_path" ]; then
+            if [ ! -f "$resume_path/state.json" ]; then
+                log_error "No state file found at: $resume_path/state.json"
+                exit 1
+            fi
+
+            log_info "Restoring state from: $resume_path"
+
+            # Copy state files from the specified run directory
+            cp "$resume_path/state.json" "$STATE_FILE"
+            cp "$resume_path/plan.md" "$RALPH_DIR/plan.md" 2>/dev/null || true
+            cp "$resume_path/decisions.md" "$RALPH_DIR/decisions.md" 2>/dev/null || true
+
+            # Update RUN_DIR to use the resumed run
+            RALPH_RUN_ID=$(basename "$resume_path")
+            RUN_DIR="$resume_path"
+            PLAN_FILE="$RUN_DIR/plan.md"
+            DECISIONS_FILE="$RUN_DIR/decisions.md"
+        else
+            # Resume from default location
+            if [ ! -f "$STATE_FILE" ]; then
+                log_error "No state file found to resume from"
+                exit 1
+            fi
         fi
     else
+        # Archive old state files before starting new run
+        archive_old_state
         if [ -z "$prompt_arg" ] && [ -t 0 ]; then
             log_error "No prompt provided"
             usage
