@@ -188,6 +188,12 @@ init_state() {
     local prompt="$1"
     local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
+    # Capture starting git commit (if in a git repo)
+    local starting_commit=""
+    if git rev-parse HEAD &>/dev/null; then
+        starting_commit=$(git rev-parse HEAD)
+    fi
+
     cat > "$STATE_FILE" <<EOF
 {
   "total_iterations": 0,
@@ -195,6 +201,7 @@ init_state() {
   "started_at": "$timestamp",
   "updated_at": "$timestamp",
   "prompt": $(echo "$prompt" | jq -Rs .),
+  "starting_commit": "$starting_commit",
   "last_completed_count": 0,
   "no_progress_iterations": 0,
   "current_phase": 1,
@@ -219,6 +226,49 @@ update_state() {
     local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
     echo "$current_state" | jq ". + $updates + {\"updated_at\": \"$timestamp\"}" > "$STATE_FILE"
+}
+
+# Show commit summary from Ralph session
+show_commit_summary() {
+    local state=$(load_state)
+    local starting_commit=$(echo "$state" | jq -r '.starting_commit // ""')
+
+    # Only show if we're in a git repo and have a starting commit
+    if [ -z "$starting_commit" ]; then
+        return 0
+    fi
+
+    # Check if we're still on a valid git repo
+    if ! git rev-parse HEAD &>/dev/null; then
+        return 0
+    fi
+
+    local current_commit=$(git rev-parse HEAD)
+
+    # Check if any commits were made
+    if [ "$starting_commit" = "$current_commit" ]; then
+        log_info "No commits made during this Ralph session"
+        return 0
+    fi
+
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    log_success "Commits made during this Ralph session:"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+
+    # Show commit range
+    log_info "Commit range: $starting_commit..$current_commit"
+    echo ""
+
+    # Show commit log with nice formatting
+    git log --oneline --decorate --no-merges "$starting_commit..$current_commit"
+    echo ""
+
+    # Count commits
+    local commit_count=$(git rev-list --count "$starting_commit..$current_commit")
+    log_info "Total commits: $commit_count"
+    echo ""
 }
 
 # Approval gate
@@ -968,6 +1018,7 @@ run_workflow() {
             if [ $breaker_result -eq 2 ]; then
                 # EXIT_SIGNAL detected - clean exit
                 log_success "Workflow completed via EXIT_SIGNAL"
+                show_commit_summary
                 break
             elif [ $breaker_result -eq 1 ]; then
                 # Circuit breaker tripped - stagnation detected
@@ -1035,7 +1086,8 @@ run_workflow() {
             local next_phase=$(determine_next_phase "$current_phase")
 
             if [ "$next_phase" = "done" ]; then
-                log_success "Ralph workflow complete - Phase 9 (COMMIT) finished"
+                log_success "Ralph workflow complete - Phase 6 (COMMIT) finished"
+                show_commit_summary
                 break
             elif [ "$next_phase" = "error" ]; then
                 log_error "Invalid phase transition from phase $current_phase"
