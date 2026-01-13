@@ -375,6 +375,7 @@ Mark task [x] in plan, log to DECISIONS_FILE_PATH, STOP. Ralph controls phases.
 CORE RULES:
 - Execute commands, verify results - don't just document
 - Minimal scope - only what's in the task
+- Commit after each implementation task (Phase 2) - one task = one commit
 - Follow project conventions (justfile, package.json, etc.)
 - Use Task/Explore for codebase questions; Glob/Grep for specific searches
 - NO: unrelated bugs, refactoring, docs (README/SUMMARY), helper scripts, .claude/.ralph commits
@@ -460,11 +461,13 @@ get_phase_prompt() {
 Read DECISIONS_FILE_PATH, git status. Create plan at PLAN_FILE_PATH with 6 phases:
 
 ## Phase 1: PLAN (2-4 analysis tasks, then mark [x])
-## Phase 2: IMPLEMENT (specific tasks: "Create X with Y", not vague)
+## Phase 2: IMPLEMENT (atomic tasks that each get their own commit - e.g., "Add multiply() function", not "Add all math functions")
 ## Phase 3: REVIEW (1 task: review all changes)
 ## Phase 4: TEST (1 task: run tests/linter/type-checker)
 ## Phase 5: FINAL-REVIEW (1 task: final verification)
-## Phase 6: COMMIT (1 task: create commit)
+## Phase 6: COMMIT (1 task: commit any remaining uncommitted changes)
+
+IMPORTANT: Each Phase 2 task is committed individually. Break work into small, atomic tasks.
 
 Tasks: '- [ ] description'. Complete Phase 1 tasks before STOP.
 EOF
@@ -473,18 +476,25 @@ EOF
             cat <<'EOF'
 Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 2 task.
 
-Complete ONE task: code/tests/config only. Mark [x], log to DECISIONS_FILE_PATH, STOP.
+Complete ONE task: code/tests/config only. Then:
+1. Stage changes: git add (ONLY files you modified)
+2. Create commit: git commit with descriptive message for THIS task
+3. Mark [x], log to DECISIONS_FILE_PATH, STOP
+
 NO docs (SUMMARY.md, guides). Testing: 20% effort, new features only, Phase 4 is main testing.
+Each task = one atomic commit.
 EOF
             ;;
         3)
             cat <<'EOF'
 Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 3 task.
 
-Review: git diff/status. Check bugs, security, quality, unwanted docs (SUMMARY.md, guides), sensitive files.
+Review: git log (recent commits from Phase 2) + git status. Check bugs, security, quality, unwanted docs, sensitive files.
 
-IF issues found: Add '- [ ] Fix: description' tasks to Phase 3, add '- [ ] Re-review after fixes' to Phase 3. Mark current [x], STOP.
+IF issues found: Add '- [ ] Fix: description' tasks to Phase 3, add '- [ ] Re-review after fixes'. Mark current [x], STOP.
 IF no issues: Mark [x], STOP. Ralph advances to Phase 4.
+
+Note: Phase 2 already committed implementation tasks. Review fixes should also be committed when done.
 EOF
             ;;
         4)
@@ -492,9 +502,9 @@ EOF
 Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 4 task.
 
 IF task is "run tests": EXECUTE tests/linter/type-checker (justfile/package.json). Wait for completion (5-10min). Log full output.
-IF task is "Fix: X": Fix ONE issue from test output.
+IF task is "Fix: X": Fix ONE issue, then stage + commit the fix with descriptive message.
 
-IF failures found: Add '- [ ] Fix: error at location' tasks to Phase 4, add '- [ ] Re-run tests' to Phase 4. Mark [x], STOP.
+IF failures found: Add '- [ ] Fix: error at location' tasks to Phase 4, add '- [ ] Re-run tests'. Mark [x], STOP.
 IF all passing: Mark [x], STOP. Ralph advances to Phase 5.
 EOF
             ;;
@@ -504,16 +514,19 @@ Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 5 task.
 
 VERIFY Phase 4 tests passed (check decisions log). Check git status for unwanted files (docs, .claude/, .ralph/, sensitive files).
 
-IF issues found: Add '- [ ] Fix: description' tasks to Phase 5. Mark [x], STOP. Ralph returns to Phase 4 to re-test.
+IF issues found: Add '- [ ] Fix: description' tasks to Phase 5 (fixes should be committed). Mark [x], STOP. Ralph returns to Phase 4 to re-test.
 IF no issues: Mark [x], STOP. Ralph advances to Phase 6.
 EOF
             ;;
         6)
             cat <<'EOF'
-Read DECISIONS_FILE_PATH, PLAN_FILE_PATH, git log (for style). Find FIRST unchecked Phase 6 task.
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 6 task.
 
-Stage ONLY code/tests/config (NO docs, .claude/, .ralph/, sensitive files). Verify with git diff --cached.
-Create commit following project style. Mark [x], log, STOP.
+Check git status:
+- IF no uncommitted changes: All work already committed in Phase 2/3/4/5. Mark [x], log "All changes committed", STOP.
+- IF uncommitted changes exist: Stage ONLY code/tests/config (NO docs, .claude/, .ralph/). Create commit. Mark [x], STOP.
+
+Note: Most commits happen during Phase 2 (implementation). This phase handles any remaining uncommitted changes.
 EOF
             ;;
     esac
