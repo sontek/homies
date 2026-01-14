@@ -1,0 +1,1238 @@
+#!/usr/bin/env bash
+# ralph - Autonomous Claude Code workflow orchestration
+# Executes: implementation → test → review → commit → PR → iterate
+set -euo pipefail
+
+# Detect script directory to find claude-jail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Configuration (can be overridden by environment variables)
+# Track if RALPH_MAX_ITERATIONS was explicitly set by user
+if [ -n "${RALPH_MAX_ITERATIONS:-}" ]; then
+    RALPH_MAX_ITERATIONS_EXPLICIT=true
+else
+    RALPH_MAX_ITERATIONS_EXPLICIT=false
+fi
+RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-50}"
+RALPH_COST_LIMIT="${RALPH_COST_LIMIT:-10.00}"
+RALPH_AUTO_APPROVE_PUSH="${RALPH_AUTO_APPROVE_PUSH:-false}"
+RALPH_DIR="${RALPH_DIR:-.ralph}"
+RALPH_AUDIT_DIR="${RALPH_AUDIT_DIR:-.ralph/audit}"
+RALPH_RUNS_DIR="${RALPH_RUNS_DIR:-.ralph/runs}"
+RALPH_CLAUDE_COMMAND="${RALPH_CLAUDE_COMMAND:-claude-jail}"
+RALPH_MODEL="${RALPH_MODEL:-sonnet}"
+RALPH_PLAN_MODEL="${RALPH_PLAN_MODEL:-$RALPH_MODEL}"
+RALPH_REVIEW_MODEL="${RALPH_REVIEW_MODEL:-$RALPH_MODEL}"
+
+# Determine Claude command path
+if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+    CLAUDE_CMD="${SCRIPT_DIR}/claude-jail"
+elif [ "$RALPH_CLAUDE_COMMAND" = "claude" ]; then
+    CLAUDE_CMD="claude"
+else
+    # Assume it's a custom path/command
+    CLAUDE_CMD="$RALPH_CLAUDE_COMMAND"
+fi
+
+# Generate unique run ID (timestamp-based)
+RALPH_RUN_ID="ralph-$(date +%Y%m%d-%H%M%S)"
+
+# State file for current run
+STATE_FILE="$RALPH_DIR/state.json"
+
+# Run-specific directory for this execution
+RUN_DIR="$RALPH_RUNS_DIR/$RALPH_RUN_ID"
+
+# Plan file for current run
+PLAN_FILE="$RUN_DIR/plan.md"
+
+# Decisions file for current run (logs what was done each iteration)
+DECISIONS_FILE="$RUN_DIR/decisions.md"
+
+# Claude Code uses .claude/ for its own files (todos.json)
+# Ralph uses .ralph/ for its own files (state, audit, runs)
+CLAUDE_DIR=".claude"
+
+# Circuit breaker tracking (for stagnation detection)
+LAST_ERROR_MSG=""
+ERROR_REPEAT_COUNT=0
+TEST_ONLY_LOOP_COUNT=0
+NO_PROGRESS_COUNT=0
+LAST_COMPLETED_TASKS=0
+LAST_FILES_MODIFIED=0
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $*"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $*"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $*"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $*"
+}
+
+# Usage
+usage() {
+    cat <<EOF
+Usage: ralph [OPTIONS] PROMPT
+
+Run autonomous Claude Code workflow on a prompt.
+
+PROMPT can be:
+  - A string: ralph "implement feature X"
+  - A file path: ralph tasks/task1.md
+  - Stdin: echo "task" | ralph
+
+Options:
+  --resume [path]    Resume from last checkpoint or specific run directory
+  --help             Show this help
+
+Environment variables:
+  RALPH_MAX_ITERATIONS      Max total iterations (default: 20)
+  RALPH_COST_LIMIT          Max cost in USD (default: 10.00)
+  RALPH_AUTO_APPROVE_PUSH   Skip push approval (default: false)
+  RALPH_CLAUDE_COMMAND      Claude command to use (default: claude-jail)
+                            Options: "claude", "claude-jail", or custom path
+  RALPH_MODEL               Model to use for all phases (default: sonnet)
+                            Options: "opus", "sonnet", "haiku", or full model name
+  RALPH_PLAN_MODEL          Model for Phase 1 planning (default: RALPH_MODEL)
+  RALPH_REVIEW_MODEL        Model for Phase 3 & 5 reviews (default: RALPH_MODEL)
+
+Examples:
+  ralph "Add user authentication"
+  ralph docs/implementation.md
+  ralph --resume                                    # Resume from last run
+  ralph --resume .ralph/runs/ralph-20260112-120125  # Resume from specific run
+  RALPH_MAX_ITERATIONS=30 ralph "complex task"
+  RALPH_CLAUDE_COMMAND=claude ralph "use native claude"
+  RALPH_MODEL=opus ralph "complex planning task"
+  RALPH_MODEL=haiku ralph "simple refactoring"
+  RALPH_PLAN_MODEL=opus ralph "use opus for planning phase"
+  RALPH_PLAN_MODEL=opus RALPH_MODEL=sonnet ralph "opus planning, sonnet implementation"
+EOF
+    exit 1
+}
+
+# Initialize directories
+init_dirs() {
+    mkdir -p "$RALPH_DIR"
+    mkdir -p "$RALPH_AUDIT_DIR"
+    mkdir -p "$RALPH_RUNS_DIR"
+    mkdir -p "$RUN_DIR"  # Create run-specific directory
+    mkdir -p "$CLAUDE_DIR"  # Ensure .claude exists for todos.json
+}
+
+# Archive old state files from previous run
+archive_old_state() {
+    # Check if there are any state files from previous run
+    local has_old_files=false
+
+    if [ -f "$STATE_FILE" ] || [ -f "$CLAUDE_DIR/todos.json" ]; then
+        has_old_files=true
+    fi
+
+    if [ "$has_old_files" = true ]; then
+        # Find the most recent run directory (if any exist)
+        local latest_run=$(ls -t "$RALPH_RUNS_DIR" 2>/dev/null | head -1)
+
+        if [ -n "$latest_run" ]; then
+            local archive_dir="$RALPH_RUNS_DIR/$latest_run"
+        else
+            # First run, create archive with timestamp
+            local archive_dir="$RALPH_RUNS_DIR/ralph-previous-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$archive_dir"
+        fi
+
+        log_info "Archiving previous run state to: $archive_dir"
+
+        # Move old state files to archive
+        [ -f "$STATE_FILE" ] && mv "$STATE_FILE" "$archive_dir/" 2>/dev/null || true
+        [ -f "$CLAUDE_DIR/todos.json" ] && mv "$CLAUDE_DIR/todos.json" "$archive_dir/" 2>/dev/null || true
+    fi
+}
+
+# Get prompt from various sources
+get_prompt() {
+    local arg="$1"
+
+    # Check if it's a file first
+    if [ -n "$arg" ] && [ -f "$arg" ]; then
+        cat "$arg"
+    # Check if we have a direct string argument
+    elif [ -n "$arg" ]; then
+        echo "$arg"
+    # Otherwise check if reading from stdin
+    elif [ ! -t 0 ]; then
+        cat
+    else
+        echo ""
+    fi
+}
+
+# Initialize state
+init_state() {
+    local prompt="$1"
+    local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+    cat > "$STATE_FILE" <<EOF
+{
+  "total_iterations": 0,
+  "cost_usd": 0.0,
+  "started_at": "$timestamp",
+  "updated_at": "$timestamp",
+  "prompt": $(echo "$prompt" | jq -Rs .),
+  "last_completed_count": 0,
+  "no_progress_iterations": 0,
+  "current_phase": 1,
+  "phase_iterations": 0
+}
+EOF
+}
+
+# Load state
+load_state() {
+    if [ -f "$STATE_FILE" ]; then
+        cat "$STATE_FILE"
+    else
+        echo "{}"
+    fi
+}
+
+# Update state
+update_state() {
+    local updates="$1"
+    local current_state=$(load_state)
+    local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+    echo "$current_state" | jq ". + $updates + {\"updated_at\": \"$timestamp\"}" > "$STATE_FILE"
+}
+
+# Approval gate
+approval_gate() {
+    local message="$1"
+
+    if [ "$RALPH_AUTO_APPROVE_PUSH" = "true" ]; then
+        log_info "Auto-approving: $message"
+        return 0
+    fi
+
+    echo ""
+    log_warning "$message"
+    read -p "Continue? (y/n) " -n 1 -r
+    echo ""
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_error "Aborted by user"
+        return 1
+    fi
+
+    return 0
+}
+
+# Check iteration limits
+check_limits() {
+    local state=$(load_state)
+    local total_iterations=$(echo "$state" | jq -r '.total_iterations // 0')
+
+    if [ "$total_iterations" -ge "$RALPH_MAX_ITERATIONS" ]; then
+        log_error "Max iterations ($RALPH_MAX_ITERATIONS) reached"
+        return 1
+    fi
+
+    # TODO: Add cost checking once we can track API costs
+    # local cost=$(echo "$state" | jq -r '.cost_usd // 0')
+    # if (( $(echo "$cost >= $RALPH_COST_LIMIT" | bc -l) )); then
+    #     log_error "Cost limit ($RALPH_COST_LIMIT USD) reached"
+    #     return 1
+    # fi
+
+    return 0
+}
+
+# Helper: Check if a phase has unchecked tasks
+phase_has_unchecked() {
+    local phase=$1
+    [ ! -f "$PLAN_FILE" ] && return 1
+
+    # Use awk to count unchecked tasks in the phase section
+    # Start at phase header, process until next phase header (excluding current phase)
+    # This handles whitespace variations: - [ ], -  [ ], etc.
+    local count=$(awk -v phase="$phase" '
+        /^## Phase [0-9]+:/ {
+            # Found a phase header
+            phase_num = $3
+            gsub(/:/, "", phase_num)
+            in_target_phase = (phase_num == phase)
+            next
+        }
+        in_target_phase && /^-[ \t]+\[[ \t]\]/ {
+            # Found unchecked task in target phase
+            count++
+        }
+        END { print count+0 }
+    ' "$PLAN_FILE")
+
+    [ "$count" -gt 0 ] && return 0 || return 1
+}
+
+# Helper: Check if all tasks in a phase are complete
+phase_tasks_complete() {
+    local phase=$1
+    [ ! -f "$PLAN_FILE" ] && return 1
+
+    # Phase is complete if it has no unchecked tasks
+    ! phase_has_unchecked "$phase"
+}
+
+# Detect if current phase is complete
+detect_phase_completion() {
+    local phase=$1
+
+    case $phase in
+        1)
+            # Phase 1 complete when plan.md exists with proper structure AND all Phase 1 tasks are checked
+            if [ -f "$PLAN_FILE" ] && grep -q "^## Phase 6:" "$PLAN_FILE"; then
+                # Plan file exists with all phases, now check if Phase 1 tasks are done
+                phase_tasks_complete 1 && return 0
+            fi
+            ;;
+        2)
+            # Phase 2 complete when all Phase 2 tasks are checked
+            phase_tasks_complete 2 && return 0
+            ;;
+        3)
+            # Phase 3 complete when all Phase 3 review tasks are checked
+            # May loop back to Phase 3 if review adds more fix tasks
+            phase_tasks_complete 3 && return 0
+            ;;
+        4)
+            # Phase 4 complete when all Phase 4 test tasks are checked
+            # May loop back to Phase 4 if tests add more fix tasks
+            phase_tasks_complete 4 && return 0
+            ;;
+        5)
+            # Phase 5 complete when all Phase 5 final review tasks are checked
+            # Returns to Phase 4 (re-test) if fixes needed, otherwise advances to Phase 6
+            phase_tasks_complete 5 && return 0
+            ;;
+        6)
+            # Phase 6 complete when commit task is checked
+            phase_tasks_complete 6 && return 0
+            ;;
+    esac
+    return 1
+}
+
+# Determine next phase based on current phase
+determine_next_phase() {
+    local current=$1
+
+    case $current in
+        1) echo 2 ;;  # Plan → Implement
+        2) echo 3 ;;  # Implement → Review
+        3)
+            # Review → Re-review (if added fix tasks) or Test (if clean)
+            # Check if phase 3 still has unchecked tasks (review added fixes)
+            phase_has_unchecked 3 && echo 3 || echo 4
+            ;;
+        4)
+            # Test → Re-test (if added fix tasks) or Final-Review (if passing)
+            phase_has_unchecked 4 && echo 4 || echo 5
+            ;;
+        5)
+            # Final-Review → Re-test (if added fix tasks) or Commit (if clean)
+            # If fixes needed, go back to Phase 4 to re-test, then re-review
+            phase_has_unchecked 5 && echo 4 || echo 6
+            ;;
+        6) echo "done" ;;  # Commit → Done
+        *) echo "error" ;;
+    esac
+}
+
+# Get generic system prompt (same for all phases)
+get_system_prompt() {
+    cat <<'EOF'
+Ralph: 6-phase autonomous workflow - PLAN, IMPLEMENT, REVIEW(loops), TEST(loops), FINAL-REVIEW(→4 if fixes), COMMIT
+
+STATELESS OPERATION:
+Complete ONE task per call. Rebuild context from DECISIONS_FILE_PATH, git status, and plan.md.
+Mark task [x] in plan, log to DECISIONS_FILE_PATH, STOP. Ralph controls phases.
+
+CORE RULES:
+- Execute commands, verify results - don't just document
+- Minimal scope - only what's in the task
+- Follow project conventions (justfile, package.json, etc.)
+- Use Task/Explore for codebase questions; Glob/Grep for specific searches
+- NO: unrelated bugs, refactoring, docs (README/SUMMARY), helper scripts, .claude/.ralph commits
+- ONLY stage: source code, tests, config files
+
+ERROR HANDLING:
+Log error details to DECISIONS_FILE_PATH and STOP. Ralph handles recovery.
+
+STATUS BLOCK (REQUIRED):
+---RALPH_STATUS---
+STATUS: IN_PROGRESS|COMPLETE|BLOCKED
+TASKS_COMPLETED_THIS_LOOP: N
+FILES_MODIFIED: N
+TESTS_STATUS: PASSING|FAILING|NOT_RUN
+WORK_TYPE: IMPLEMENTATION|TESTING|DOCUMENTATION|REFACTORING
+EXIT_SIGNAL: true|false
+RECOMMENDATION: one-line next step
+---END_RALPH_STATUS---
+
+EXIT_SIGNAL=true ONLY when ALL conditions met:
+1. All plan tasks marked [x] or [~]
+2. Tests passing (or NOT_RUN if before Phase 5)
+3. No errors in last execution
+4. No meaningful work remaining
+
+EXAMPLES:
+
+Example 1 - Making Progress:
+---RALPH_STATUS---
+STATUS: IN_PROGRESS
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 3
+TESTS_STATUS: PASSING
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: false
+RECOMMENDATION: Continue with next Phase 2 task from plan
+---END_RALPH_STATUS---
+
+Example 2 - All Done (Phase 9 complete):
+---RALPH_STATUS---
+STATUS: COMPLETE
+TASKS_COMPLETED_THIS_LOOP: 1
+FILES_MODIFIED: 1
+TESTS_STATUS: PASSING
+WORK_TYPE: IMPLEMENTATION
+EXIT_SIGNAL: true
+RECOMMENDATION: All tasks complete, tests passing, workflow finished
+---END_RALPH_STATUS---
+
+Example 3 - Blocked:
+---RALPH_STATUS---
+STATUS: BLOCKED
+TASKS_COMPLETED_THIS_LOOP: 0
+FILES_MODIFIED: 2
+TESTS_STATUS: FAILING
+WORK_TYPE: DEBUGGING
+EXIT_SIGNAL: false
+RECOMMENDATION: Same import error 3x, needs investigation
+---END_RALPH_STATUS---
+
+AVOID:
+- Busy work when done
+- Test-only loops
+- Scope creep
+- Missing status block
+
+DECISIONS LOG FORMAT:
+## [Iteration N] Phase X: Task Name
+**Task:** (exact from plan)
+**What I Did:** actions/commands
+**Why:** rationale
+**Result:** success/failure/findings
+EOF
+}
+
+# Get phase-specific instructions (sent as regular prompt, not system prompt)
+get_phase_prompt() {
+    local phase=$1
+
+    case $phase in
+        1)
+            cat <<'EOF'
+Read DECISIONS_FILE_PATH, git status. Create plan at PLAN_FILE_PATH with 6 phases:
+
+## Phase 1: PLAN (2-4 analysis tasks, then mark [x])
+## Phase 2: IMPLEMENT (specific tasks: "Create X with Y", not vague)
+## Phase 3: REVIEW (1 task: review all changes)
+## Phase 4: TEST (1 task: run tests/linter/type-checker)
+## Phase 5: FINAL-REVIEW (1 task: final verification)
+## Phase 6: COMMIT (1 task: create commit)
+
+Tasks: '- [ ] description'. Complete Phase 1 tasks before STOP.
+EOF
+            ;;
+        2)
+            cat <<'EOF'
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 2 task.
+
+Complete ONE task: code/tests/config only. Mark [x], log to DECISIONS_FILE_PATH, STOP.
+NO docs (SUMMARY.md, guides). Testing: 20% effort, new features only, Phase 4 is main testing.
+EOF
+            ;;
+        3)
+            cat <<'EOF'
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 3 task.
+
+Review: git diff/status. Check bugs, security, quality, unwanted docs (SUMMARY.md, guides), sensitive files.
+
+IF issues found: Add '- [ ] Fix: description' tasks to Phase 3, add '- [ ] Re-review after fixes' to Phase 3. Mark current [x], STOP.
+IF no issues: Mark [x], STOP. Ralph advances to Phase 4.
+EOF
+            ;;
+        4)
+            cat <<'EOF'
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 4 task.
+
+IF task is "run tests": EXECUTE tests/linter/type-checker (justfile/package.json). Wait for completion (5-10min). Log full output.
+IF task is "Fix: X": Fix ONE issue from test output.
+
+IF failures found: Add '- [ ] Fix: error at location' tasks to Phase 4, add '- [ ] Re-run tests' to Phase 4. Mark [x], STOP.
+IF all passing: Mark [x], STOP. Ralph advances to Phase 5.
+EOF
+            ;;
+        5)
+            cat <<'EOF'
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH. Find FIRST unchecked Phase 5 task.
+
+VERIFY Phase 4 tests passed (check decisions log). Check git status for unwanted files (docs, .claude/, .ralph/, sensitive files).
+
+IF issues found: Add '- [ ] Fix: description' tasks to Phase 5. Mark [x], STOP. Ralph returns to Phase 4 to re-test.
+IF no issues: Mark [x], STOP. Ralph advances to Phase 6.
+EOF
+            ;;
+        6)
+            cat <<'EOF'
+Read DECISIONS_FILE_PATH, PLAN_FILE_PATH, git log (for style). Find FIRST unchecked Phase 6 task.
+
+Stage ONLY code/tests/config (NO docs, .claude/, .ralph/, sensitive files). Verify with git diff --cached.
+Create commit following project style. Mark [x], log, STOP.
+EOF
+            ;;
+    esac
+}
+
+# Run Claude with a message and iteration number
+run_claude() {
+    local message="$1"
+    local iteration="$2"
+
+    # Conditional logging and checks based on command
+    if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+        log_info "Running Claude in Docker sandbox..."
+
+        # Check if Docker Desktop is running
+        if ! docker info >/dev/null 2>&1; then
+            log_error "Docker Desktop is not running"
+            exit 1
+        fi
+
+        # Check if claude-jail is available
+        if [ ! -x "$CLAUDE_CMD" ]; then
+            log_error "claude-jail not found at: $CLAUDE_CMD"
+            exit 1
+        fi
+    else
+        log_info "Running Claude..."
+
+        # Check if claude command is available
+        if ! command -v "$CLAUDE_CMD" >/dev/null 2>&1; then
+            log_error "Claude command not found: $CLAUDE_CMD"
+            exit 1
+        fi
+    fi
+
+    # Get current phase from state
+    local state=$(load_state)
+    local current_phase=$(echo "$state" | jq -r '.current_phase // 1')
+    local phase_iterations=$(echo "$state" | jq -r '.phase_iterations // 0')
+    local original_prompt="$message"
+
+    # Get generic system prompt (same for all phases)
+    local SYSTEM_PROMPT=$(get_system_prompt)
+
+    # Get phase-specific instructions with actual file paths injected
+    local PHASE_INSTRUCTIONS=$(get_phase_prompt "$current_phase" | sed "s|PLAN_FILE_PATH|$PLAN_FILE|g; s|DECISIONS_FILE_PATH|$DECISIONS_FILE|g")
+
+    # Phase name for logging and context
+    local phase_name
+    case $current_phase in
+        1) phase_name="PLAN" ;;
+        2) phase_name="IMPLEMENT" ;;
+        3) phase_name="REVIEW" ;;
+        4) phase_name="TEST" ;;
+        5) phase_name="FINAL-REVIEW" ;;
+        6) phase_name="COMMIT" ;;
+        *) phase_name="UNKNOWN" ;;
+    esac
+
+    # Select model based on phase (if phase-specific models are configured)
+    local model="$RALPH_MODEL"
+    case $current_phase in
+        1) model="${RALPH_PLAN_MODEL}" ;;
+        3|5) model="${RALPH_REVIEW_MODEL}" ;;
+    esac
+
+    # Build loop context for iteration awareness
+    local LOOP_CONTEXT=""
+    if [ "$iteration" -gt 1 ]; then
+        # Count tasks completed so far
+        local completed_tasks=0
+        if [ -f "$PLAN_FILE" ]; then
+            completed_tasks=$(grep -c '^- \[x\]' "$PLAN_FILE" 2>/dev/null || echo "0")
+        fi
+
+        # Get recent activity from decisions file (last 3 entries)
+        local recent_activity=""
+        if [ -f "$DECISIONS_FILE" ]; then
+            recent_activity=$(tail -50 "$DECISIONS_FILE" | grep -A 3 "^## \[Iteration" | tail -20)
+        fi
+
+        LOOP_CONTEXT="
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LOOP CONTEXT (Iteration $iteration):
+- Total iterations so far: $iteration
+- Phase iterations: $phase_iterations
+- Tasks completed: $completed_tasks
+- Current phase: $current_phase ($phase_name)
+
+Recent activity (last few decisions):
+$recent_activity
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"
+    fi
+
+    # Build dynamic regular prompt
+    local FULL_PROMPT
+    if [ "$current_phase" = "1" ]; then
+        # Phase 1: Just the original task + phase instructions
+        FULL_PROMPT="Original task: $original_prompt
+$LOOP_CONTEXT
+Phase 1 (PLAN) instructions:
+$PHASE_INSTRUCTIONS"
+    else
+        # Phases 2-9: Reference the plan document
+        FULL_PROMPT="Original task: $original_prompt
+Plan document: $PLAN_FILE
+$LOOP_CONTEXT
+Current phase: Phase $current_phase
+Phase instructions:
+$PHASE_INSTRUCTIONS"
+    fi
+
+    log_info "Phase $current_phase: $phase_name (iteration $phase_iterations in this phase)"
+
+    # Show environment info for claude-jail
+    if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+        if [ -f ".claude/Dockerfile" ]; then
+            log_info "Docker: Using custom .claude/Dockerfile"
+        else
+            log_info "Docker: Using base template (docker/sandbox-templates:claude-code)"
+        fi
+    fi
+
+    log_info "Executing: $CLAUDE_CMD -p --model $model --output-format json --system-prompt \"<generic>\" --permission-mode bypassPermissions"
+
+    # Log the phase-specific prompt being sent
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "PROMPT (Phase $current_phase - $phase_name):"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "$FULL_PROMPT"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+
+    # Retry logic for transient errors
+    local max_retries=3
+    local retry_count=0
+    local exit_code=1
+    local output_file=""
+    local output_text=""
+    local persistent_output="$RUN_DIR/last_output.txt"
+
+    while [ $retry_count -lt $max_retries ]; do
+        # Run Claude and capture output and exit code
+        output_file=$(mktemp)
+
+        if [ "$RALPH_CLAUDE_COMMAND" = "claude-jail" ]; then
+            # claude-jail needs script wrapper for pseudo-TTY (docker sandbox requirement)
+            script -q "$output_file" "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > /dev/null 2>&1
+            exit_code=$?
+        else
+            # Native claude handles TTY properly
+            "$CLAUDE_CMD" -p --model "$model" --output-format json --system-prompt "$SYSTEM_PROMPT" --permission-mode bypassPermissions "$FULL_PROMPT" > "$output_file" 2>&1
+            exit_code=$?
+        fi
+
+        # Parse JSON output and extract text content
+        # With --output-format json, Claude returns a JSON object with the response
+        output_text="$output_file"
+        if grep -q '"type":"result"' "$output_file" 2>/dev/null; then
+            # JSON output detected - extract the text content
+            local json_output="$output_file"
+            output_text=$(mktemp)
+
+            # Check for errors in JSON
+            if jq -e '.is_error == true' "$json_output" > /dev/null 2>&1; then
+                # Extract error message
+                local error_msg=$(jq -r '.errors[]' "$json_output" 2>/dev/null || echo "")
+
+                # Check for non-retryable errors (authentication, authorization)
+                if echo "$error_msg" | grep -qiE "authentication|unauthorized|invalid api key|permission denied|forbidden"; then
+                    # Non-retryable error - fail immediately
+                    log_error "Claude returned a non-retryable error:"
+                    echo "$error_msg"
+                    rm -f "$output_file"
+                    rm -f "$output_text"
+                    return 1
+                fi
+
+                # All other errors are potentially transient - retry them
+                retry_count=$((retry_count + 1))
+                if [ $retry_count -lt $max_retries ]; then
+                    log_warning "Error detected (attempt $retry_count/$max_retries): $error_msg"
+                    log_info "Retrying in 3 seconds..."
+                    sleep 3
+                    rm -f "$output_file"
+                    [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+                    continue
+                else
+                    log_error "Max retries reached. Claude returned an error:"
+                    echo "$error_msg"
+                    rm -f "$output_file"
+                    rm -f "$output_text"
+                    return 1
+                fi
+            fi
+
+            # Extract the actual response text from JSON
+            jq -r '.result // ""' "$json_output" 2>/dev/null > "$output_text"
+
+            # If jq extraction failed or returned empty, fall back to showing raw output
+            if [ ! -s "$output_text" ]; then
+                log_warning "Could not extract text from JSON output, using raw output"
+                cp "$json_output" "$output_text"
+            fi
+        fi
+
+        # Check if command succeeded
+        if [ $exit_code -eq 0 ]; then
+            # Success - break out of retry loop
+            break
+        else
+            # Failed - check if we should retry
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                log_warning "Command failed with exit code $exit_code (attempt $retry_count/$max_retries)"
+                log_info "Retrying in 3 seconds..."
+                sleep 3
+                rm -f "$output_file"
+                [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+                continue
+            fi
+        fi
+    done
+
+    # Strip ANSI escape codes and save to persistent location for circuit breaker
+    # The script command adds TTY control codes that break status block parsing
+    # Use sed to remove ANSI escape sequences: ESC [ ... m
+    sed 's/\x1b\[[0-9;]*m//g' "$output_text" > "$persistent_output"
+
+    # Display the output
+    cat "$output_text"
+
+    if [ $exit_code -ne 0 ]; then
+        log_error "$CLAUDE_CMD exited with code $exit_code after $retry_count attempts"
+        log_error "Last 20 lines of output:"
+        tail -20 "$output_text" | while IFS= read -r line; do
+            echo "  $line" >&2
+        done
+        rm -f "$output_file"
+        [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+        return 1
+    fi
+
+    rm -f "$output_file"
+    [ "$output_text" != "$output_file" ] && rm -f "$output_text"
+
+    if [ $retry_count -gt 0 ]; then
+        log_info "Claude finished successfully after $((retry_count + 1)) attempts"
+    else
+        log_info "Claude finished successfully"
+    fi
+}
+
+# Unstage any .claude/ or .ralph/ files that shouldn't be committed
+unstage_ralph_files() {
+    # Check if there are any staged files in .claude/ or .ralph/
+    if git diff --cached --name-only | grep -qE '^\.claude/|^\.ralph/'; then
+        log_warning "Unstaging .claude/ and .ralph/ files (should not be committed)"
+        git reset HEAD .claude/ .ralph/ 2>/dev/null || true
+    fi
+}
+
+# Parse status block from Claude's output
+parse_status_block() {
+    local output_file="$1"
+
+    # Extract status block if it exists
+    # More lenient pattern to handle potential whitespace or control chars
+    # Use -F for fixed string matching and -- to prevent --- being interpreted as options
+    if grep -qF -- "---RALPH_STATUS---" "$output_file"; then
+        # Use awk to extract everything between the markers
+        # Strip leading/trailing whitespace from each line
+        # Use -- in grep to prevent pattern from being interpreted as option
+        awk '/---RALPH_STATUS---/,/---END_RALPH_STATUS---/' "$output_file" | \
+            grep -v -- "---.*RALPH_STATUS.*---" | \
+            sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    fi
+}
+
+# Check if exit signal was set in status block
+check_exit_signal() {
+    local status_block="$1"
+
+    # More lenient pattern - match EXIT_SIGNAL: true anywhere in line
+    if echo "$status_block" | grep -qi "EXIT_SIGNAL:[[:space:]]*true"; then
+        return 0  # Exit signal detected
+    else
+        return 1  # No exit signal
+    fi
+}
+
+# Detect and handle circuit breaker conditions
+check_circuit_breaker() {
+    local output_file="$1"
+    local iteration="$2"
+
+    # Parse status block from output
+    local status_block=$(parse_status_block "$output_file")
+
+    # Debug: log if status block was found
+    if [ -z "$status_block" ]; then
+        log_warning "Circuit breaker: No status block found in output"
+        return 0  # Don't trigger circuit breaker if we can't parse status
+    fi
+
+    # Check for EXIT_SIGNAL
+    if check_exit_signal "$status_block"; then
+        log_success "EXIT_SIGNAL detected in status block - workflow complete!"
+        echo ""
+        echo "Status Block:"
+        echo "$status_block"
+        echo ""
+        return 2  # Special code for clean exit
+    fi
+
+    # Extract metrics from status block with more robust parsing
+    # Use grep with lenient whitespace matching and awk to extract value
+    local tasks_completed=$(echo "$status_block" | grep -i "TASKS_COMPLETED_THIS_LOOP:" | sed 's/.*:[[:space:]]*//' || echo "0")
+    local files_modified=$(echo "$status_block" | grep -i "FILES_MODIFIED:" | sed 's/.*:[[:space:]]*//' || echo "0")
+    local work_type=$(echo "$status_block" | grep -i "WORK_TYPE:" | sed 's/.*:[[:space:]]*//' || echo "")
+
+    # Default to 0 if empty
+    [ -z "$tasks_completed" ] && tasks_completed=0
+    [ -z "$files_modified" ] && files_modified=0
+
+    # Detect test-only loops (3+ consecutive loops with TESTING work type and no file modifications)
+    if [ "$work_type" = "TESTING" ] && [ "$files_modified" = "0" ]; then
+        TEST_ONLY_LOOP_COUNT=$((TEST_ONLY_LOOP_COUNT + 1))
+
+        if [ $TEST_ONLY_LOOP_COUNT -ge 3 ]; then
+            log_warning "Circuit breaker: Detected $TEST_ONLY_LOOP_COUNT consecutive test-only loops"
+            log_warning "No files being modified, only running tests - likely stagnating"
+            return 1
+        fi
+    else
+        TEST_ONLY_LOOP_COUNT=0  # Reset counter
+    fi
+
+    # Detect no-progress loops (3+ loops with no tasks completed and no files modified)
+    if [ "$tasks_completed" = "0" ] && [ "$files_modified" = "0" ]; then
+        NO_PROGRESS_COUNT=$((NO_PROGRESS_COUNT + 1))
+
+        if [ $NO_PROGRESS_COUNT -ge 3 ]; then
+            log_warning "Circuit breaker: Detected $NO_PROGRESS_COUNT consecutive loops with no progress"
+            log_warning "No tasks completed and no files modified - likely stuck"
+            return 1
+        fi
+    else
+        NO_PROGRESS_COUNT=0  # Reset counter
+    fi
+
+    # Detect repeated errors (check last 50 lines of output for error patterns)
+    local current_errors=$(tail -50 "$output_file" | grep -i "error\|failed\|exception" | head -5 | sort -u)
+
+    if [ -n "$current_errors" ] && [ "$current_errors" = "$LAST_ERROR_MSG" ]; then
+        ERROR_REPEAT_COUNT=$((ERROR_REPEAT_COUNT + 1))
+
+        if [ $ERROR_REPEAT_COUNT -ge 3 ]; then
+            log_warning "Circuit breaker: Same error repeated $ERROR_REPEAT_COUNT times"
+            log_warning "Error pattern:"
+            echo "$current_errors" | head -3
+            return 1
+        fi
+    else
+        LAST_ERROR_MSG="$current_errors"
+        ERROR_REPEAT_COUNT=0  # Reset if errors changed
+    fi
+
+    return 0  # No circuit breaker conditions met
+}
+
+# Main workflow - Simple loop like the original Ralph
+# Based on: https://ghuntley.com/ralph/
+# Original: while :; do cat PROMPT.md | claude-code ; done
+run_workflow() {
+    local prompt=$(load_state | jq -r '.prompt')
+
+    log_info "Starting Ralph autonomous workflow..."
+    log_info "Prompt: $prompt"
+    echo ""
+
+    # Show system prompt once at the beginning
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "SYSTEM PROMPT (used for all phases):"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    get_system_prompt
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+
+    # Infinite loop - Claude will work until the task is complete
+    while true; do
+        if ! check_limits; then
+            log_error "Stopping due to limits"
+            exit 1
+        fi
+
+        # Update iteration count
+        local state=$(load_state)
+        local total=$(($(echo "$state" | jq -r '.total_iterations // 0') + 1))
+        local current_phase=$(echo "$state" | jq -r '.current_phase // 1')
+        local phase_iterations=$(echo "$state" | jq -r '.phase_iterations // 0')
+
+        phase_iterations=$((phase_iterations + 1))
+        update_state "{\"total_iterations\": $total, \"phase_iterations\": $phase_iterations}"
+
+        # Phase name for logging
+        local phase_name
+        case $current_phase in
+            1) phase_name="PLAN" ;;
+            2) phase_name="IMPLEMENT" ;;
+            3) phase_name="REVIEW" ;;
+            4) phase_name="FIX (post-review)" ;;
+            5) phase_name="TEST" ;;
+            6) phase_name="FIX (post-test)" ;;
+            7) phase_name="FINAL-REVIEW" ;;
+            8) phase_name="FIX (post-final-review)" ;;
+            9) phase_name="COMMIT" ;;
+            *) phase_name="UNKNOWN" ;;
+        esac
+
+        log_info "Iteration $total - Phase $current_phase: $phase_name"
+        echo ""
+
+        # Run Claude with the prompt and iteration number
+        # Iteration 1 forces planning, subsequent iterations execute one todo at a time
+        if ! run_claude "$prompt" "$total"; then
+            log_error "Claude execution failed, stopping workflow"
+            exit 1
+        fi
+
+        # Check circuit breaker conditions (stagnation, repeated errors, exit signal)
+        local circuit_breaker_output="$RUN_DIR/last_output.txt"
+        if [ -f "$circuit_breaker_output" ]; then
+            check_circuit_breaker "$circuit_breaker_output" "$total"
+            local breaker_result=$?
+
+            if [ $breaker_result -eq 2 ]; then
+                # EXIT_SIGNAL detected - clean exit
+                log_success "Workflow completed via EXIT_SIGNAL"
+                break
+            elif [ $breaker_result -eq 1 ]; then
+                # Circuit breaker tripped - stagnation detected
+                log_error "Circuit breaker triggered - halting workflow to prevent runaway loop"
+                log_error "Review $RUN_DIR/last_output.txt and $DECISIONS_FILE for details"
+                exit 1
+            fi
+        fi
+
+        # Unstage any .claude/ or .ralph/ files (should never be committed)
+        unstage_ralph_files
+
+        # Check for phase dependencies - route to fix phases if they have work
+        # This prevents getting stuck when review phases have tasks that depend on fix phases
+        case $current_phase in
+            3)
+                # Phase 3 (REVIEW) - check if Phase 4 (FIX) has unchecked tasks
+                if phase_has_unchecked 4; then
+                    log_info "Phase 3 has dependency on Phase 4 - routing to Phase 4 first"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "**From**: Phase 3 (REVIEW)" >> "$DECISIONS_FILE"
+                    echo "**To**: Phase 4 (FIX)" >> "$DECISIONS_FILE"
+                    echo "**Reason**: Phase 4 has unchecked fix tasks that must be completed before Phase 3 review can finish" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    update_state "{\"current_phase\": 4, \"phase_iterations\": 0}"
+                    continue
+                fi
+                ;;
+            5)
+                # Phase 5 (TEST) - check if Phase 6 (FIX) has unchecked tasks
+                if phase_has_unchecked 6; then
+                    log_info "Phase 5 has dependency on Phase 6 - routing to Phase 6 first"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "**From**: Phase 5 (TEST)" >> "$DECISIONS_FILE"
+                    echo "**To**: Phase 6 (FIX)" >> "$DECISIONS_FILE"
+                    echo "**Reason**: Phase 6 has unchecked fix tasks that must be completed before Phase 5 testing can finish" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    update_state "{\"current_phase\": 6, \"phase_iterations\": 0}"
+                    continue
+                fi
+                ;;
+            7)
+                # Phase 7 (FINAL-REVIEW) - check if Phase 8 (FIX) has unchecked tasks
+                if phase_has_unchecked 8; then
+                    log_info "Phase 7 has dependency on Phase 8 - routing to Phase 8 first"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    echo "**From**: Phase 7 (FINAL-REVIEW)" >> "$DECISIONS_FILE"
+                    echo "**To**: Phase 8 (FIX)" >> "$DECISIONS_FILE"
+                    echo "**Reason**: Phase 8 has unchecked fix tasks that must be completed before Phase 7 final review can finish" >> "$DECISIONS_FILE"
+                    echo "" >> "$DECISIONS_FILE"
+                    update_state "{\"current_phase\": 8, \"phase_iterations\": 0}"
+                    continue
+                fi
+                ;;
+        esac
+
+        # Check for phase completion and transition
+        if detect_phase_completion "$current_phase"; then
+            local next_phase=$(determine_next_phase "$current_phase")
+
+            if [ "$next_phase" = "done" ]; then
+                log_success "Ralph workflow complete - Phase 9 (COMMIT) finished"
+                break
+            elif [ "$next_phase" = "error" ]; then
+                log_error "Invalid phase transition from phase $current_phase"
+                exit 1
+            elif [ "$next_phase" != "$current_phase" ]; then
+                # Phase transition
+                log_info "Phase $current_phase ($phase_name) complete → advancing to Phase $next_phase"
+
+                # Log phase transition
+                echo "" >> "$DECISIONS_FILE"
+                echo "## Phase Transition (Iteration $total)" >> "$DECISIONS_FILE"
+                echo "" >> "$DECISIONS_FILE"
+                echo "**From**: Phase $current_phase ($phase_name)" >> "$DECISIONS_FILE"
+                echo "**To**: Phase $next_phase" >> "$DECISIONS_FILE"
+                echo "" >> "$DECISIONS_FILE"
+
+                # Update state with new phase
+                update_state "{\"current_phase\": $next_phase, \"phase_iterations\": 0}"
+            fi
+        fi
+
+        # Check if Claude created plan (required in Phase 1)
+        if [ "$current_phase" = "1" ] && [ ! -f "$PLAN_FILE" ]; then
+            log_error "Phase 1 MUST create $PLAN_FILE but none was created!"
+            log_warning "Will retry Phase 1..."
+
+            # Reset phase iterations to retry
+            update_state "{\"phase_iterations\": 0}"
+            sleep 2
+            continue
+        fi
+
+        # Show task status if plan exists
+        if [ -f "$PLAN_FILE" ]; then
+            local unchecked_count=$(grep -c '^- \[ \]' "$PLAN_FILE" 2>/dev/null || echo "0")
+            local checked_count=$(grep -c '^- \[x\]' "$PLAN_FILE" 2>/dev/null || echo "0")
+            local skipped_count=$(grep -c '^- \[~\]' "$PLAN_FILE" 2>/dev/null || echo "0")
+
+            if [ "$skipped_count" != "0" ]; then
+                log_info "Task status: $checked_count completed, $skipped_count skipped, $unchecked_count remaining"
+            else
+                log_info "Task status: $checked_count completed, $unchecked_count remaining"
+            fi
+        fi
+
+        # Small delay between iterations to avoid tight loops
+        sleep 2
+    done
+
+    # Copy state files to run directory (plan.md and decisions.md already there)
+    log_info "Archiving run artifacts to: $RUN_DIR"
+
+    [ -f "$STATE_FILE" ] && cp "$STATE_FILE" "$RUN_DIR/" || true
+    [ -f "$CLAUDE_DIR/todos.json" ] && cp "$CLAUDE_DIR/todos.json" "$RUN_DIR/" || true
+
+    echo ""
+    local state=$(load_state)
+    local iterations=$(echo "$state" | jq -r '.total_iterations')
+    echo "Summary:"
+    echo "  Run ID: $RALPH_RUN_ID"
+    echo "  Run directory: $RUN_DIR"
+    echo "  Total iterations: $iterations"
+
+    # Show task completion status from plan file
+    if [ -f "$PLAN_FILE" ]; then
+        local completed_tasks=$(grep -c '^- \[x\]' "$PLAN_FILE" 2>/dev/null || echo "0")
+        local skipped_tasks=$(grep -c '^- \[~\]' "$PLAN_FILE" 2>/dev/null || echo "0")
+        local unchecked_tasks=$(grep -c '^- \[ \]' "$PLAN_FILE" 2>/dev/null || echo "0")
+        local total_tasks=$((completed_tasks + skipped_tasks + unchecked_tasks))
+
+        if [ "$skipped_tasks" != "0" ]; then
+            echo "  Tasks: $completed_tasks completed, $skipped_tasks skipped, $unchecked_tasks remaining (total: $total_tasks)"
+        else
+            echo "  Tasks: $completed_tasks/$total_tasks completed"
+        fi
+    fi
+    echo ""
+
+    # Check if decisions were logged
+    if [ -f "$DECISIONS_FILE" ]; then
+        log_warning "Ralph made decisions during autonomous operation"
+        echo ""
+        echo "Review decisions made: $DECISIONS_FILE"
+        echo ""
+        cat "$DECISIONS_FILE"
+        echo ""
+    fi
+}
+
+# Main
+main() {
+    # Parse arguments
+    local resume=false
+    local resume_path=""
+    local prompt_arg=""
+
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --resume)
+                resume=true
+                # Check if next argument is a path
+                if [[ $# -gt 1 ]] && [[ ! "$2" =~ ^-- ]]; then
+                    resume_path="$2"
+                    shift
+                fi
+                shift
+                ;;
+            --help|-h)
+                usage
+                ;;
+            *)
+                prompt_arg="$1"
+                shift
+                ;;
+        esac
+    done
+
+    # Initialize directories
+    init_dirs
+
+    # Get prompt
+    if [ "$resume" = true ]; then
+        log_info "Resuming from checkpoint..."
+
+        # If resume path provided, restore from that run directory
+        if [ -n "$resume_path" ]; then
+            if [ ! -f "$resume_path/state.json" ]; then
+                log_error "No state file found at: $resume_path/state.json"
+                exit 1
+            fi
+
+            log_info "Restoring state from: $resume_path"
+
+            # Copy state files from the specified run directory
+            cp "$resume_path/state.json" "$STATE_FILE"
+            cp "$resume_path/plan.md" "$RALPH_DIR/plan.md" 2>/dev/null || true
+            cp "$resume_path/decisions.md" "$RALPH_DIR/decisions.md" 2>/dev/null || true
+
+            # Update RUN_DIR to use the resumed run
+            RALPH_RUN_ID=$(basename "$resume_path")
+            RUN_DIR="$resume_path"
+            PLAN_FILE="$RUN_DIR/plan.md"
+            DECISIONS_FILE="$RUN_DIR/decisions.md"
+        else
+            # Resume from default location
+            if [ ! -f "$STATE_FILE" ]; then
+                log_error "No state file found to resume from"
+                exit 1
+            fi
+        fi
+
+        # Check if we're at or past the iteration limit
+        local state=$(load_state)
+        local current_iterations=$(echo "$state" | jq -r '.total_iterations // 0')
+
+        if [ "$current_iterations" -ge "$RALPH_MAX_ITERATIONS" ]; then
+            # Check if user explicitly set RALPH_MAX_ITERATIONS (via env var)
+            if [ "$RALPH_MAX_ITERATIONS_EXPLICIT" = "false" ]; then
+                # User didn't set it - auto-extend by 50
+                local old_limit=$RALPH_MAX_ITERATIONS
+                RALPH_MAX_ITERATIONS=$((current_iterations + 50))
+                log_warning "Current run has $current_iterations iterations, at limit of $old_limit"
+                log_info "Auto-extending iteration limit to $RALPH_MAX_ITERATIONS"
+                log_info "To set a custom limit, use: RALPH_MAX_ITERATIONS=<number> ralph --resume"
+            else
+                # User explicitly set it but it's still too low
+                log_error "Current run has $current_iterations iterations, but limit is $RALPH_MAX_ITERATIONS"
+                log_error "Increase the limit to continue: RALPH_MAX_ITERATIONS=$((current_iterations + 50)) ralph --resume"
+                exit 1
+            fi
+        elif [ "$current_iterations" -gt $((RALPH_MAX_ITERATIONS - 10)) ]; then
+            # Within 10 iterations of the limit - warn them
+            local remaining=$((RALPH_MAX_ITERATIONS - current_iterations))
+            log_warning "Approaching iteration limit: $current_iterations/$RALPH_MAX_ITERATIONS ($remaining remaining)"
+            log_info "To increase limit, use: RALPH_MAX_ITERATIONS=<number> ralph --resume"
+        fi
+    else
+        # Archive old state files before starting new run
+        archive_old_state
+        if [ -z "$prompt_arg" ] && [ -t 0 ]; then
+            log_error "No prompt provided"
+            usage
+        fi
+
+        local prompt=$(get_prompt "$prompt_arg")
+
+        if [ -z "$prompt" ]; then
+            log_error "Empty prompt"
+            exit 1
+        fi
+
+        log_info "Initializing Ralph workflow..."
+        init_state "$prompt"
+    fi
+
+    # Start audit log with unbuffered output
+    local audit_log="$RALPH_AUDIT_DIR/ralph-$(date +%Y%m%d-%H%M%S).log"
+    exec > >(stdbuf -oL -eL tee -a "$audit_log") 2>&1
+
+    log_info "Run ID: $RALPH_RUN_ID"
+    log_info "Run directory: $RUN_DIR"
+    log_info "Audit log: $audit_log"
+    log_info "Max iterations: $RALPH_MAX_ITERATIONS"
+    log_info "Cost limit: $RALPH_COST_LIMIT USD"
+
+    # Run workflow
+    run_workflow
+
+    log_success "All done!"
+}
+
+# Run
+main "$@"
