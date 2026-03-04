@@ -13,7 +13,7 @@ if [ -n "${RALPH_MAX_ITERATIONS:-}" ]; then
 else
     RALPH_MAX_ITERATIONS_EXPLICIT=false
 fi
-RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-50}"
+RALPH_MAX_ITERATIONS="${RALPH_MAX_ITERATIONS:-10}"
 RALPH_COST_LIMIT="${RALPH_COST_LIMIT:-10.00}"
 RALPH_AUTO_APPROVE_PUSH="${RALPH_AUTO_APPROVE_PUSH:-false}"
 RALPH_DIR="${RALPH_DIR:-.ralph}"
@@ -102,7 +102,8 @@ Options:
   --help             Show this help
 
 Environment variables:
-  RALPH_MAX_ITERATIONS      Max total iterations (default: 20)
+  RALPH_MAX_ITERATIONS      Max complete cycles through all 6 phases (default: 10)
+                            One cycle = PLAN → IMPLEMENT → REVIEW → TEST → FINAL-REVIEW → COMMIT
   RALPH_COST_LIMIT          Max cost in USD (default: 10.00)
   RALPH_AUTO_APPROVE_PUSH   Skip push approval (default: false)
   RALPH_CLAUDE_COMMAND      Claude command to use (default: claude-jail)
@@ -117,7 +118,7 @@ Examples:
   ralph docs/implementation.md
   ralph --resume                                    # Resume from last run
   ralph --resume .ralph/runs/ralph-20260112-120125  # Resume from specific run
-  RALPH_MAX_ITERATIONS=30 ralph "complex task"
+  RALPH_MAX_ITERATIONS=20 ralph "complex task"      # Allow up to 20 complete cycles
   RALPH_CLAUDE_COMMAND=claude ralph "use native claude"
   RALPH_MODEL=opus ralph "complex planning task"
   RALPH_MODEL=haiku ralph "simple refactoring"
@@ -196,7 +197,8 @@ init_state() {
 
     cat > "$STATE_FILE" <<EOF
 {
-  "total_iterations": 0,
+  "cycle_iterations": 0,
+  "phase_executions": 0,
   "cost_usd": 0.0,
   "started_at": "$timestamp",
   "updated_at": "$timestamp",
@@ -296,10 +298,10 @@ approval_gate() {
 # Check iteration limits
 check_limits() {
     local state=$(load_state)
-    local total_iterations=$(echo "$state" | jq -r '.total_iterations // 0')
+    local cycle_iterations=$(echo "$state" | jq -r '.cycle_iterations // 0')
 
-    if [ "$total_iterations" -ge "$RALPH_MAX_ITERATIONS" ]; then
-        log_error "Max iterations ($RALPH_MAX_ITERATIONS) reached"
+    if [ "$cycle_iterations" -ge "$RALPH_MAX_ITERATIONS" ]; then
+        log_error "Max iterations ($RALPH_MAX_ITERATIONS complete cycles) reached"
         return 1
     fi
 
@@ -508,8 +510,16 @@ get_phase_prompt() {
     case $phase in
         1)
             cat <<'EOF'
-Read DECISIONS_FILE_PATH, git status. Create plan at PLAN_FILE_PATH with 6 phases:
+STATELESS CYCLE: Each cycle starts fresh. Don't read old plan files or decisions.
+Use git log and filesystem to understand what was done.
 
+Review git status, git log (recent commits), and current state of the codebase.
+Assess if additional work is needed (bugs, improvements, missing features, original task completion).
+
+IF no additional work needed: Set EXIT_SIGNAL=true in status block and STOP
+IF additional work found: Create plan at PLAN_FILE_PATH with 6 phases
+
+Plan structure:
 ## Phase 1: PLAN (2-4 analysis tasks, then mark [x])
 ## Phase 2: IMPLEMENT (atomic tasks that each get their own commit - e.g., "Add multiply() function", not "Add all math functions")
 ## Phase 3: REVIEW (1 task: review all changes)
@@ -646,6 +656,10 @@ run_claude() {
     # Build loop context for iteration awareness
     local LOOP_CONTEXT=""
     if [ "$iteration" -gt 1 ]; then
+        # Get cycle info from state
+        local current_state=$(load_state)
+        local cycle_num=$(echo "$current_state" | jq -r '.cycle_iterations // 0')
+
         # Count tasks completed so far
         local completed_tasks=0
         if [ -f "$PLAN_FILE" ]; then
@@ -655,15 +669,16 @@ run_claude() {
         # Get recent activity from decisions file (last 3 entries)
         local recent_activity=""
         if [ -f "$DECISIONS_FILE" ]; then
-            recent_activity=$(tail -50 "$DECISIONS_FILE" | grep -A 3 "^## \[Iteration" | tail -20)
+            recent_activity=$(tail -50 "$DECISIONS_FILE" | grep -A 3 "^##" | tail -20)
         fi
 
         LOOP_CONTEXT="
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LOOP CONTEXT (Iteration $iteration):
-- Total iterations so far: $iteration
-- Phase iterations: $phase_iterations
-- Tasks completed: $completed_tasks
+LOOP CONTEXT (Cycle $cycle_num, Phase Execution $iteration):
+- Complete cycles so far: $cycle_num
+- Phase executions so far: $iteration
+- Phase iterations in current phase: $phase_iterations
+- Tasks completed in current plan: $completed_tasks
 - Current phase: $current_phase ($phase_name)
 
 Recent activity (last few decisions):
@@ -977,12 +992,13 @@ run_workflow() {
 
         # Update iteration count
         local state=$(load_state)
-        local total=$(($(echo "$state" | jq -r '.total_iterations // 0') + 1))
+        local phase_executions=$(($(echo "$state" | jq -r '.phase_executions // 0') + 1))
+        local cycle_iterations=$(echo "$state" | jq -r '.cycle_iterations // 0')
         local current_phase=$(echo "$state" | jq -r '.current_phase // 1')
         local phase_iterations=$(echo "$state" | jq -r '.phase_iterations // 0')
 
         phase_iterations=$((phase_iterations + 1))
-        update_state "{\"total_iterations\": $total, \"phase_iterations\": $phase_iterations}"
+        update_state "{\"phase_executions\": $phase_executions, \"phase_iterations\": $phase_iterations}"
 
         # Phase name for logging
         local phase_name
@@ -999,12 +1015,12 @@ run_workflow() {
             *) phase_name="UNKNOWN" ;;
         esac
 
-        log_info "Iteration $total - Phase $current_phase: $phase_name"
+        log_info "Cycle $cycle_iterations, Phase Execution $phase_executions - Phase $current_phase: $phase_name"
         echo ""
 
-        # Run Claude with the prompt and iteration number
-        # Iteration 1 forces planning, subsequent iterations execute one todo at a time
-        if ! run_claude "$prompt" "$total"; then
+        # Run Claude with the prompt and phase execution number
+        # Phase execution 1 forces planning, subsequent executions execute one todo at a time
+        if ! run_claude "$prompt" "$phase_executions"; then
             log_error "Claude execution failed, stopping workflow"
             exit 1
         fi
@@ -1012,12 +1028,12 @@ run_workflow() {
         # Check circuit breaker conditions (stagnation, repeated errors, exit signal)
         local circuit_breaker_output="$RUN_DIR/last_output.txt"
         if [ -f "$circuit_breaker_output" ]; then
-            check_circuit_breaker "$circuit_breaker_output" "$total"
+            check_circuit_breaker "$circuit_breaker_output" "$phase_executions"
             local breaker_result=$?
 
             if [ $breaker_result -eq 2 ]; then
                 # EXIT_SIGNAL detected - clean exit
-                log_success "Workflow completed via EXIT_SIGNAL"
+                log_success "Workflow completed via EXIT_SIGNAL (cycle $cycle_iterations, phase execution $phase_executions)"
                 show_commit_summary
                 break
             elif [ $breaker_result -eq 1 ]; then
@@ -1039,7 +1055,7 @@ run_workflow() {
                 if phase_has_unchecked 4; then
                     log_info "Phase 3 has dependency on Phase 4 - routing to Phase 4 first"
                     echo "" >> "$DECISIONS_FILE"
-                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Phase Execution $phase_executions)" >> "$DECISIONS_FILE"
                     echo "" >> "$DECISIONS_FILE"
                     echo "**From**: Phase 3 (REVIEW)" >> "$DECISIONS_FILE"
                     echo "**To**: Phase 4 (FIX)" >> "$DECISIONS_FILE"
@@ -1054,7 +1070,7 @@ run_workflow() {
                 if phase_has_unchecked 6; then
                     log_info "Phase 5 has dependency on Phase 6 - routing to Phase 6 first"
                     echo "" >> "$DECISIONS_FILE"
-                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Phase Execution $phase_executions)" >> "$DECISIONS_FILE"
                     echo "" >> "$DECISIONS_FILE"
                     echo "**From**: Phase 5 (TEST)" >> "$DECISIONS_FILE"
                     echo "**To**: Phase 6 (FIX)" >> "$DECISIONS_FILE"
@@ -1069,7 +1085,7 @@ run_workflow() {
                 if phase_has_unchecked 8; then
                     log_info "Phase 7 has dependency on Phase 8 - routing to Phase 8 first"
                     echo "" >> "$DECISIONS_FILE"
-                    echo "## Phase Dependency Routing (Iteration $total)" >> "$DECISIONS_FILE"
+                    echo "## Phase Dependency Routing (Phase Execution $phase_executions)" >> "$DECISIONS_FILE"
                     echo "" >> "$DECISIONS_FILE"
                     echo "**From**: Phase 7 (FINAL-REVIEW)" >> "$DECISIONS_FILE"
                     echo "**To**: Phase 8 (FIX)" >> "$DECISIONS_FILE"
@@ -1086,9 +1102,31 @@ run_workflow() {
             local next_phase=$(determine_next_phase "$current_phase")
 
             if [ "$next_phase" = "done" ]; then
-                log_success "Ralph workflow complete - Phase 6 (COMMIT) finished"
-                show_commit_summary
-                break
+                # Phase 6 (COMMIT) finished - loop back to Phase 1 for next cycle
+                local new_cycle=$((cycle_iterations + 1))
+                log_success "Cycle $cycle_iterations complete - Phase 6 (COMMIT) finished"
+                log_info "Starting cycle $new_cycle - returning to Phase 1 (PLAN)"
+
+                # Archive the old plan.md (makes next cycle stateless)
+                if [ -f "$PLAN_FILE" ]; then
+                    local archived_plan="$RUN_DIR/plan-cycle-$cycle_iterations.md"
+                    log_info "Archiving plan to: $(basename "$archived_plan")"
+                    mv "$PLAN_FILE" "$archived_plan"
+                fi
+
+                # Log cycle completion and transition
+                echo "" >> "$DECISIONS_FILE"
+                echo "## Cycle $cycle_iterations Complete (Phase Execution $phase_executions)" >> "$DECISIONS_FILE"
+                echo "" >> "$DECISIONS_FILE"
+                echo "**Phase 6 (COMMIT)**: Complete" >> "$DECISIONS_FILE"
+                echo "**Next**: Starting cycle $new_cycle - Phase 1 (PLAN)" >> "$DECISIONS_FILE"
+                echo "**Note**: Previous plan archived. Next cycle will start fresh (stateless)." >> "$DECISIONS_FILE"
+                echo "" >> "$DECISIONS_FILE"
+
+                # Update state: increment cycle, reset to Phase 1
+                update_state "{\"cycle_iterations\": $new_cycle, \"current_phase\": 1, \"phase_iterations\": 0}"
+
+                # Continue loop (don't break) - will go back to Phase 1
             elif [ "$next_phase" = "error" ]; then
                 log_error "Invalid phase transition from phase $current_phase"
                 exit 1
@@ -1098,7 +1136,7 @@ run_workflow() {
 
                 # Log phase transition
                 echo "" >> "$DECISIONS_FILE"
-                echo "## Phase Transition (Iteration $total)" >> "$DECISIONS_FILE"
+                echo "## Phase Transition (Phase Execution $phase_executions)" >> "$DECISIONS_FILE"
                 echo "" >> "$DECISIONS_FILE"
                 echo "**From**: Phase $current_phase ($phase_name)" >> "$DECISIONS_FILE"
                 echo "**To**: Phase $next_phase" >> "$DECISIONS_FILE"
@@ -1145,11 +1183,13 @@ run_workflow() {
 
     echo ""
     local state=$(load_state)
-    local iterations=$(echo "$state" | jq -r '.total_iterations')
+    local cycles=$(echo "$state" | jq -r '.cycle_iterations // 0')
+    local phase_execs=$(echo "$state" | jq -r '.phase_executions // 0')
     echo "Summary:"
     echo "  Run ID: $RALPH_RUN_ID"
     echo "  Run directory: $RUN_DIR"
-    echo "  Total iterations: $iterations"
+    echo "  Complete cycles: $cycles"
+    echo "  Phase executions: $phase_execs"
 
     # Show task completion status from plan file
     if [ -f "$PLAN_FILE" ]; then
@@ -1239,29 +1279,29 @@ main() {
             fi
         fi
 
-        # Check if we're at or past the iteration limit
+        # Check if we're at or past the cycle limit
         local state=$(load_state)
-        local current_iterations=$(echo "$state" | jq -r '.total_iterations // 0')
+        local current_cycles=$(echo "$state" | jq -r '.cycle_iterations // 0')
 
-        if [ "$current_iterations" -ge "$RALPH_MAX_ITERATIONS" ]; then
+        if [ "$current_cycles" -ge "$RALPH_MAX_ITERATIONS" ]; then
             # Check if user explicitly set RALPH_MAX_ITERATIONS (via env var)
             if [ "$RALPH_MAX_ITERATIONS_EXPLICIT" = "false" ]; then
-                # User didn't set it - auto-extend by 50
+                # User didn't set it - auto-extend by 10 cycles
                 local old_limit=$RALPH_MAX_ITERATIONS
-                RALPH_MAX_ITERATIONS=$((current_iterations + 50))
-                log_warning "Current run has $current_iterations iterations, at limit of $old_limit"
-                log_info "Auto-extending iteration limit to $RALPH_MAX_ITERATIONS"
+                RALPH_MAX_ITERATIONS=$((current_cycles + 10))
+                log_warning "Current run has $current_cycles complete cycles, at limit of $old_limit"
+                log_info "Auto-extending cycle limit to $RALPH_MAX_ITERATIONS"
                 log_info "To set a custom limit, use: RALPH_MAX_ITERATIONS=<number> ralph --resume"
             else
                 # User explicitly set it but it's still too low
-                log_error "Current run has $current_iterations iterations, but limit is $RALPH_MAX_ITERATIONS"
-                log_error "Increase the limit to continue: RALPH_MAX_ITERATIONS=$((current_iterations + 50)) ralph --resume"
+                log_error "Current run has $current_cycles complete cycles, but limit is $RALPH_MAX_ITERATIONS"
+                log_error "Increase the limit to continue: RALPH_MAX_ITERATIONS=$((current_cycles + 10)) ralph --resume"
                 exit 1
             fi
-        elif [ "$current_iterations" -gt $((RALPH_MAX_ITERATIONS - 10)) ]; then
-            # Within 10 iterations of the limit - warn them
-            local remaining=$((RALPH_MAX_ITERATIONS - current_iterations))
-            log_warning "Approaching iteration limit: $current_iterations/$RALPH_MAX_ITERATIONS ($remaining remaining)"
+        elif [ "$current_cycles" -gt $((RALPH_MAX_ITERATIONS - 3)) ]; then
+            # Within 3 cycles of the limit - warn them
+            local remaining=$((RALPH_MAX_ITERATIONS - current_cycles))
+            log_warning "Approaching cycle limit: $current_cycles/$RALPH_MAX_ITERATIONS ($remaining remaining)"
             log_info "To increase limit, use: RALPH_MAX_ITERATIONS=<number> ralph --resume"
         fi
     else
@@ -1290,7 +1330,7 @@ main() {
     log_info "Run ID: $RALPH_RUN_ID"
     log_info "Run directory: $RUN_DIR"
     log_info "Audit log: $audit_log"
-    log_info "Max iterations: $RALPH_MAX_ITERATIONS"
+    log_info "Max cycles: $RALPH_MAX_ITERATIONS (each cycle = 6 phases)"
     log_info "Cost limit: $RALPH_COST_LIMIT USD"
 
     # Run workflow
