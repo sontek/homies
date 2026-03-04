@@ -15,3 +15,4 @@ autoload -U +X compinit && compinit
 # Using starship now
 # [ -f "${XDG_CONFIG_HOME}/zsh/prompt.zsh" ] && . "${XDG_CONFIG_HOME}/zsh/prompt.zsh"
 
+export PATH="$HOME/.local/bin:$PATH"
