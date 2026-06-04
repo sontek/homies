@@ -43,8 +43,12 @@ export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 # Enable RTX activations
 if command -v mise &> /dev/null
 then
-    eval "$(mise activate zsh)"
-    eval "$(mise completion zsh)"
+    if [[ -o interactive ]]; then
+        eval "$(mise activate zsh)"
+        eval "$(mise completion zsh)"
+    else
+        export PATH="$HOME/.local/share/mise/shims:$PATH"
+    fi
 fi
 
 # Setup starship for a nice prompt

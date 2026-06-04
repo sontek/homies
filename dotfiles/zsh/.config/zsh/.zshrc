@@ -1,6 +1,10 @@
 export TERM="xterm"
 export PS1="> "
 
+# Ensure core system paths are always present (GUI-launched shells
+# like Conductor may not inherit them)
+[[ ":$PATH:" != *":/usr/bin:"* ]] && export PATH="$PATH:/usr/bin:/bin:/usr/sbin:/sbin"
+
 # Enable bash compatible completions for
 # apps that don't have zsh specific ones
 autoload -U +X bashcompinit && bashcompinit
