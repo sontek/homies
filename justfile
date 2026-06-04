@@ -25,6 +25,7 @@ install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet neofet
 # Install apps for every day use
 install-system-apps:
   @just install-nix "act"
+  @just install-nix "aider-chat"
   @just install-nix "asciinema"
   @just install-nix "asciinema-agg"
   @just install-nix "ast-grep"
@@ -44,6 +45,7 @@ install-system-apps:
   @just install-nix "direnv"
   @just install-nix "docker-ls"
   @just install-nix "duf"
+  @just install-nix "dwdiff"
   @just install-nix "earthly"
   @just install-nix "easyrsa"
   @just install-nix "eza"
