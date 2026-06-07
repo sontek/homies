@@ -77,7 +77,11 @@ then
     eval "$(atuin init zsh --disable-up-arrow)"
 fi
 
-# Setup the KUBECONFIG env var to use ~/kubeconfigs
-export KUBECONFIG=$(find ~/kubeconfigs -type f|xargs|tr -s '[:blank:]' ':')
+# Setup the KUBECONFIG env var from ~/kubeconfigs, only if it exists and has
+# files (it's absent on machines/VMs without kube configs, where an unguarded
+# find errors on every shell startup).
+if [ -d ~/kubeconfigs ] && [ -n "$(find ~/kubeconfigs -type f 2>/dev/null)" ]; then
+  export KUBECONFIG=$(find ~/kubeconfigs -type f|xargs|tr -s '[:blank:]' ':')
+fi
 . "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh"
 

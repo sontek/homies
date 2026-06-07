@@ -33,15 +33,22 @@ if [ -f /var/lib/.homies-bootstrap-done ]; then
   log "system bootstrap already done (sentinel present) — skipping apt + nix"
 else
   export DEBIAN_FRONTEND=noninteractive
-  log "apt: updating index + installing curl xz-utils just ripgrep ..."
+  log "apt: updating index + installing curl xz-utils just ripgrep zsh ..."
   sudo -E apt-get update
-  sudo -E apt-get -y install curl xz-utils just ripgrep
+  sudo -E apt-get -y install curl xz-utils just ripgrep zsh
   if [ ! -e /nix ] && ! command -v nix >/dev/null 2>&1; then
     log "nix: installing Determinate Nix (this is the slow step) ..."
     curl --retry 3 --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
       | sudo sh -s -- install --no-confirm
   else
     log "nix: already installed — skipping"
+  fi
+  # Make zsh the login shell so `colima ssh` / `just vm-ssh` lands in zsh.
+  ZSH_BIN="$(command -v zsh || true)"
+  if [ -n "$ZSH_BIN" ]; then
+    grep -qxF "$ZSH_BIN" /etc/shells || echo "$ZSH_BIN" | sudo tee -a /etc/shells >/dev/null
+    sudo chsh -s "$ZSH_BIN" "$(whoami)"
+    log "login shell set to $ZSH_BIN"
   fi
   sudo touch /var/lib/.homies-bootstrap-done
   log "system bootstrap complete (sentinel written)"
