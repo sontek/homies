@@ -19,6 +19,20 @@ install-nix nix_apps args="":
       fi \
   done
 
+# Install an app from its own flake (not in nixpkgs), e.g. 'just install-flake
+# "github:owner/repo"'. --accept-flake-config trusts the flake's declared cache.
+install-flake flake_ref:
+  @if nix profile list | rg -q -F "{{flake_ref}}"; then \
+      echo "Flake {{flake_ref}} already installed, skipping"; \
+  else \
+      echo "Installing {{flake_ref}}"; \
+      nix profile install --accept-flake-config "{{flake_ref}}"; \
+  fi
+
+# Install apps that ship their own flake rather than living in nixpkgs
+install-flake-apps:
+  @just install-flake "github:modem-dev/hunk"
+
 # Install fun apps
 install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet neofetch")
 
@@ -79,6 +93,7 @@ install-system-apps:
   @just install-nix "tokei"
   @just install-nix "lz4"
   @just install-nix "minikube"
+  @just install-nix "mise"
   @just install-nix "ncurses"
   @just install-nix "ngrok" "--impure"
   @just install-nix "openssl"
@@ -95,7 +110,6 @@ install-system-apps:
   @just install-nix "neovim"
   @just install-nix "readline"
   @just install-nix "ripgrep"
-  @just install-nix "rtx"
   @just install-nix "sd"
   @just install-nix "shellcheck"
   @just install-nix "starship"
@@ -123,7 +137,7 @@ install-sre-apps:
   @just install-nix "mage golangci-lint e1s granted"
 
 # Install all applications
-install: install-system-apps install-sre-apps install-fun-apps
+install: install-system-apps install-sre-apps install-fun-apps install-flake-apps
   @echo "Done installing all packages"
 
 # Upgrade all installed applications
@@ -165,14 +179,19 @@ remove-dotfiles:
 #
 # Usage: vm-up <name> [cpu] [mem] [disk] | vm-down/vm-ssh/vm-status <name> | vm-list
 #
-# Create or start a project VM (Colima profile + ~/code/<name> mount), then
-# provision it. Bootstrap runs AFTER start (over ssh) because Colima's boot-time
-# provision scripts run before DNS is up; post-start it's reliable + visible.
+# Create or start a project VM (Colima profile), then provision it. Mounts the
+# named project (~/code/<name>) PLUS ~/code/sontek (homies, sontek-skills, ...)
+# so your own tooling is available in every VM. Bootstrap runs AFTER start (over
+# ssh) because Colima's boot-time provision scripts run before DNS is up.
 vm-up name cpu="6" memory="6" disk="100":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  mounts=(--mount "$HOME/code/{{name}}:w")
+  # Always include ~/code/sontek, unless this IS the sontek VM (no duplicate mount).
+  [ "{{name}}" = "sontek" ] || mounts+=(--mount "$HOME/code/sontek:w")
   colima start {{name}} --runtime docker --vm-type vz --mount-type virtiofs --ssh-agent \
-    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} \
-    --mount "$HOME/code/{{name}}:w"
-  @just vm-bootstrap {{name}}
+    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} "${mounts[@]}"
+  just vm-bootstrap {{name}}
 
 # Provision a running VM (idempotent): ~/code symlinks, apt prereqs (just/rg/curl),
 # Nix. Streams output here. Re-runnable any time; also used by `vm-up`.
