@@ -179,14 +179,19 @@ remove-dotfiles:
 #
 # Usage: vm-up <name> [cpu] [mem] [disk] | vm-down/vm-ssh/vm-status <name> | vm-list
 #
-# Create or start a project VM (Colima profile + ~/code/<name> mount), then
-# provision it. Bootstrap runs AFTER start (over ssh) because Colima's boot-time
-# provision scripts run before DNS is up; post-start it's reliable + visible.
+# Create or start a project VM (Colima profile), then provision it. Mounts the
+# named project (~/code/<name>) PLUS ~/code/sontek (homies, sontek-skills, ...)
+# so your own tooling is available in every VM. Bootstrap runs AFTER start (over
+# ssh) because Colima's boot-time provision scripts run before DNS is up.
 vm-up name cpu="6" memory="6" disk="100":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  mounts=(--mount "$HOME/code/{{name}}:w")
+  # Always include ~/code/sontek, unless this IS the sontek VM (no duplicate mount).
+  [ "{{name}}" = "sontek" ] || mounts+=(--mount "$HOME/code/sontek:w")
   colima start {{name}} --runtime docker --vm-type vz --mount-type virtiofs --ssh-agent \
-    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} \
-    --mount "$HOME/code/{{name}}:w"
-  @just vm-bootstrap {{name}}
+    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} "${mounts[@]}"
+  just vm-bootstrap {{name}}
 
 # Provision a running VM (idempotent): ~/code symlinks, apt prereqs (just/rg/curl),
 # Nix. Streams output here. Re-runnable any time; also used by `vm-up`.
