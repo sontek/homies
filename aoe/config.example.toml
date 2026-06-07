@@ -1,0 +1,55 @@
+# AOE config — verified against the agent-of-empires source (config.rs, repo_config.rs,
+# runtime_base.rs). Global file lives at:
+#   macOS:  ~/.agent-of-empires/config.toml
+#   Linux:  ~/.config/agent-of-empires/config.toml  ($XDG_CONFIG_HOME)
+# Per-repo override: .agent-of-empires/config.toml (legacy .aoe/config.toml still read).
+
+[sandbox]
+enabled_by_default = true
+default_image = "sontek/aoe-devmachine:latest"   # built from ./Dockerfile
+
+# Mount ~/.ssh (ro) so git push/pull over SSH works in-container.
+mount_ssh = true
+
+# Forward credentials from the host (never bake secrets into the image).
+#   "KEY"        -> forward host value      "KEY=VALUE" -> literal
+#   "KEY=$VAR"   -> read named host var     "KEY=$$lit" -> literal starting with $
+environment = [
+  "AWS_PROFILE",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_SESSION_TOKEN",
+  "GH_TOKEN",
+]
+
+# Docker access for the agent: host-socket passthrough (docker-OUT-of-docker —
+# launched containers are SIBLINGS on the host daemon, not nested). AOE has no
+# privileged/DinD mode, so this is the only option. Add ~/.aws (ro) for SSO cache.
+extra_volumes = [
+  "/var/run/docker.sock:/var/run/docker.sock",
+  # "/Users/john/.aws:/root/.aws:ro",
+]
+
+# Expose in-sandbox dev servers to the host. CREATE-TIME ONLY — declare every
+# port up front; adding one later requires recreating the session container.
+# (Irrelevant for compose/Tilt siblings — those publish on the host daemon directly.)
+port_mappings = ["3000:3000", "5432:5432"]
+
+# Optional resource caps.
+# cpu_limit = "4"
+# memory_limit = "8g"
+
+[worktree]
+enabled = true
+# Bare-repo layout keeps .git inside /workspace so git works in-container.
+# AOE auto-detects it; this template is the per-branch worktree path.
+bare_repo_path_template = "./{branch}"
+auto_cleanup = true
+
+[hooks]
+# Runs once at session creation; a hard failure ABORTS setup. `mise trust` is
+# required because mise refuses to auto-run an untrusted repo config.
+on_create = ["mise trust --yes", "mise install"]
+# Runs every session start; failures only log.
+# on_launch = ["docker compose up -d db"]
+# on_destroy = ["docker compose down"]
