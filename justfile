@@ -37,12 +37,16 @@ install-system-apps:
   @just install-nix "cheat"
   @just install-nix "cmake"
   @just install-nix "cairo"
+  @just install-nix "colima"
   @just install-nix "colordiff"
   @just install-nix "coreutils"
   @just install-nix "crane"
   @just install-nix "cue"
   @just install-nix "delta"
   @just install-nix "direnv"
+  @just install-nix "docker-client"
+  @just install-nix "docker-compose"
+  @just install-nix "docker-credential-helpers"
   @just install-nix "docker-ls"
   @just install-nix "duf"
   @just install-nix "dwdiff"
@@ -72,7 +76,7 @@ install-system-apps:
   @just install-nix "libgit2"
   @just install-nix "libffi"
   @just install-nix "libpng"
-  @just install-nix "loc"
+  @just install-nix "tokei"
   @just install-nix "lz4"
   @just install-nix "minikube"
   @just install-nix "ncurses"
@@ -144,6 +148,52 @@ install-dotfiles:
 # Removes all the dotfiles
 remove-dotfiles:
   cd dotfiles && stow --verbose=1 --delete --target=$HOME */
+
+# --- Dev VMs (Colima) ----------------------------------------------------
+# One Linux VM per project, NAMED AFTER its ~/code subdir, so each VM mounts
+# ONLY that project and can't see your other projects or $HOME:
+#   `just vm-up drape`     -> profile "drape",    mounts ~/code/drape
+#   `just vm-up stacklet`  -> profile "stacklet", mounts ~/code/stacklet
+# vz/virtiofs + the no-$HOME default also come from the stowed template
+# (~/.config/colima/_templates/default.yaml); the --mount here narrows it to the
+# one project (a flag mount replaces the template's broader default).
+#
+# RAM note: an 18GiB host can't comfortably run two 8GiB VMs at once, so the
+# defaults are modest (6 CPU / 6 GiB) to let two coexist. Bump per-invocation
+# for a single heavy VM: `just vm-up drape 8 12`. Sizing changes apply after a
+# down + up. Disk is thin-provisioned, so 100 is a ceiling, not upfront cost.
+#
+# Usage: vm-up <name> [cpu] [mem] [disk] | vm-down/vm-ssh/vm-status <name> | vm-list
+#
+# Create or start a project VM (Colima profile + ~/code/<name> mount), then
+# provision it. Bootstrap runs AFTER start (over ssh) because Colima's boot-time
+# provision scripts run before DNS is up; post-start it's reliable + visible.
+vm-up name cpu="6" memory="6" disk="100":
+  colima start {{name}} --runtime docker --vm-type vz --mount-type virtiofs --ssh-agent \
+    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} \
+    --mount "$HOME/code/{{name}}:w"
+  @just vm-bootstrap {{name}}
+
+# Provision a running VM (idempotent): ~/code symlinks, apt prereqs (just/rg/curl),
+# Nix. Streams output here. Re-runnable any time; also used by `vm-up`.
+vm-bootstrap name:
+  colima ssh -p {{name}} -- bash -s < {{justfile_directory()}}/vm-bootstrap.sh
+
+# Stop a VM (frees RAM/CPU; disk + everything installed inside persists)
+vm-down name:
+  colima stop {{name}}
+
+# Shell into a VM
+vm-ssh name:
+  colima ssh -p {{name}}
+
+# Show a VM's status and address
+vm-status name:
+  colima status {{name}}
+
+# List all VMs and their state
+vm-list:
+  colima list
 
 asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt rust kops yq jq"
 # Configure ASDF with all desired plugins

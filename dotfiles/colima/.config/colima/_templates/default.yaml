@@ -1,0 +1,43 @@
+# Colima default template (managed by stow: `just install-dotfiles`).
+#
+# Colima seeds every NEW profile from this file (`colima start <name>`), so it
+# defines the default *shape* of our VMs. It does NOT rewrite already-created
+# profiles (e.g. the existing `default`), and per-profile `--flags` override it.
+#
+# NOTE: this sets VM SHAPE only. Software bootstrap (apt deps, Nix, ~/code
+# symlinks) is NOT done here — Colima `provision:` scripts run at early boot,
+# BEFORE the VM's DNS is up, so network steps fail intermittently. The bootstrap
+# runs post-start instead, over ssh, from the `just vm-up` recipe (vm-bootstrap.sh).
+
+# Container runtime. A template MUST set this: when a template is present Colima
+# seeds new profiles from it, and an absent runtime resolves to '' and fails with
+# "unsupported container runtime ''" (it does NOT fall back to the --runtime default).
+runtime: docker
+
+# Apple Virtualization.framework + virtiofs = the fast native path on Apple Silicon.
+# NOTE: mountType cannot be changed after a VM is created.
+vmType: vz
+mountType: virtiofs
+
+# Pin explicit public resolvers. Colima's default host-resolver proxies DNS
+# through the Mac and is flaky here -- intermittent failures left runtime DNS
+# broken. Reliable upstreams keep resolution working once the VM is up.
+dns:
+  - 1.1.1.1
+  - 8.8.8.8
+  - 4.2.2.2
+  - 4.2.2.1
+
+# Forward the host SSH agent into the VM so `git clone git@github.com:...` uses
+# your Mac's keys WITHOUT the private key ever living on the VM disk (keeps the
+# "no ~/.ssh in the VM" isolation). Trade-off: while you're connected, processes
+# in the VM can use the agent to auth as you -- for tighter control of what an
+# agent can reach, use a scoped GH_TOKEN over HTTPS instead.
+forwardAgent: true
+
+# Only share our source tree — not the rest of $HOME. Same path inside the VM
+# (/Users/<you>/code), which also makes docker-compose/tilt bind mounts resolve.
+# Override per-profile when a VM needs something different.
+mounts:
+  - location: ~/code
+    writable: true
