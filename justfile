@@ -19,6 +19,20 @@ install-nix nix_apps args="":
       fi \
   done
 
+# Install an app from its own flake (not in nixpkgs), e.g. 'just install-flake
+# "github:owner/repo"'. --accept-flake-config trusts the flake's declared cache.
+install-flake flake_ref:
+  @if nix profile list | rg -q -F "{{flake_ref}}"; then \
+      echo "Flake {{flake_ref}} already installed, skipping"; \
+  else \
+      echo "Installing {{flake_ref}}"; \
+      nix profile install --accept-flake-config "{{flake_ref}}"; \
+  fi
+
+# Install apps that ship their own flake rather than living in nixpkgs
+install-flake-apps:
+  @just install-flake "github:modem-dev/hunk"
+
 # Install fun apps
 install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet neofetch")
 
@@ -79,6 +93,7 @@ install-system-apps:
   @just install-nix "tokei"
   @just install-nix "lz4"
   @just install-nix "minikube"
+  @just install-nix "mise"
   @just install-nix "ncurses"
   @just install-nix "ngrok" "--impure"
   @just install-nix "openssl"
@@ -95,7 +110,6 @@ install-system-apps:
   @just install-nix "neovim"
   @just install-nix "readline"
   @just install-nix "ripgrep"
-  @just install-nix "rtx"
   @just install-nix "sd"
   @just install-nix "shellcheck"
   @just install-nix "starship"
@@ -123,7 +137,7 @@ install-sre-apps:
   @just install-nix "mage golangci-lint e1s granted"
 
 # Install all applications
-install: install-system-apps install-sre-apps install-fun-apps
+install: install-system-apps install-sre-apps install-fun-apps install-flake-apps
   @echo "Done installing all packages"
 
 # Upgrade all installed applications
