@@ -52,7 +52,9 @@ else
   # extension ("cannot open shared object file: libfzf.so").
   log "apt: updating index + installing curl xz-utils just ripgrep zsh build-essential ..."
   sudo -E apt-get update
-  sudo -E apt-get -y install curl xz-utils just ripgrep zsh build-essential
+  # ncurses-term ships the tmux-256color terminfo entry into /usr/share/terminfo
+  # so the apt tmux finds it (the cursor-shape fix in tmux.conf depends on it).
+  sudo -E apt-get -y install curl xz-utils just ripgrep zsh build-essential stow ncurses-term
   if [ ! -e /nix ] && ! command -v nix >/dev/null 2>&1; then
     log "nix: installing Determinate Nix (this is the slow step) ..."
     curl --retry 3 --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
@@ -113,6 +115,20 @@ print("    sontek-skills@sontek-skills-local enabled -> " + skills)
 PY
 else
   log "claude: $SKILLS_DIR not mounted, skipping plugin registration"
+fi
+
+# Symlink our terminal dotfiles into the VM so tmux + zsh behave like the host —
+# notably a real TERM (the zsh rc upgrades colima's bare "xterm" to 256color) and
+# tmux cursor-shape passthrough, so TUI cursors (aoe/claude input box) render.
+# Scoped to the terminal packages: the `claude` package's settings are managed
+# above, and the mac-only packages (kitty/alacritty/colima) aren't useful here.
+HOMIES_DIR="$HOME/code/sontek/homies"
+if [ -d "$HOMIES_DIR/dotfiles" ] && command -v stow >/dev/null 2>&1; then
+  log "stow: symlinking tmux + zsh dotfiles into \$HOME ..."
+  ( cd "$HOMIES_DIR/dotfiles" && stow --restow --target="$HOME" tmux zsh ) \
+    || log "stow: skipped/failed (non-fatal)"
+else
+  log "stow: dotfiles not mounted or stow missing — skipping dotfile symlinks"
 fi
 
 log "done: just/ripgrep/curl + nix + claude ready; ~/code bind mounts in place"
