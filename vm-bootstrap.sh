@@ -71,4 +71,48 @@ else
   log "system bootstrap complete (sentinel written)"
 fi
 
-log "done: just/ripgrep/curl + nix ready; ~/code bind mounts in place"
+# Claude Code + our skills. Install the CLI (native installer, self-updating)
+# when missing, then register ~/code/sontek/sontek-skills as a plugin
+# marketplace and enable it, so our skills and subagents are available the
+# moment you run `claude` in the VM. Both steps are idempotent and run on every
+# bootstrap so a recreated VM self-heals; plugin registration is skipped when
+# the skills tree isn't mounted. python3 (system) merges the JSON so existing
+# settings are preserved.
+if ! command -v claude >/dev/null 2>&1; then
+  log "claude: installing Claude Code (native installer) ..."
+  curl -fsSL https://claude.ai/install.sh | bash
+else
+  log "claude: already installed, skipping"
+fi
+
+SKILLS_DIR="$HOME/code/sontek/sontek-skills"
+if [ -d "$SKILLS_DIR" ]; then
+  log "claude: registering sontek-skills plugin marketplace ..."
+  PYBIN=/usr/bin/python3; [ -x "$PYBIN" ] || PYBIN=python3
+  "$PYBIN" - "$SKILLS_DIR" <<'PY'
+import json, os, sys
+skills = sys.argv[1]
+cfg_dir = os.path.expanduser("~/.claude")
+cfg = os.path.join(cfg_dir, "settings.json")
+os.makedirs(cfg_dir, exist_ok=True)
+data = {}
+if os.path.exists(cfg):
+    try:
+        with open(cfg) as f:
+            data = json.load(f)
+    except (ValueError, OSError):
+        data = {}
+data.setdefault("extraKnownMarketplaces", {})["sontek-skills-local"] = {
+    "source": {"source": "directory", "path": skills}
+}
+data.setdefault("enabledPlugins", {})["sontek-skills@sontek-skills-local"] = True
+with open(cfg, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+print("    sontek-skills@sontek-skills-local enabled -> " + skills)
+PY
+else
+  log "claude: $SKILLS_DIR not mounted, skipping plugin registration"
+fi
+
+log "done: just/ripgrep/curl + nix + claude ready; ~/code bind mounts in place"
