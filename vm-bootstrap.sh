@@ -40,6 +40,19 @@ for d in /Users/*/code/*/; do
   fi
 done
 
+# Expose the read-only ~/screenshots host mount under the guest home too. It
+# lands at its literal host path (/Users/<you>/screenshots) — which is what a
+# dragged screenshot's path already points to — but the guest home differs
+# (/home/<you>.guest), so a bare `~/screenshots` wouldn't resolve. Symlink it so
+# the short path works inside the VM. A symlink (not a bind mount) is fine here:
+# we only ever read files by path, never cd into it as a session cwd.
+for s in /Users/*/screenshots; do
+  [ -d "$s" ] || continue
+  ln -sfn "$s" "$HOME/screenshots"
+  echo "    ~/screenshots -> $s (symlink)"
+  break
+done
+
 # One-time bootstrap: homies prerequisites (just + ripgrep, used by its justfile)
 # plus curl/xz-utils, then Determinate Nix. Sentinel-guarded so it runs once.
 if [ -f /var/lib/.homies-bootstrap-done ]; then
