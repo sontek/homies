@@ -1,0 +1,16 @@
+# Hunk diff viewer config (managed by stow: `just install-dotfiles`).
+# This is the global config; a repo can override any key in its own
+# .hunk/config.toml. Keys mirror the CLI flags from `hunk diff --help`.
+
+# Always show agent notes (the rationale an agent attaches to a changeset)
+# rather than starting hidden and toggling them on each review.
+agent_notes = true
+
+# Other available toggles, left at hunk's defaults. Uncomment to change:
+# theme = "..."                  # named theme override
+# mode = "auto"                  # layout: auto, split, stack
+# line_numbers = true
+# wrap_lines = false
+# hunk_headers = true
+# color_moved = false
+# transparent_background = false
