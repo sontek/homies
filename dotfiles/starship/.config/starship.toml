@@ -1,6 +1,6 @@
 add_newline = true
 format = '''[$cmd_duration](bold purple)
-[$hostname](bold red)[$git_branch](bold blue) [$kubernetes](bold cyan) [$aws](bold orange) [$python](bold blue)
+$hostname[$git_branch](bold blue) [$kubernetes](bold cyan) [$aws](bold orange) [$python](bold blue)
 [$directory](bold green)
 [$character](bold yellow)
 '''
@@ -39,9 +39,14 @@ symbol = "tf(bold)"
 format = "[$symbol $version $workspace]($style)"
   
 [hostname]
-ssh_only = false
-disabled = true
-format =  "[$hostname](bold red) "
+# Show the hostname only over SSH, which is exactly when we're inside a Colima
+# dev VM (`colima ssh` / `just vm-ssh`). The local Mac shell isn't SSH, so it
+# stays clean; VMs render e.g. `colima-stacklet` as a white-on-red badge so the
+# two shells are unmistakable. The color lives here, so the main `format` just
+# places `$hostname` with no wrapper of its own (avoids double-styling).
+ssh_only = true
+disabled = false
+format =  "[ $hostname ](bold white bg:red) "
 
 [package]
 disabled = true

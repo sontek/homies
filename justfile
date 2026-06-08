@@ -32,9 +32,10 @@ install-flake flake_ref:
 # Install apps that ship their own flake rather than living in nixpkgs
 install-flake-apps:
   @just install-flake "github:modem-dev/hunk"
+  @just install-flake "github:agent-of-empires/agent-of-empires"
 
 # Install fun apps
-install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet neofetch")
+install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet fastfetch")
 
 # Install apps for every day use
 install-system-apps:
@@ -174,23 +175,28 @@ remove-dotfiles:
 #
 # RAM note: an 18GiB host can't comfortably run two 8GiB VMs at once, so the
 # defaults are modest (6 CPU / 6 GiB) to let two coexist. Bump per-invocation
-# for a single heavy VM: `just vm-up drape 8 12`. Sizing changes apply after a
-# down + up. Disk is thin-provisioned, so 100 is a ceiling, not upfront cost.
+# for a single heavy VM: `just vm-up drape 8 12 150`. Sizing changes apply after
+# a down + up. Both disks are thin-provisioned (sparse), so the numbers are
+# ceilings, not upfront cost; root_disk sizes /nix (the toolchain), disk sizes
+# the container-runtime store.
 #
-# Usage: vm-up <name> [cpu] [mem] [disk] | vm-down/vm-ssh/vm-status <name> | vm-list
+# Usage: vm-up <name> [cpu] [mem] [disk] [root_disk] | vm-down/vm-ssh/vm-status <name> | vm-list
 #
 # Create or start a project VM (Colima profile), then provision it. Mounts the
 # named project (~/code/<name>) PLUS ~/code/sontek (homies, sontek-skills, ...)
 # so your own tooling is available in every VM. Bootstrap runs AFTER start (over
 # ssh) because Colima's boot-time provision scripts run before DNS is up.
-vm-up name cpu="6" memory="6" disk="100":
+vm-up name cpu="6" memory="6" disk="100" root_disk="100":
   #!/usr/bin/env bash
   set -euo pipefail
   mounts=(--mount "$HOME/code/{{name}}:w")
   # Always include ~/code/sontek, unless this IS the sontek VM (no duplicate mount).
   [ "{{name}}" = "sontek" ] || mounts+=(--mount "$HOME/code/sontek:w")
+  # Two sparse disks: --root-disk holds the OS + /nix (the toolchain), --disk is
+  # Colima's dedicated container-runtime disk (docker/containerd). The default
+  # root disk is only 20 GiB, which /nix overflows, so size it explicitly.
   colima start {{name}} --runtime docker --vm-type vz --mount-type virtiofs --ssh-agent \
-    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} "${mounts[@]}"
+    --cpu {{cpu}} --memory {{memory}} --disk {{disk}} --root-disk {{root_disk}} "${mounts[@]}"
   just vm-bootstrap {{name}}
 
 # Provision a running VM (idempotent): ~/code symlinks, apt prereqs (just/rg/curl),
