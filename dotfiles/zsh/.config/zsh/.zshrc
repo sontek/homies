@@ -1,7 +1,8 @@
-# Upgrade a bare/downgraded TERM (e.g. the plain "xterm" colima ssh hands the VM)
-# to 256color, but leave richer values (xterm-kitty, tmux-256color, screen-*) alone
-# so we don't clobber the terminal's real capabilities or tmux's default-terminal.
-[[ -z "$TERM" || "$TERM" == "xterm" ]] && export TERM="xterm-256color"
+# Keep the terminal's real TERM (kitty, tmux, screen) when its terminfo entry
+# resolves; only fall back to a universally-present 256color entry when it
+# doesn't — so a bare/unknown TERM can't break `clear` and friends with
+# "unknown terminal type", without clobbering capable terminals.
+infocmp "$TERM" >/dev/null 2>&1 || export TERM="xterm-256color"
 export PS1="> "
 
 # Ensure core system paths are always present (GUI-launched shells
