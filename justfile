@@ -199,8 +199,9 @@ vm-up name cpu="6" memory="6" disk="100" root_disk="100":
     --cpu {{cpu}} --memory {{memory}} --disk {{disk}} --root-disk {{root_disk}} "${mounts[@]}"
   just vm-bootstrap {{name}}
 
-# Provision a running VM (idempotent): ~/code symlinks, apt prereqs (just/rg/curl),
-# Nix. Streams output here. Re-runnable any time; also used by `vm-up`.
+# Provision a running VM (idempotent): ~/code bind mounts, apt prereqs
+# (just/rg/curl/build-essential), Nix. Streams output here. Re-runnable any time;
+# also used by `vm-up`.
 vm-bootstrap name:
   colima ssh -p {{name}} -- bash -s < {{justfile_directory()}}/vm-bootstrap.sh
 

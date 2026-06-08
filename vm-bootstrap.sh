@@ -17,14 +17,27 @@ log() { printf '\n==> [vm-bootstrap] %s\n' "$*"; }
 
 log "starting on $(hostname) (user $(whoami))"
 
-# Symlink whatever project is mounted under /Users/*/code/* to a clean
-# ~/code/<name> path (runs as the user; no network needed).
-log "linking mounted projects into ~/code ..."
+# Bind-mount whatever project is mounted under /Users/*/code/* onto a clean
+# ~/code/<name> path. A bind mount (not a symlink) is deliberate: getcwd()
+# resolves a symlink back to /Users/..., so tools that key off the working
+# directory (aoe defaults a new session to the current directory) would report
+# the ugly mount path. A bind mount is a real mount point, so the cwd stays
+# ~/code/<name>. Bind mounts don't persist across a VM stop, so this re-runs on
+# every `vm-up`. Old symlinks from earlier bootstraps are converted to mounts.
+log "bind-mounting mounted projects into ~/code ..."
 mkdir -p "$HOME/code"
 for d in /Users/*/code/*/; do
   [ -d "$d" ] || continue
-  ln -sfn "${d%/}" "$HOME/code/$(basename "$d")"
-  echo "    ~/code/$(basename "$d") -> ${d%/}"
+  name="$(basename "$d")"
+  target="$HOME/code/$name"
+  [ -L "$target" ] && rm -f "$target"
+  mkdir -p "$target"
+  if mountpoint -q "$target"; then
+    echo "    ~/code/$name already mounted"
+  else
+    sudo mount --bind "${d%/}" "$target"
+    echo "    ~/code/$name -> ${d%/} (bind)"
+  fi
 done
 
 # One-time bootstrap: homies prerequisites (just + ripgrep, used by its justfile)
@@ -33,9 +46,13 @@ if [ -f /var/lib/.homies-bootstrap-done ]; then
   log "system bootstrap already done (sentinel present) — skipping apt + nix"
 else
   export DEBIAN_FRONTEND=noninteractive
-  log "apt: updating index + installing curl xz-utils just ripgrep zsh ..."
+  # build-essential gives us a C toolchain (cc/make) so Neovim plugins with
+  # native components compile in-VM: telescope-fzf-native's libfzf.so and
+  # nvim-treesitter parsers. Without it :PackerSync fails to load the fzf
+  # extension ("cannot open shared object file: libfzf.so").
+  log "apt: updating index + installing curl xz-utils just ripgrep zsh build-essential ..."
   sudo -E apt-get update
-  sudo -E apt-get -y install curl xz-utils just ripgrep zsh
+  sudo -E apt-get -y install curl xz-utils just ripgrep zsh build-essential
   if [ ! -e /nix ] && ! command -v nix >/dev/null 2>&1; then
     log "nix: installing Determinate Nix (this is the slow step) ..."
     curl --retry 3 --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
@@ -54,4 +71,48 @@ else
   log "system bootstrap complete (sentinel written)"
 fi
 
-log "done — just/ripgrep/curl + nix ready; ~/code symlinks in place"
+# Claude Code + our skills. Install the CLI (native installer, self-updating)
+# when missing, then register ~/code/sontek/sontek-skills as a plugin
+# marketplace and enable it, so our skills and subagents are available the
+# moment you run `claude` in the VM. Both steps are idempotent and run on every
+# bootstrap so a recreated VM self-heals; plugin registration is skipped when
+# the skills tree isn't mounted. python3 (system) merges the JSON so existing
+# settings are preserved.
+if ! command -v claude >/dev/null 2>&1; then
+  log "claude: installing Claude Code (native installer) ..."
+  curl -fsSL https://claude.ai/install.sh | bash
+else
+  log "claude: already installed, skipping"
+fi
+
+SKILLS_DIR="$HOME/code/sontek/sontek-skills"
+if [ -d "$SKILLS_DIR" ]; then
+  log "claude: registering sontek-skills plugin marketplace ..."
+  PYBIN=/usr/bin/python3; [ -x "$PYBIN" ] || PYBIN=python3
+  "$PYBIN" - "$SKILLS_DIR" <<'PY'
+import json, os, sys
+skills = sys.argv[1]
+cfg_dir = os.path.expanduser("~/.claude")
+cfg = os.path.join(cfg_dir, "settings.json")
+os.makedirs(cfg_dir, exist_ok=True)
+data = {}
+if os.path.exists(cfg):
+    try:
+        with open(cfg) as f:
+            data = json.load(f)
+    except (ValueError, OSError):
+        data = {}
+data.setdefault("extraKnownMarketplaces", {})["sontek-skills-local"] = {
+    "source": {"source": "directory", "path": skills}
+}
+data.setdefault("enabledPlugins", {})["sontek-skills@sontek-skills-local"] = True
+with open(cfg, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+print("    sontek-skills@sontek-skills-local enabled -> " + skills)
+PY
+else
+  log "claude: $SKILLS_DIR not mounted, skipping plugin registration"
+fi
+
+log "done: just/ripgrep/curl + nix + claude ready; ~/code bind mounts in place"

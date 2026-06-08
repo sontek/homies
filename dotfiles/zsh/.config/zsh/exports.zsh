@@ -85,3 +85,20 @@ if [ -d ~/kubeconfigs ] && [ -n "$(find ~/kubeconfigs -type f 2>/dev/null)" ]; t
 fi
 . "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh"
 
+# In a Colima dev VM (hostname colima-<project>), a fresh `vm-ssh` / `colima ssh`
+# login lands in the inherited host path (/Users/.../code/...) or $HOME. Move it
+# to the clean ~/code/<project> bind mount so tools that default to the working
+# directory (e.g. aoe) report ~/code/<project> instead of the /Users/... mount
+# path. Skip it inside tmux: aoe runs each agent and its paired terminal (`t`) in
+# a tmux pane whose cwd is that session's worktree (often under /Users/...), and
+# auto-cd here would yank those panes back to the project root. $TMUX is the
+# discriminator (a real ssh login isn't in tmux). The hostname guard keeps the
+# Mac shell untouched.
+if [[ -o interactive && -z "$TMUX" && "$HOST" == colima-* ]]; then
+  __vm_proj="$HOME/code/${${HOST#colima-}%%.*}"
+  if [[ -d "$__vm_proj" && ( "$PWD" == "$HOME" || "$PWD" == /Users/* ) ]]; then
+    cd "$__vm_proj"
+  fi
+  unset __vm_proj
+fi
+
