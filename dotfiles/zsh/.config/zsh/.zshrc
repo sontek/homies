@@ -1,4 +1,7 @@
-export TERM="xterm"
+# Upgrade a bare/downgraded TERM (e.g. the plain "xterm" colima ssh hands the VM)
+# to 256color, but leave richer values (xterm-kitty, tmux-256color, screen-*) alone
+# so we don't clobber the terminal's real capabilities or tmux's default-terminal.
+[[ -z "$TERM" || "$TERM" == "xterm" ]] && export TERM="xterm-256color"
 export PS1="> "
 
 # Ensure core system paths are always present (GUI-launched shells
