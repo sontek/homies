@@ -5,7 +5,7 @@
 # profiles (e.g. the existing `default`), and per-profile `--flags` override it.
 #
 # NOTE: this sets VM SHAPE only. Software bootstrap (apt deps, Nix, ~/code
-# symlinks) is NOT done here — Colima `provision:` scripts run at early boot,
+# bind mounts) is NOT done here. Colima `provision:` scripts run at early boot,
 # BEFORE the VM's DNS is up, so network steps fail intermittently. The bootstrap
 # runs post-start instead, over ssh, from the `just vm-up` recipe (vm-bootstrap.sh).
 

@@ -85,3 +85,17 @@ if [ -d ~/kubeconfigs ] && [ -n "$(find ~/kubeconfigs -type f 2>/dev/null)" ]; t
 fi
 . "${XDG_CONFIG_HOME}/zsh/dynamic-exports.zsh"
 
+# In a Colima dev VM (hostname colima-<project>), a fresh `vm-ssh` / `colima ssh`
+# login lands in the inherited host path (/Users/.../code/...) or $HOME. Move it
+# to the clean ~/code/<project> bind mount so tools that default to the working
+# directory (e.g. aoe) report ~/code/<project> instead of the /Users/... mount
+# path. Guarded to the VM by hostname, and only from $HOME or a /Users path so it
+# never pulls an aoe/worktree shell (already in the project) out of its dir.
+if [[ -o interactive && "$HOST" == colima-* ]]; then
+  __vm_proj="$HOME/code/${${HOST#colima-}%%.*}"
+  if [[ -d "$__vm_proj" && ( "$PWD" == "$HOME" || "$PWD" == /Users/* ) ]]; then
+    cd "$__vm_proj"
+  fi
+  unset __vm_proj
+fi
+

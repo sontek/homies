@@ -17,14 +17,27 @@ log() { printf '\n==> [vm-bootstrap] %s\n' "$*"; }
 
 log "starting on $(hostname) (user $(whoami))"
 
-# Symlink whatever project is mounted under /Users/*/code/* to a clean
-# ~/code/<name> path (runs as the user; no network needed).
-log "linking mounted projects into ~/code ..."
+# Bind-mount whatever project is mounted under /Users/*/code/* onto a clean
+# ~/code/<name> path. A bind mount (not a symlink) is deliberate: getcwd()
+# resolves a symlink back to /Users/..., so tools that key off the working
+# directory (aoe defaults a new session to the current directory) would report
+# the ugly mount path. A bind mount is a real mount point, so the cwd stays
+# ~/code/<name>. Bind mounts don't persist across a VM stop, so this re-runs on
+# every `vm-up`. Old symlinks from earlier bootstraps are converted to mounts.
+log "bind-mounting mounted projects into ~/code ..."
 mkdir -p "$HOME/code"
 for d in /Users/*/code/*/; do
   [ -d "$d" ] || continue
-  ln -sfn "${d%/}" "$HOME/code/$(basename "$d")"
-  echo "    ~/code/$(basename "$d") -> ${d%/}"
+  name="$(basename "$d")"
+  target="$HOME/code/$name"
+  [ -L "$target" ] && rm -f "$target"
+  mkdir -p "$target"
+  if mountpoint -q "$target"; then
+    echo "    ~/code/$name already mounted"
+  else
+    sudo mount --bind "${d%/}" "$target"
+    echo "    ~/code/$name -> ${d%/} (bind)"
+  fi
 done
 
 # One-time bootstrap: homies prerequisites (just + ripgrep, used by its justfile)
@@ -33,9 +46,13 @@ if [ -f /var/lib/.homies-bootstrap-done ]; then
   log "system bootstrap already done (sentinel present) — skipping apt + nix"
 else
   export DEBIAN_FRONTEND=noninteractive
-  log "apt: updating index + installing curl xz-utils just ripgrep zsh ..."
+  # build-essential gives us a C toolchain (cc/make) so Neovim plugins with
+  # native components compile in-VM: telescope-fzf-native's libfzf.so and
+  # nvim-treesitter parsers. Without it :PackerSync fails to load the fzf
+  # extension ("cannot open shared object file: libfzf.so").
+  log "apt: updating index + installing curl xz-utils just ripgrep zsh build-essential ..."
   sudo -E apt-get update
-  sudo -E apt-get -y install curl xz-utils just ripgrep zsh
+  sudo -E apt-get -y install curl xz-utils just ripgrep zsh build-essential
   if [ ! -e /nix ] && ! command -v nix >/dev/null 2>&1; then
     log "nix: installing Determinate Nix (this is the slow step) ..."
     curl --retry 3 --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
@@ -54,4 +71,4 @@ else
   log "system bootstrap complete (sentinel written)"
 fi
 
-log "done — just/ripgrep/curl + nix ready; ~/code symlinks in place"
+log "done: just/ripgrep/curl + nix ready; ~/code bind mounts in place"
