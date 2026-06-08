@@ -188,7 +188,8 @@ remove-dotfiles:
 #
 # Create or start a project VM (Colima profile), then provision it. Mounts the
 # named project (~/code/<name>) PLUS ~/code/sontek (homies, sontek-skills, ...)
-# so your own tooling is available in every VM. Bootstrap runs AFTER start (over
+# so your own tooling is available in every VM, PLUS ~/screenshots (read-only) so
+# dragged screenshots resolve at the same path inside the VM. Bootstrap runs AFTER start (over
 # ssh) because Colima's boot-time provision scripts run before DNS is up.
 vm-up name cpu="6" memory="6" disk="100" root_disk="100":
   #!/usr/bin/env bash
@@ -196,6 +197,10 @@ vm-up name cpu="6" memory="6" disk="100" root_disk="100":
   mounts=(--mount "$HOME/code/{{name}}:w")
   # Always include ~/code/sontek, unless this IS the sontek VM (no duplicate mount).
   [ "{{name}}" = "sontek" ] || mounts+=(--mount "$HOME/code/sontek:w")
+  # Share ~/screenshots (read-only) at the SAME path so dragging a screenshot into
+  # an in-VM agent (aoe/claude) hands it a path that resolves identically in the VM.
+  # macOS saves screencaptures here: `defaults write com.apple.screencapture location`.
+  mounts+=(--mount "$HOME/screenshots:r")
   # Two sparse disks: --root-disk holds the OS + /nix (the toolchain), --disk is
   # Colima's dedicated container-runtime disk (docker/containerd). The default
   # root disk is only 20 GiB, which /nix overflows, so size it explicitly.
