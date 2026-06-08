@@ -87,6 +87,7 @@ install-system-apps:
   @just install-nix "icu"
   @just install-nix "imagemagick"
   @just install-nix "jless"
+  @just install-nix "jq"
   @just install-nix "k6"
   @just install-nix "k9s"
   @just install-nix "libgit2"
@@ -128,6 +129,7 @@ install-system-apps:
   @just install-nix "wget"
   @just install-nix "xh"
   @just install-nix "xz"
+  @just install-nix "yq-go"
   @just install-nix "zellij"
   @just install-nix "zsh"
 
@@ -223,7 +225,7 @@ vm-status name:
 vm-list:
   colima list
 
-asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt rust kops yq jq"
+asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt rust kops"
 # Configure ASDF with all desired plugins
 setup-asdf:
   @for plugin in {{asdf_plugins}}; do \
