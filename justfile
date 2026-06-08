@@ -69,6 +69,7 @@ install-system-apps:
   @just install-nix "easyrsa"
   @just install-nix "eza"
   @just install-nix "ffmpeg"
+  @just install-nix "flock"
   @just install-nix "fontconfig"
   @just install-nix "freetype"
   @just install-nix "fzf"
