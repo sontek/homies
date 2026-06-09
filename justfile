@@ -218,9 +218,23 @@ vm-bootstrap name:
 vm-down name:
   colima stop {{name}}
 
-# Shell into a VM
+# Shell into a VM. When invoked from kitty, use kitty's `ssh` kitten: it copies
+# kitty's terminfo to the VM and sets TERM=xterm-kitty, so OSC 8 hyperlinks (e.g.
+# Claude Code's clickable "PR #NNNN" link), truecolor, and other TUI features
+# survive the SSH hop -- including inside a remote tmux. colima already publishes
+# an ssh_config (Host colima-<name>), Include'd from ~/.ssh/config, so the kitten
+# can reach the VM directly. Falls back to plain `colima ssh` elsewhere.
 vm-ssh name:
-  colima ssh -p {{name}}
+  #!/usr/bin/env bash
+  set -euo pipefail
+  # Use kitty's ssh kitten only when talking directly to kitty. TERM=xterm-kitty
+  # means a real kitty window; inside tmux, tmux rewrites TERM (e.g. to
+  # xterm-256color), so this also excludes the nested-tmux case where the
+  # kitten's terminal-detection handshake misbehaves. Otherwise: plain colima ssh.
+  if [[ "${TERM:-}" == *kitty* ]] && command -v kitten >/dev/null 2>&1; then
+    exec kitten ssh "colima-{{name}}"
+  fi
+  exec colima ssh -p {{name}}
 
 # Show a VM's status and address
 vm-status name:
