@@ -66,6 +66,22 @@ else
   log "apt: updating index + installing curl xz-utils just ripgrep zsh build-essential ..."
   sudo -E apt-get update
   sudo -E apt-get -y install curl xz-utils just ripgrep zsh build-essential
+  # Headless-Chromium system libraries for Playwright. Projects that render with
+  # a headless browser (docs sites using mkdocs-to-pdf / mermaid, screenshot
+  # tooling, etc.) ultimately run `playwright install chromium`, and the
+  # downloaded Chromium needs these .so's to launch. Installing them once here
+  # means that later install works without --with-deps (which shells out to sudo
+  # at runtime). The Chromium binary itself is downloaded per-project into the
+  # shared ~/.cache/ms-playwright, so it's cached machine-wide after first use.
+  # This is Playwright's Chromium dep set for Ubuntu 24.04 (noble); regenerate
+  # with `playwright install-deps --dry-run chromium` if it drifts.
+  log "apt: installing Playwright headless-Chromium system libraries ..."
+  sudo -E apt-get -y install --no-install-recommends \
+    libnss3 libnspr4 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 \
+    libxkbcommon0 libatspi2.0-0t64 libxcomposite1 libxdamage1 libxfixes3 \
+    libxrandr2 libgbm1 libasound2t64 libpango-1.0-0 libcairo2 libdbus-1-3 \
+    libdrm2 libxcb1 libx11-6 libxext6 libglib2.0-0t64 \
+    fonts-liberation fonts-noto-color-emoji xvfb
   if [ ! -e /nix ] && ! command -v nix >/dev/null 2>&1; then
     log "nix: installing Determinate Nix (this is the slow step) ..."
     curl --retry 3 --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
