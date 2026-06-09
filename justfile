@@ -218,9 +218,35 @@ vm-bootstrap name:
 vm-down name:
   colima stop {{name}}
 
-# Shell into a VM
+# Shell into a VM with the local terminal's identity carried over the SSH hop,
+# so OSC 8 hyperlinks (e.g. Claude Code's clickable "PR #NNNN" link), truecolor,
+# and other TUI features work -- including inside a remote tmux. colima publishes
+# an ssh_config (Host colima-<name>), Include'd from ~/.ssh/config, so we can ssh
+# the VM directly. Handles kitty and ghostty; anything else (and inside tmux,
+# where TERM is rewritten and these handshakes break) falls back to plain colima
+# ssh, where hyperlinks still ride the FORCE_HYPERLINK + tmux xterm*:hyperlinks
+# fallback.
 vm-ssh name:
-  colima ssh -p {{name}}
+  #!/usr/bin/env bash
+  set -euo pipefail
+  host="colima-{{name}}"
+  case "${TERM:-}" in
+    *kitty*)
+      # kitty: the ssh kitten copies terminfo and sets TERM=xterm-kitty itself
+      # (and Claude detects kitty straight from TERM containing "kitty").
+      if command -v kitten >/dev/null 2>&1; then exec kitten ssh "$host"; fi
+      ;;
+    xterm-ghostty)
+      # ghostty has no kitten. Push its terminfo to the VM if missing, then force
+      # TERM on the remote login shell -- lima's sshd ignores a forwarded/SetEnv
+      # TERM, so it only sticks when set in the remote command. Also set
+      # TERM_PROGRAM, which is how Claude detects ghostty (TERM alone won't).
+      ssh "$host" -- 'infocmp xterm-ghostty >/dev/null 2>&1' \
+        || infocmp -x xterm-ghostty | ssh "$host" -- 'tic -x -' >/dev/null 2>&1 || true
+      exec ssh -t "$host" -- 'TERM=xterm-ghostty TERM_PROGRAM=ghostty exec "$SHELL" -l'
+      ;;
+  esac
+  exec colima ssh -p {{name}}
 
 # Show a VM's status and address
 vm-status name:
