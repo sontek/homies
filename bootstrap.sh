@@ -23,6 +23,14 @@ function configure_nix() {
         echo "Enabling experimental features"
         echo "$CONFIG_STRING" >> $NIX_CONFIG_PATH/nix.conf
     fi
+
+    # Pin `nixpkgs` to a stable release. The Determinate installer's global
+    # registry points nixpkgs at a weekly/unstable channel, where packages we
+    # install can be marked broken ("This package is broken ... Refusing to
+    # evaluate"). A user registry entry takes precedence over the global one.
+    NIXPKGS_PIN="github:NixOS/nixpkgs/nixos-26.05"
+    echo "Pinning nixpkgs to $NIXPKGS_PIN"
+    nix registry add nixpkgs "$NIXPKGS_PIN"
 }
 
 function install_dependencies() {
