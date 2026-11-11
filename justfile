@@ -32,7 +32,8 @@ install-flake flake_ref:
 # Install apps that ship their own flake rather than living in nixpkgs
 install-flake-apps:
   @just install-flake "github:modem-dev/hunk"
-  @just install-flake "github:agent-of-empires/agent-of-empires"
+  # The default package is API-only; aoe-with-web embeds the `aoe serve` dashboard.
+  @just install-flake "github:agent-of-empires/agent-of-empires#aoe-with-web"
 
 # Install fun apps
 install-fun-apps: (install-nix "boxes cowsay figlet fortune lolcat toilet fastfetch")
