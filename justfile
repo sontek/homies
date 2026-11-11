@@ -98,6 +98,7 @@ install-system-apps:
   @just install-nix "lz4"
   @just install-nix "minikube"
   @just install-nix "mise"
+  @just install-nix "mutagen"
   @just install-nix "ncurses"
   @just install-nix "ngrok" "--impure"
   @just install-nix "openssl"
@@ -256,6 +257,33 @@ vm-status name:
 # List all VMs and their state
 vm-list:
   colima list
+
+# Keep a copy of this Mac's screenshots folder on another machine, at the SAME
+# path, so a screenshot dragged into a terminal ssh'd there pastes a path that
+# resolves. One-way (here -> host) over plain ssh to the host, so this Mac needs
+# no Remote Login. Mutagen's daemon keeps it running in the background and
+# across reboots; re-running replaces the session. The host must let you create
+# the path (e.g. `sudo mkdir -p /Users/<you> && sudo chown "$USER": /Users/<you>`).
+#
+# Usage: sync-screenshots <ssh-host> [path]
+sync-screenshots host path=(home_directory() / "screenshots"):
+  #!/usr/bin/env bash
+  set -euo pipefail
+  host='{{host}}'
+  path='{{path}}'
+  name="screenshots-${host//[^a-zA-Z0-9]/-}"
+  if ! ssh "$host" -- mkdir -p "'$path'"; then
+    echo "Could not create $path on $host. On $host, run:" >&2
+    echo "  sudo mkdir -p '$path' && sudo chown -R \"\$USER\": '$path'" >&2
+    exit 1
+  fi
+  # Start the daemon at login (launchd); only supported on macOS.
+  if [[ $OSTYPE == darwin* ]]; then mutagen daemon register; fi
+  mutagen daemon start
+  mutagen sync terminate "$name" >/dev/null 2>&1 || true
+  mutagen sync create --name="$name" --mode=one-way-replica "$path" "$host:$path"
+  mutagen sync flush "$name"
+  mutagen sync list "$name"
 
 asdf_plugins := "nodejs python golang helm yarn poetry kubectl kustomize terraform terragrunt postgres pnpm sentinel skaffold tilt rust kops"
 # Configure ASDF with all desired plugins
