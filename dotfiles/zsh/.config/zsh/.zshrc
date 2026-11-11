@@ -23,27 +23,3 @@ autoload -U +X compinit && compinit
 # [ -f "${XDG_CONFIG_HOME}/zsh/prompt.zsh" ] && . "${XDG_CONFIG_HOME}/zsh/prompt.zsh"
 
 export PATH="$HOME/.local/bin:$PATH"
-
-# Mac screenshots on a Linux box over SSH (see README).
-# macOS: tell the Linux boxes we ssh into which user and screenshots folder to
-# mount. SendEnv in ~/.ssh/config passes these on; sshd accepts LC_* by
-# default. Set MAC_SCREENSHOTS to use a folder other than ~/screenshots.
-if [[ $OSTYPE == darwin* ]]; then
-  export LC_MAC_USER="$USER"
-  export LC_MAC_SCREENSHOTS="${MAC_SCREENSHOTS:-$HOME/screenshots}"
-fi
-
-# Linux, over SSH from a Mac: mount that folder at the same path through the
-# reverse tunnel (RemoteForward 2222 and the mac-tunnel host in ~/.ssh/config),
-# so dragged screenshot paths resolve here unchanged. flock keeps concurrent
-# shells from racing; sshfs daemonizes once mounted, which releases the lock.
-# Errors go to the log, not the terminal.
-if [[ $OSTYPE == linux* && -o interactive && -n $SSH_CONNECTION ]] \
-   && [[ -n $LC_MAC_USER && -d $LC_MAC_SCREENSHOTS ]] \
-   && ! mountpoint -q "$LC_MAC_SCREENSHOTS" \
-   && ss -Hltn 'sport = :2222' | grep -q .; then
-  flock -n "${XDG_RUNTIME_DIR:-/tmp}/mac-screenshots.lock" \
-    sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,BatchMode=yes \
-    "${LC_MAC_USER}@mac-tunnel:${LC_MAC_SCREENSHOTS}" "$LC_MAC_SCREENSHOTS" \
-    >>"${XDG_CACHE_HOME:-$HOME/.cache}/mac-screenshots-mount.log" 2>&1 &!
-fi
