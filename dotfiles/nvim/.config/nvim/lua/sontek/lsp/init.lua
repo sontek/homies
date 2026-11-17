@@ -84,4 +84,17 @@ for _, lsp in pairs(servers) do
     end
 end
 
-vim.lsp.enable(servers)
+-- Enabling a server that isn't installed errors each time a matching
+-- file opens. Only enable servers Mason installed or that are on PATH.
+local registry = require('mason-registry')
+local to_package = require('mason-lspconfig').get_mappings().lspconfig_to_package
+local available = vim.tbl_filter(function(lsp)
+    local package = to_package[lsp]
+    if package and registry.is_installed(package) then
+        return true
+    end
+    local cmd = vim.lsp.config[lsp].cmd
+    return type(cmd) == 'table' and vim.fn.executable(cmd[1]) == 1
+end, servers)
+
+vim.lsp.enable(available)
