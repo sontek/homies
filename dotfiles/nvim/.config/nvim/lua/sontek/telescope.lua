@@ -35,8 +35,9 @@ require('telescope').setup {
     }
 }
 -- To get fzf loaded and working with telescope, we need to call
--- load_extension, somewhere after setup function:
-require('telescope').load_extension('fzf')
+-- load_extension, somewhere after setup function. Its native library is
+-- built on install; if that build failed, fall back to the default sorter.
+pcall(require('telescope').load_extension, 'fzf')
 
 -- Key mappings for telescope
 -- Fuzzy search for files in the current working directory
