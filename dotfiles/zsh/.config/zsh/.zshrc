@@ -23,3 +23,13 @@ autoload -U +X compinit && compinit
 # [ -f "${XDG_CONFIG_HOME}/zsh/prompt.zsh" ] && . "${XDG_CONFIG_HOME}/zsh/prompt.zsh"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# A remote program (tmux, vim) that enables mouse reporting and then dies with
+# its SSH connection never sends the codes to turn it off, so the terminal
+# keeps typing escape codes like "35;82;44M" whenever the mouse moves. Turn
+# mouse reporting and focus events off before each prompt to recover.
+_reset_mouse_reporting() {
+  printf '\e[?1000l\e[?1002l\e[?1003l\e[?1004l\e[?1006l\e[?1015l'
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _reset_mouse_reporting
